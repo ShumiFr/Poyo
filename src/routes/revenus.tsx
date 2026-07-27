@@ -1,9 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useRevenus } from '../store/useRevenus'
 
 export const Route = createFileRoute('/revenus')({
    component: RouteComponent,
 })
 
 function RouteComponent() {
-   return <div>Revenus</div>
+   const revenus = useRevenus((state) => state.revenus)
+
+   return <div>
+      {revenus.map((revenu) => (
+         <div key={revenu.id}>
+            <h3>{revenu.nom}</h3>
+            <p>{revenu.montant}</p>
+         </div>
+      ))}
+   </div>
 }
