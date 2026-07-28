@@ -1,8 +1,12 @@
+export type Frequence = 'regulier' | 'occasionnel'
+
+export type TypeAction = 'depense' | 'revenu' | 'enveloppeEntrant' | 'enveloppeSortant' | 'voeuEntrant' | 'voeuSortant'
+
 export interface Revenu {
    id: string
    nom: string
    montant: number
-   type: 'regulier' | 'ponctuel'
+   type: Frequence
    estRecu: boolean
 }
 
@@ -10,7 +14,7 @@ export interface Depense {
    id: string
    nom: string
    montant: number
-   type: 'regulier' | 'ponctuel'
+   type: Frequence
    estPaye: boolean
 }
 
@@ -35,5 +39,5 @@ export interface Flux {
    date: Date
    nom: string
    montant: number
-   type: 'depense' | 'revenu' | 'enveloppeEntrant' | 'enveloppeSortant' | 'voeuEntrant' | 'voeuSortant'
+   type: TypeAction
 }
