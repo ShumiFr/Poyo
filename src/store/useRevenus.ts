@@ -5,7 +5,8 @@ interface RevenusStore {
    revenus: Revenu[]
    ajouterRevenu: (revenu: Revenu) => void
    //modifierRevenu: (revenu: Revenu) => void
-   //retirerRevenu: (revenu: Revenu) => void
+   retirerRevenu: (id: string) => void
+   marquerRecu: (id: string) => void
 }
 
 export const useRevenus = create<RevenusStore>((set) => ({
@@ -23,4 +24,16 @@ export const useRevenus = create<RevenusStore>((set) => ({
       set((state) => ({
          revenus: [...state.revenus, revenu]
       })),
+
+   retirerRevenu: (id) =>
+      set((state) => ({
+         revenus: state.revenus.filter((revenu) => revenu.id !== id)
+      })),
+
+   marquerRecu: (id) =>
+      set((state) => ({
+         revenus: state.revenus.map((revenu) =>
+            revenu.id === id ? { ...revenu, estRecu: !revenu.estRecu } : revenu
+         )
+      }))
 }))
