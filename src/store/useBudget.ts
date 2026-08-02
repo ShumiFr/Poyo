@@ -57,7 +57,7 @@ export const useBudget = create<BudgetStore>((set) => ({
       {
          id: "1",
          nom: "Voiture",
-         montant: 50,
+         montant: 50.50,
          couleur: "blue",
          icone: "car"
       }

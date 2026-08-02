@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import calculerDisponible from "../lib/calculs";
 import { useBudget } from "../store/useBudget";
+import format from "../lib/format";
 
 export const Route = createFileRoute('/')({
    component: DashboardComponent,
@@ -17,8 +18,8 @@ function DashboardComponent() {
    return (
       <>
          <div>Dashboard</div>
-         <p>Disponible: {Math.max(0, totalDisponible)}</p>
-         {totalDisponible < 0 && <p>Il manque {-totalDisponible} €</p>}
+         <p>Disponible: {format(Math.max(0, totalDisponible))}</p>
+         {totalDisponible < 0 && <p>Il manque {format(-totalDisponible)}</p>}
       </>
    )
 }

@@ -48,10 +48,11 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Le disponible affiché ne descend jamais sous 0 (`Math.max(0, …)` à l'affichage)
    - [x] Si le disponible réel est négatif, une alerte affiche le manque (fonction garde la valeur brute)
 
-- **F3 · Formatage des montants en euros (FR)** — `SOCLE` 🔨
+- **F3 · Formatage des montants en euros (FR)** — `SOCLE` ✅
   En tant qu'utilisatrice, je veux des montants lisibles (« 1 139 € ») afin de lire mes chiffres d'un coup d'œil.
-   - [ ] Une fonction unique `fmt(n)` arrondit et ajoute « € » avec espace insécable
-   - [ ] Utilisée partout (jamais de concaténation manuelle)
+   - [x] Une fonction unique `format(n)` (`src/lib/format.ts`) via `Intl.NumberFormat('fr-FR')`, « € » avec espace insécable
+   - [x] Centimes affichés seulement s'il y en a (`Number.isInteger` → 0 ou 2 décimales)
+   - [x] Utilisée dans le dashboard (à réutiliser partout au fil des écrans)
 
 - **F4 · Navigation par onglets** — `SOCLE` ✅
   En tant qu'utilisatrice, je veux 6 onglets en bas afin de naviguer entre les écrans.
