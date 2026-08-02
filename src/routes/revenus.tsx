@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useRevenus } from '../store/useRevenus'
+import { useBudget } from '../store/useBudget'
 import Form from '../components/FormRevenu'
 
 export const Route = createFileRoute('/revenus')({
@@ -7,9 +7,9 @@ export const Route = createFileRoute('/revenus')({
 })
 
 function RouteComponent() {
-   const revenus = useRevenus((state) => state.revenus)
-   const retirerRevenu = useRevenus((state) => state.retirerRevenu)
-   const marquerRecu = useRevenus((state) => state.marquerRecu)
+   const revenus = useBudget((state) => state.revenus)
+   const retirerRevenu = useBudget((state) => state.retirerRevenu)
+   const marquerRecu = useBudget((state) => state.marquerRecu)
 
    function handleDelete(e: React.MouseEvent<HTMLButtonElement>) {
       e.preventDefault()

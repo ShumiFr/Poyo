@@ -1,12 +1,12 @@
 import { useState } from "react";
 import type { Depense } from "../types";
-import { useDepenses } from "../store/useDepenses";
+import { useBudget } from "../store/useBudget";
 
 export default function FormDepense() {
    const [nom, setNom] = useState("")
    const [montant, setMontant] = useState(0)
    const [type, setType] = useState<'regulier' | 'occasionnel'>('regulier')
-   const ajouterDepense = useDepenses((state) => state.ajouterDepense)
+   const ajouterDepense = useBudget((state) => state.ajouterDepense)
 
    function createDepense() {
       const depense: Depense = {
