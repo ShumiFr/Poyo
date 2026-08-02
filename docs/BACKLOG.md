@@ -37,17 +37,18 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 - **F1 · Un état central unique** — `SOCLE` ✅
   En tant que dev, je veux un store central (compte, charges, rentrées, enveloppes, vœux, journal) afin que tous les écrans lisent la même source de vérité.
-   - [ ] Un solde de compte (`compte`) sert de base à tous les calculs
-   - [ ] Chaque collection est typée et vit au même endroit
-   - [ ] Le solde et le « disponible » sont partagés entre écrans
+   - [x] Un solde de compte (`compte`) sert de base à tous les calculs
+   - [x] Chaque collection est typée et vit au même endroit
+   - [x] Le solde et le « disponible » sont partagés entre écrans
 
-- **F2 · Le « Disponible » est calculé, pas stocké** — `SOCLE` 🔨
+- **F2 · Le « Disponible » est calculé, pas stocké** — `SOCLE` ✅
   En tant qu'utilisatrice, je veux voir en temps réel ce qu'il me reste afin de savoir combien je peux placer ou dépenser.
-   - [ ] `disponible = compte − charges non payées − réserve courses − enveloppes − vœux`
-   - [ ] Toute action met le disponible à jour automatiquement
-   - [ ] Le disponible affiché ne descend jamais sous 0
+   - [x] `disponible = compte − charges non payées − réserve courses − enveloppes − vœux` (réserve courses à brancher avec D7)
+   - [x] Toute action met le disponible à jour automatiquement (état dérivé, `calculerDisponible`)
+   - [x] Le disponible affiché ne descend jamais sous 0 (`Math.max(0, …)` à l'affichage)
+   - [x] Si le disponible réel est négatif, une alerte affiche le manque (fonction garde la valeur brute)
 
-- **F3 · Formatage des montants en euros (FR)** — `SOCLE` ⬜
+- **F3 · Formatage des montants en euros (FR)** — `SOCLE` 🔨
   En tant qu'utilisatrice, je veux des montants lisibles (« 1 139 € ») afin de lire mes chiffres d'un coup d'œil.
    - [ ] Une fonction unique `fmt(n)` arrondit et ajoute « € » avec espace insécable
    - [ ] Utilisée partout (jamais de concaténation manuelle)
@@ -199,6 +200,14 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
   En tant qu'utilisatrice, je veux changer nom, couleur ou icône.
    - [ ] Réutilise le sélecteur style/couleur/icône de la création
 
+- **E6 · Dépenser directement depuis une enveloppe** — `V2` ⬜
+  En tant qu'utilisatrice, je veux payer une dépense avec l'argent d'une enveloppe afin qu'il quitte l'enveloppe ET le compte sans repasser par le disponible.
+   - [ ] Montant plafonné au contenu de l'enveloppe
+   - [ ] Diminue à la fois le solde de l'enveloppe et le `compte`
+   - [ ] N'augmente jamais le disponible (l'argent était déjà réservé)
+   - [ ] Entrée « Sortie (enveloppe) » dans l'historique
+   - [ ] Chaque carte enveloppe affiche son propre historique de paiements
+
 ## EPIC — Vœux (objectifs d'épargne)
 
 - **V1 · Lister les vœux avec progression** — `V1` ⬜
@@ -217,6 +226,13 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 - **V4 · Créer un vœu** — `V2` ⬜
   En tant qu'utilisatrice, je veux créer un projet (nom, objectif).
    - [ ] Nom + objectif (> 0) requis ; commence à 0 € épargné
+
+- **V5 · Marquer un vœu comme acheté (avec ajustement)** — `V2` ⬜
+  En tant qu'utilisatrice, je veux valider l'achat une fois la cible atteinte afin que le montant sorte du compte.
+   - [ ] Disponible seulement quand `montantActuel >= montantTotal`
+   - [ ] Confirmation du montant réel (l'article a pu augmenter ou baisser) avant de décompter
+   - [ ] Le montant réel est déduit du `compte` ; l'écart éventuel est rectifié (rendu au disponible ou repris)
+   - [ ] Entrée « Achat (vœu) » dans l'historique ; le vœu passe « terminé »
 
 ## EPIC — Historique (journal)
 
