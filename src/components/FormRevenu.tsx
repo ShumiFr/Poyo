@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRevenus } from "../store/useRevenus";
 import type { Revenu } from "../types";
 
-export default function Form() {
+export default function FormRevenu() {
    const [nom, setNom] = useState("")
    const [montant, setMontant] = useState(0)
    const [type, setType] = useState<'regulier' | 'occasionnel'>('regulier')

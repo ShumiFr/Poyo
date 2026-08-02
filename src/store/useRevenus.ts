@@ -4,7 +4,7 @@ import { create } from "zustand";
 interface RevenusStore {
    revenus: Revenu[]
    ajouterRevenu: (revenu: Revenu) => void
-   //modifierRevenu: (revenu: Revenu) => void
+   //modifierRevenu: (rid: string) => void
    retirerRevenu: (id: string) => void
    marquerRecu: (id: string) => void
 }

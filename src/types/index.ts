@@ -15,7 +15,7 @@ export interface Depense {
    nom: string
    montant: number
    type: Frequence
-   estPaye: boolean
+   estPayer: boolean
 }
 
 export interface Enveloppe {

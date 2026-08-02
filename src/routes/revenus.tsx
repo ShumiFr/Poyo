@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useRevenus } from '../store/useRevenus'
-import Form from '../components/Form'
+import Form from '../components/FormRevenu'
 
 export const Route = createFileRoute('/revenus')({
    component: RouteComponent,
