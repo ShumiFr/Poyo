@@ -9,6 +9,9 @@ export interface BudgetStore {
    voeux: Voeu[],
    historique: Flux[]
 
+   //Comptes
+   ajouterAuCompte: (montant: number) => void
+
    //Revenus
    ajouterRevenu: (revenu: Revenu) => void
    retirerRevenu: (id: string) => void
@@ -80,6 +83,9 @@ export const useBudget = create<BudgetStore>((set) => ({
          type: "depense"
       }
    ],
+
+   ajouterAuCompte: (montant) =>
+      set((state) => ({ compte: state.compte + montant })),
 
    ajouterRevenu: (revenu) =>
       set((state) => ({

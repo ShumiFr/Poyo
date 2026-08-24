@@ -264,11 +264,12 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 ## EPIC — Saisie (composants transversaux)
 
-- **S1 · Pavé numérique réutilisable** — `V1` ⬜
+- **S1 · Pavé numérique réutilisable** — `V1` ✅
   En tant qu'utilisatrice, je veux saisir un montant avec un clavier chiffré afin de le faire vite sur mobile.
-   - [ ] Un même composant pour : entrée d'argent, ajout/retrait enveloppe et vœu, ajustements
-   - [ ] Affiche le montant en cours ; bouton « valider » désactivé si invalide
-   - [ ] Reçoit titre, sous-titre et fonction de validation (props)
+   - [x] Composant générique `PaveNumerique` piloté par props (branché sur l'entrée d'argent de l'accueil ; réutilisable enveloppes/vœux)
+   - [x] Affiche le montant en cours ; bouton « valider » désactivé si invalide (`montant <= 0`)
+   - [x] Reçoit `titre`, `sousTitre` et `onValider(montant)` (callback) en props
+   - [x] Saisie décimale : virgule unique, 2 décimales max, conversion `,`→`.` centralisée
 
 - **S2 · Feuille de formulaire réutilisable** — `V2` ⬜
   En tant qu'utilisatrice, je veux un formulaire cohérent pour créer/éditer.
