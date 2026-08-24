@@ -59,10 +59,11 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Chaque onglet mène à sa route (TanStack Router)
    - [x] L'onglet actif est mis en avant
 
-- **F5 · Persistance locale** — `V1` ⬜
+- **F5 · Persistance locale** — `V1` ✅
   En tant qu'utilisatrice, je veux que mes données survivent au rechargement afin de ne pas tout ressaisir.
-   - [ ] Middleware `persist` de Zustand (localStorage)
-   - [ ] Recharger conserve compte, charges, enveloppes, vœux et historique
+   - [x] Middleware `persist` de Zustand (localStorage, clé `poyo-budget`)
+   - [x] Recharger conserve compte, charges, enveloppes, vœux et historique
+   - [x] Dates de l'historique reconstruites à l'affichage (`new Date(flux.date)`, car JSON les stocke en texte)
 
 ## EPIC — Accueil (vue d'ensemble)
 

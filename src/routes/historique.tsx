@@ -29,7 +29,7 @@ function RouteComponent() {
                <div key={flux.id} className="card">
                   <div>
                      <h3 className="h3">{flux.nom}</h3>
-                     <p>{style.tag} · {flux.date.toLocaleDateString('fr-FR')}</p>
+                     <p>{style.tag} · {new Date(flux.date).toLocaleDateString('fr-FR')}</p>
                   </div>
                   <h3 className={style.couleur}>{style.signe} {format(flux.montant)}</h3>
                </div>

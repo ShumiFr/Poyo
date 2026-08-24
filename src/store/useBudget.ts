@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { Depense, Enveloppe, Flux, Revenu, TypeAction, Voeu } from "../types";
 
 export interface BudgetStore {
@@ -43,7 +44,7 @@ export interface BudgetStore {
    */
 }
 
-export const useBudget = create<BudgetStore>((set, get) => ({
+export const useBudget = create<BudgetStore>()(persist((set, get) => ({
    compte: 0,
    revenus: [
       {
@@ -175,4 +176,4 @@ export const useBudget = create<BudgetStore>((set, get) => ({
       const voeu = get().voeux.find((v) => v.id === id)
       get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuSortant")
    }
-}))
+}), { name: "poyo-budget" }))
