@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useBudget } from '../store/useBudget'
 import Form from '../components/FormRevenu'
+import format from '../lib/format'
 
 export const Route = createFileRoute('/revenus')({
    component: RouteComponent,
@@ -29,11 +30,13 @@ function RouteComponent() {
 
    return <div>
       {revenus.map((revenu) => (
-         <div key={revenu.id}>
+         <div key={revenu.id} className={revenu.estRecu ? "recu" : ""}>
             <h3>{revenu.nom}</h3>
-            <p>{revenu.montant} €</p>
+            <p>{format(revenu.montant)}</p>
             <div>
-               <button id={revenu.id} onClick={handleRecu}>Reçu</button>
+               <button id={revenu.id} onClick={handleRecu}>
+                  {revenu.estRecu ? "Reçu ✓" : "Marquer reçu"}
+               </button>
             </div>
             <div>
                <button id={revenu.id} onClick={handleDelete}>Retirer</button>

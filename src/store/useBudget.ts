@@ -23,6 +23,7 @@ export interface BudgetStore {
 
    //Depenses
    ajouterDepense: (depense: Depense) => void
+   marquerPayer: (id: string) => void
 
    //Enveloppes
    ajouterArgentEnveloppe: (id: string, montant: number) => void
@@ -115,19 +116,40 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
          revenus: state.revenus.filter((revenu) => revenu.id !== id)
       })),
 
-   marquerRecu: (id) =>
+   marquerRecu: (id) => {
+      const revenu = get().revenus.find((r) => r.id === id)
+      if (!revenu) return
+      const devientRecu = !revenu.estRecu
       set((state) => ({
-         revenus: state.revenus.map((revenu) =>
-            revenu.id === id
-               ? { ...revenu, estRecu: !revenu.estRecu }
-               : revenu
-         )
-      })),
+         revenus: state.revenus.map((r) =>
+            r.id === id ? { ...r, estRecu: devientRecu } : r
+         ),
+         compte: devientRecu
+            ? state.compte + revenu.montant
+            : state.compte - revenu.montant,
+      }))
+      get().ajouterMouvement(revenu.nom, revenu.montant, devientRecu ? "revenu" : "depense")
+   },
 
    ajouterDepense: (depense) =>
       set((state) => ({
          depenses: [...state.depenses, depense]
       })),
+
+   marquerPayer: (id) => {
+      const depense = get().depenses.find((d) => d.id === id)
+      if (!depense) return
+      const devientPayee = !depense.estPayer
+      set((state) => ({
+         depenses: state.depenses.map((d) =>
+            d.id === id ? { ...d, estPayer: devientPayee } : d
+         ),
+         compte: devientPayee
+            ? state.compte - depense.montant
+            : state.compte + depense.montant,
+      }))
+      get().ajouterMouvement(depense.nom, depense.montant, devientPayee ? "depense" : "revenu")
+   },
 
    ajouterArgentEnveloppe: (id, montant) => {
       set((state) => ({

@@ -109,16 +109,16 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
   En tant qu'utilisatrice, je veux modifier le nom et le montant d'une rentrée.
    - [ ] Cliquer le montant ouvre l'édition ; enregistrer met à jour
 
-- **R4 · Marquer comme reçue** — `V1` 🔨
+- **R4 · Marquer comme reçue** — `V1` ✅
   En tant qu'utilisatrice, je veux marquer un revenu comme reçu afin qu'il s'ajoute à mon compte.
-   - [ ] Montant ajouté au compte + date de réception
-   - [ ] Entrée « Rentrée » dans l'historique
-   - [ ] Carte en état « reçu » (✓)
+   - [x] Montant ajouté au compte
+   - [x] Entrée « Rentrée » dans l'historique
+   - [x] Carte en état « reçu » (✓)
 
-- **R5 · Annuler une réception** — `V1` ⬜
+- **R5 · Annuler une réception** — `V1` 🔨
   En tant qu'utilisatrice, je veux annuler un « reçu » afin de corriger.
-   - [ ] Montant retiré du compte
-   - [ ] Entrée « annulé » dans l'historique
+   - [x] Re-cliquer bascule : montant retiré du compte + mouvement inverse journalisé
+   - [ ] Libellé dédié « annulé » (aujourd'hui : même nom, tag Sortie)
 
 - **R6 · Total reçu du mois** — `V2` ⬜
   En tant qu'utilisatrice, je veux voir le total déjà reçu ce mois.
@@ -144,16 +144,16 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
   En tant qu'utilisatrice, je veux modifier le montant d'une charge.
    - [ ] Cliquer le montant ouvre l'édition ; enregistrer met à jour
 
-- **D4 · Marquer comme payée** — `V1` ⬜
+- **D4 · Marquer comme payée** — `V1` ✅
   En tant qu'utilisatrice, je veux marquer une charge comme payée afin qu'elle soit déduite du compte.
-   - [ ] Montant retiré du compte + date
-   - [ ] Entrée « Sortie » dans l'historique ; carte grisée
-   - [ ] La charge sort du calcul « à venir »
+   - [x] Montant retiré du compte
+   - [x] Entrée « Sortie » dans l'historique ; carte grisée (classe `payee`)
+   - [x] La charge sort du calcul « à venir » (filtre `!estPayer` dans `calculerDisponible`)
 
-- **D5 · Annuler un paiement** — `V1` ⬜
+- **D5 · Annuler un paiement** — `V1` 🔨
   En tant qu'utilisatrice, je veux annuler un paiement afin de corriger.
-   - [ ] Montant rendu au compte
-   - [ ] Entrée « paiement annulé » dans l'historique
+   - [x] Re-cliquer bascule : montant rendu au compte + mouvement inverse journalisé
+   - [ ] Libellé dédié « paiement annulé » (aujourd'hui : même nom, tag Rentrée)
 
 - **D6 · Charge prévisionnelle ajustable** — `V2` ⬜
   En tant qu'utilisatrice, je veux un budget prévisionnel ajustable (± 10 €) puis « dépensé » afin de gérer un poste variable.
