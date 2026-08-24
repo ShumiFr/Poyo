@@ -18,8 +18,10 @@ function RouteComponent() {
 
    return (
       <>
-         <h2>Vœux</h2>
-         <p>{format(Math.max(0, totalDisponible))} libre</p>
+         <div className="screen-titre-row">
+            <h2>Vœux</h2>
+            <span className="screen-resume info">{format(Math.max(0, totalDisponible))} libre</span>
+         </div>
 
          {voeux.map((voeu) => (
             <VoeuCard key={voeu.id} voeu={voeu} disponible={totalDisponible} />

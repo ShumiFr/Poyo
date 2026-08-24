@@ -3,8 +3,8 @@ export function Modal({ isOpen, onClose, children, }: { isOpen: boolean; onClose
    if (!isOpen) return null;
    return (
       <div className="overlay" onClick={onClose}>
-         <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <button onClick={onClose}>✕</button>
+         <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="grabber" />
             {children}
          </div>
       </div>

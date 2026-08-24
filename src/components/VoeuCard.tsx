@@ -17,17 +17,12 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
 
    function handleValider(montant: number) {
       setOuvert(false)
-      if (montant <= disponible) {
-         ajouterArgent(voeu.id, montant)
-      } else {
-         setMontantEnAttente(montant)
-      }
+      if (montant <= disponible) ajouterArgent(voeu.id, montant)
+      else setMontantEnAttente(montant)
    }
 
    function confirmerDepassement() {
-      if (montantEnAttente !== null) {
-         ajouterArgent(voeu.id, montantEnAttente)
-      }
+      if (montantEnAttente !== null) ajouterArgent(voeu.id, montantEnAttente)
       setMontantEnAttente(null)
    }
 
@@ -37,40 +32,57 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
    }
 
    return (
-      <div id={voeu.id} className="card">
-         <div>
-            <h3 className="h3">{voeu.nom}</h3>
-            <p>{format(voeu.montantActuel)} sur {format(voeu.montantTotal)} · {Math.round(pourcentage)} %</p>
+      <div className="card">
+         <div className="voeu-tete">
+            <h3>{voeu.nom}</h3>
+            <span className="sur">sur {format(voeu.montantTotal)}</span>
          </div>
+         <p className="voeu-montant text-purple">
+            {format(voeu.montantActuel)} <span className="pct">· {Math.round(pourcentage)} %</span>
+         </p>
 
          <div className="barre">
             <div className="barre-remplie" style={{ width: pourcentage + '%' }} />
          </div>
 
-         <button onClick={() => setOuvertRetrait(true)}>Retirer</button>
-         <button onClick={() => setOuvert(true)}>Mettre de côté</button>
+         <div className="carte-actions">
+            <button className="btn" onClick={() => setOuvertRetrait(true)}>Retirer</button>
+            <button className="btn bg-purple" onClick={() => setOuvert(true)}>Mettre de côté</button>
+         </div>
 
          <Modal isOpen={ouvert} onClose={() => setOuvert(false)}>
             <PaveNumerique
-               titre="Mettre de côté"
-               sousTitre={voeu.nom}
+               titre={"Mettre de côté · " + voeu.nom}
+               sousTitre={"Disponible : " + format(disponible)}
+               couleur="purple"
+               libelleValider="Mettre de côté"
+               onAnnuler={() => setOuvert(false)}
                onValider={handleValider}
             />
          </Modal>
 
          <Modal isOpen={ouvertRetrait} onClose={() => setOuvertRetrait(false)}>
             <PaveNumerique
-               titre="Retirer du vœu"
-               sousTitre={voeu.nom}
+               titre={"Retirer · " + voeu.nom}
+               sousTitre={"Mis de côté : " + format(voeu.montantActuel)}
+               couleur="purple"
+               libelleValider="Retirer"
+               onAnnuler={() => setOuvertRetrait(false)}
                onValider={handleRetrait}
             />
          </Modal>
 
          <Modal isOpen={montantEnAttente !== null} onClose={() => setMontantEnAttente(null)}>
-            <p>Disponible sur le compte : {format(disponible)}</p>
-            <p>Montant à placer : <span className="text-red">{format(montantEnAttente ?? 0)}</span></p>
-            <button onClick={() => setMontantEnAttente(null)}>Annuler</button>
-            <button onClick={confirmerDepassement}>Valider</button>
+            <h2>Dépassement du disponible</h2>
+            <p className="sous">Vérifie avant de placer</p>
+            <ul className="legende">
+               <li><span className="libelle">Disponible sur le compte</span><span className="valeur">{format(disponible)}</span></li>
+               <li><span className="libelle">Montant à placer</span><span className="valeur text-red">{format(montantEnAttente ?? 0)}</span></li>
+            </ul>
+            <div className="pave-actions">
+               <button className="btn" onClick={() => setMontantEnAttente(null)}>Annuler</button>
+               <button className="btn bg-purple" onClick={confirmerDepassement}>Valider</button>
+            </div>
          </Modal>
       </div>
    )

@@ -1,22 +1,53 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import { Clock, ArrowDown, FileText, Mail, Flag, AlignLeft, RefreshCw } from "lucide-react";
+import { useBudget } from "../store/useBudget";
+import { libelleMois } from "../lib/format";
 
 export const Route = createRootRoute({
-  component: RootComponent,
+   component: RootComponent,
 });
 
-function RootComponent() {
-  return (
-    <>
-      <nav style={{ display: "flex", gap: "1rem", padding: "1rem" }}>
-        <Link to="/">Accueil</Link>
-        <Link to="/revenus">Revenus</Link>
-        <Link to="/depenses">Depenses</Link>
-        <Link to="/enveloppes">Enveloppes</Link>
-        <Link to="/souhaits">Souhaits</Link>
-        <Link to="/historique">Historique</Link>
-      </nav>
+const onglets = [
+   { to: "/", label: "Accueil", Icone: Clock, exact: true },
+   { to: "/revenus", label: "Rentrées", Icone: ArrowDown },
+   { to: "/depenses", label: "Dépenses", Icone: FileText },
+   { to: "/enveloppes", label: "Enveloppes", Icone: Mail },
+   { to: "/souhaits", label: "Vœux", Icone: Flag },
+   { to: "/historique", label: "Historique", Icone: AlignLeft },
+] as const;
 
-      <Outlet />
-    </>
-  );
+function RootComponent() {
+   const mois = useBudget((state) => state.mois);
+   const annee = useBudget((state) => state.annee);
+
+   return (
+      <>
+         <header className="app-header">
+            <div>
+               <div className="titre">Poyo</div>
+               <div className="mois">{libelleMois(mois, annee)}</div>
+            </div>
+            {/* Nouveau mois : sera branché avec la story M1 */}
+            <button className="btn-mois"><RefreshCw size={16} /> Nouveau mois</button>
+         </header>
+
+         <main className="screen">
+            <Outlet />
+         </main>
+
+         <nav className="bottom-nav">
+            {onglets.map((item) => (
+               <Link
+                  key={item.to}
+                  to={item.to}
+                  activeOptions={"exact" in item ? { exact: true } : undefined}
+                  activeProps={{ className: "actif" }}
+               >
+                  <item.Icone size={20} />
+                  {item.label}
+               </Link>
+            ))}
+         </nav>
+      </>
+   );
 }

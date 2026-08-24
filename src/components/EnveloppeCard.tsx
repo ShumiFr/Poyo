@@ -15,17 +15,12 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
 
    function handleValider(montant: number) {
       setOuvert(false)
-      if (montant <= disponible) {
-         ajouterArgent(enveloppe.id, montant)
-      } else {
-         setMontantEnAttente(montant)
-      }
+      if (montant <= disponible) ajouterArgent(enveloppe.id, montant)
+      else setMontantEnAttente(montant)
    }
 
    function confirmerDepassement() {
-      if (montantEnAttente !== null) {
-         ajouterArgent(enveloppe.id, montantEnAttente)
-      }
+      if (montantEnAttente !== null) ajouterArgent(enveloppe.id, montantEnAttente)
       setMontantEnAttente(null)
    }
 
@@ -35,36 +30,51 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
    }
 
    return (
-      <div id={enveloppe.id} className="card">
-         <div>
-            <span>{enveloppe.icone}</span>
-            <h3 className="h3">{enveloppe.nom}</h3>
+      <div className="card">
+         <div className="carte-tete">
+            <span className={"icone-box text-" + enveloppe.couleur}>{enveloppe.icone}</span>
+            <h3>{enveloppe.nom}</h3>
+            <span className={"montant text-" + enveloppe.couleur}>{format(enveloppe.montant)}</span>
          </div>
-         <h3 className={"text-" + enveloppe.couleur}>{format(enveloppe.montant)}</h3>
-         <button onClick={() => setOuvertRetrait(true)}>Retirer</button>
-         <button className={"bg-" + enveloppe.couleur} onClick={() => setOuvert(true)}>Ajouter</button>
+
+         <div className="carte-actions">
+            <button className="btn" onClick={() => setOuvertRetrait(true)}>Retirer</button>
+            <button className={"btn bg-" + enveloppe.couleur} onClick={() => setOuvert(true)}>Ajouter</button>
+         </div>
 
          <Modal isOpen={ouvert} onClose={() => setOuvert(false)}>
             <PaveNumerique
-               titre="Ajouter dans l'enveloppe"
-               sousTitre={enveloppe.nom}
+               titre={"Ajouter · " + enveloppe.nom}
+               sousTitre={"Disponible : " + format(disponible)}
+               couleur={enveloppe.couleur}
+               libelleValider="Ajouter"
+               onAnnuler={() => setOuvert(false)}
                onValider={handleValider}
             />
          </Modal>
 
          <Modal isOpen={ouvertRetrait} onClose={() => setOuvertRetrait(false)}>
             <PaveNumerique
-               titre="Retirer de l'enveloppe"
-               sousTitre={enveloppe.nom}
+               titre={"Retirer · " + enveloppe.nom}
+               sousTitre={"Dans l'enveloppe : " + format(enveloppe.montant)}
+               couleur={enveloppe.couleur}
+               libelleValider="Retirer"
+               onAnnuler={() => setOuvertRetrait(false)}
                onValider={handleRetrait}
             />
          </Modal>
 
          <Modal isOpen={montantEnAttente !== null} onClose={() => setMontantEnAttente(null)}>
-            <p>Disponible sur le compte : {format(disponible)}</p>
-            <p>Montant à placer : <span className="text-red">{format(montantEnAttente ?? 0)}</span></p>
-            <button onClick={() => setMontantEnAttente(null)}>Annuler</button>
-            <button onClick={confirmerDepassement}>Valider</button>
+            <h2>Dépassement du disponible</h2>
+            <p className="sous">Vérifie avant de placer</p>
+            <ul className="legende">
+               <li><span className="libelle">Disponible sur le compte</span><span className="valeur">{format(disponible)}</span></li>
+               <li><span className="libelle">Montant à placer</span><span className="valeur text-red">{format(montantEnAttente ?? 0)}</span></li>
+            </ul>
+            <div className="pave-actions">
+               <button className="btn" onClick={() => setMontantEnAttente(null)}>Annuler</button>
+               <button className="btn btn-primary" onClick={confirmerDepassement}>Valider</button>
+            </div>
          </Modal>
       </div>
    )

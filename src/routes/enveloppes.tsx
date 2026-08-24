@@ -18,8 +18,10 @@ function RouteComponent() {
 
   return (
     <>
-      <h2>Enveloppes</h2>
-      <p>{format(Math.max(0, totalDisponible))} libre</p>
+      <div className="screen-titre-row">
+        <h2>Enveloppes</h2>
+        <span className="screen-resume info">{format(Math.max(0, totalDisponible))} libre</span>
+      </div>
 
       {enveloppes.map((enveloppe) => (
         <EnveloppeCard key={enveloppe.id} enveloppe={enveloppe} disponible={totalDisponible} />
