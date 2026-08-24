@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Depense, Enveloppe, Flux, Revenu, Voeu } from "../types";
+import type { Depense, Enveloppe, Flux, Revenu, TypeAction, Voeu } from "../types";
 
 export interface BudgetStore {
    compte: number,
@@ -8,6 +8,9 @@ export interface BudgetStore {
    enveloppes: Enveloppe[],
    voeux: Voeu[],
    historique: Flux[]
+
+   //Historique
+   ajouterMouvement: (nom: string, montant: number, type: TypeAction) => void
 
    //Comptes
    ajouterAuCompte: (montant: number) => void
@@ -23,24 +26,24 @@ export interface BudgetStore {
    //Enveloppes
    ajouterArgentEnveloppe: (id: string, montant: number) => void
    retirerArgentEnveloppe: (id: string, montant: number) => void
+
+   //Voeux
+   ajouterArgentVoeu: (id: string, montant: number) => void
+   retirerArgentVoeu: (id: string, montant: number) => void
    /*retirerDepense: (id: string) => void
    marquerPayer: (id: string) => void
 
    //Enveloppes
    ajouterEnveloppe: (enveloppe: Enveloppe) => void
    retirerEnveloppe: (id: string) => void
-   ajouterArgentEnveloppe: (id: string, montant: number) => void
-   retirerArgentEnveloppe: (id: string, montant: number) => void
 
    //Voeux
    ajouterVoeu: (voeu: Voeu) => void
    retirerVoeu: (id: string) => void
-   ajouterArgentVoeu: (id: string, montant: number) => void
-   retirerArgentVoeu: (id: string, montant: number) => void
    */
 }
 
-export const useBudget = create<BudgetStore>((set) => ({
+export const useBudget = create<BudgetStore>((set, get) => ({
    compte: 0,
    revenus: [
       {
@@ -88,8 +91,18 @@ export const useBudget = create<BudgetStore>((set) => ({
       }
    ],
 
-   ajouterAuCompte: (montant) =>
-      set((state) => ({ compte: state.compte + montant })),
+   ajouterMouvement: (nom, montant, type) =>
+      set((state) => ({
+         historique: [
+            { id: crypto.randomUUID(), date: new Date(), nom, montant, type },
+            ...state.historique,
+         ]
+      })),
+
+   ajouterAuCompte: (montant) => {
+      set((state) => ({ compte: state.compte + montant }))
+      get().ajouterMouvement("Entrée d'argent", montant, "revenu")
+   },
 
    ajouterRevenu: (revenu) =>
       set((state) => ({
@@ -115,16 +128,19 @@ export const useBudget = create<BudgetStore>((set) => ({
          depenses: [...state.depenses, depense]
       })),
 
-   ajouterArgentEnveloppe: (id, montant) =>
+   ajouterArgentEnveloppe: (id, montant) => {
       set((state) => ({
          enveloppes: state.enveloppes.map((enveloppe) =>
             enveloppe.id === id
                ? { ...enveloppe, montant: enveloppe.montant + montant }
                : enveloppe
          )
-      })),
+      }))
+      const enveloppe = get().enveloppes.find((e) => e.id === id)
+      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeEntrant")
+   },
 
-   retirerArgentEnveloppe: (id, montant) =>
+   retirerArgentEnveloppe: (id, montant) => {
       set((state) => ({
          enveloppes: state.enveloppes.map((enveloppe) =>
             enveloppe.id === id
@@ -132,4 +148,31 @@ export const useBudget = create<BudgetStore>((set) => ({
                : enveloppe
          )
       }))
+      const enveloppe = get().enveloppes.find((e) => e.id === id)
+      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeSortant")
+   },
+
+   ajouterArgentVoeu: (id, montant) => {
+      set((state) => ({
+         voeux: state.voeux.map((voeu) =>
+            voeu.id === id
+               ? { ...voeu, montantActuel: voeu.montantActuel + montant }
+               : voeu
+         )
+      }))
+      const voeu = get().voeux.find((v) => v.id === id)
+      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuEntrant")
+   },
+
+   retirerArgentVoeu: (id, montant) => {
+      set((state) => ({
+         voeux: state.voeux.map((voeu) =>
+            voeu.id === id
+               ? { ...voeu, montantActuel: Math.max(0, voeu.montantActuel - montant) }
+               : voeu
+         )
+      }))
+      const voeu = get().voeux.find((v) => v.id === id)
+      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuSortant")
+   }
 }))

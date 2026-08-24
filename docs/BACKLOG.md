@@ -87,10 +87,10 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [ ] charges → Dépenses, enveloppes → Enveloppes, etc.
    - [ ] Part « disponible » → entrée d'argent
 
-- **A5 · Entrée d'argent rapide** — `V1` ⬜
+- **A5 · Entrée d'argent rapide** — `V1` ✅
   En tant qu'utilisatrice, je veux ajouter une somme à mon compte afin d'enregistrer une rentrée imprévue.
-   - [ ] Le bouton ouvre le pavé numérique (S1)
-   - [ ] Valider augmente le compte + crée une entrée d'historique
+   - [x] Le bouton ouvre le pavé numérique (S1)
+   - [x] Valider augmente le compte + crée une entrée d'historique
 
 ## EPIC — Rentrées (revenus)
 
@@ -182,15 +182,15 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
   En tant qu'utilisatrice, je veux voir mes enveloppes (icône, couleur, montant).
    - [x] Une carte par enveloppe (`EnveloppeCard`) ; en-tête « X € libre » (= disponible partagé)
 
-- **E2 · Ajouter dans une enveloppe** — `V1` 🔨
+- **E2 · Ajouter dans une enveloppe** — `V1` ✅
   En tant qu'utilisatrice, je veux mettre de l'argent dans une enveloppe afin de le réserver.
    - [x] Pavé numérique ; si le montant dépasse le disponible, popup de confirmation (place quand même, disponible passe négatif + alerte)
-   - [ ] Entrée « mis de côté » dans l'historique (attend H2)
+   - [x] Entrée « mis de côté » dans l'historique
 
-- **E3 · Retirer d'une enveloppe** — `V1` 🔨
+- **E3 · Retirer d'une enveloppe** — `V1` ✅
   En tant qu'utilisatrice, je veux reprendre de l'argent d'une enveloppe afin de le rendre disponible.
    - [x] Plafonné au contenu de l'enveloppe (`Math.max(0, …)` dans l'action)
-   - [ ] Entrée « repris » dans l'historique (attend H2)
+   - [x] Entrée « repris » dans l'historique
 
 - **E4 · Créer une enveloppe** — `V2` ⬜
   En tant qu'utilisatrice, je veux créer une enveloppe (nom, couleur, icône).
@@ -211,18 +211,18 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 ## EPIC — Vœux (objectifs d'épargne)
 
-- **V1 · Lister les vœux avec progression** — `V1` ⬜
+- **V1 · Lister les vœux avec progression** — `V1` ✅
   En tant qu'utilisatrice, je veux voir chaque projet avec sa barre de progression (X € sur Y €, %).
-   - [ ] Barre remplie proportionnelle à `montant / cible`
-   - [ ] Pourcentage plafonné à 100 %
+   - [x] Barre remplie proportionnelle à `montantActuel / montantTotal` (`VoeuCard`)
+   - [x] Pourcentage plafonné à 100 % (`Math.min(100, …)`)
 
-- **V2 · Mettre de côté pour un vœu** — `V1` ⬜
+- **V2 · Mettre de côté pour un vœu** — `V1` ✅
   En tant qu'utilisatrice, je veux ajouter au vœu afin de faire avancer mon objectif.
-   - [ ] Pavé numérique ; plafonné au disponible ; entrée « mis de côté »
+   - [x] Pavé numérique ; popup de dépassement (comme E2) ; entrée « mis de côté »
 
-- **V3 · Retirer d'un vœu** — `V1` ⬜
+- **V3 · Retirer d'un vœu** — `V1` ✅
   En tant qu'utilisatrice, je veux reprendre de l'argent d'un vœu afin de le réaffecter.
-   - [ ] Plafonné au montant épargné ; entrée « repris »
+   - [x] Plafonné au montant épargné (`Math.max(0, …)`) ; entrée « repris »
 
 - **V4 · Créer un vœu** — `V2` ⬜
   En tant qu'utilisatrice, je veux créer un projet (nom, objectif).
@@ -239,15 +239,16 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 > Le journal n'est pas saisi à la main : il se remplit tout seul à chaque action (story transversale).
 
-- **H1 · Afficher le journal** — `V1` ⬜
+- **H1 · Afficher le journal** — `V1` ✅
   En tant qu'utilisatrice, je veux la liste de mes mouvements, plus récent en premier.
-   - [ ] Chaque ligne : date, libellé, tag (Rentrée/Sortie/Mis de côté/Repris), montant coloré
-   - [ ] Signe et couleur selon le type de mouvement
+   - [x] Chaque ligne : date, libellé, tag (Rentrée/Sortie/Mis de côté/Repris), montant coloré
+   - [x] Signe et couleur selon le type de mouvement (table `affichage` par `TypeAction`)
 
-- **H2 · Journalisation automatique** — `V1` ⬜
+- **H2 · Journalisation automatique** — `V1` 🔨
   En tant que système, je veux qu'une entrée soit créée à chaque action d'argent.
-   - [ ] Recevoir, payer, mettre de côté, retirer… ajoutent chacun une ligne
-   - [ ] Une fonction unique `ajouterMouvement()` centralise l'écriture
+   - [x] Une fonction unique `ajouterMouvement()` centralise l'écriture (appelée via `get()`)
+   - [x] Branchée : entrée d'argent, ajout/retrait enveloppe, mise de côté/retrait vœu
+   - [ ] Reste à brancher au fil des stories : payer une charge (D4), recevoir un revenu (R4)
 
 ## EPIC — Passage au nouveau mois
 
