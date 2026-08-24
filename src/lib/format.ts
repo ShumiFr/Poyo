@@ -7,3 +7,12 @@ export default function format(number: number): string {
       maximumFractionDigits: decimales,
    }).format(number)
 }
+
+// Libellé « Août 2026 » à partir d'un index de mois (0-11) et d'une année.
+export function libelleMois(mois: number, annee: number): string {
+   const texte = new Date(annee, mois).toLocaleDateString('fr-FR', {
+      month: 'long',
+      year: 'numeric',
+   })
+   return texte.charAt(0).toUpperCase() + texte.slice(1)
+}

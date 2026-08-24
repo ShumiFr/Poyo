@@ -4,6 +4,8 @@ import type { Depense, Enveloppe, Flux, Revenu, TypeAction, Voeu } from "../type
 
 export interface BudgetStore {
    compte: number,
+   mois: number,
+   annee: number,
    revenus: Revenu[],
    depenses: Depense[],
    enveloppes: Enveloppe[],
@@ -20,10 +22,13 @@ export interface BudgetStore {
    ajouterRevenu: (revenu: Revenu) => void
    retirerRevenu: (id: string) => void
    marquerRecu: (id: string) => void
+   modifierRevenu: (id: string, nom: string, montant: number) => void
 
    //Depenses
    ajouterDepense: (depense: Depense) => void
+   retirerDepense: (id: string) => void
    marquerPayer: (id: string) => void
+   modifierDepense: (id: string, nom: string, montant: number) => void
 
    //Enveloppes
    ajouterArgentEnveloppe: (id: string, montant: number) => void
@@ -32,21 +37,12 @@ export interface BudgetStore {
    //Voeux
    ajouterArgentVoeu: (id: string, montant: number) => void
    retirerArgentVoeu: (id: string, montant: number) => void
-   /*retirerDepense: (id: string) => void
-   marquerPayer: (id: string) => void
-
-   //Enveloppes
-   ajouterEnveloppe: (enveloppe: Enveloppe) => void
-   retirerEnveloppe: (id: string) => void
-
-   //Voeux
-   ajouterVoeu: (voeu: Voeu) => void
-   retirerVoeu: (id: string) => void
-   */
 }
 
 export const useBudget = create<BudgetStore>()(persist((set, get) => ({
    compte: 0,
+   mois: new Date().getMonth(),
+   annee: new Date().getFullYear(),
    revenus: [
       {
          id: "1",
@@ -128,12 +124,35 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
             ? state.compte + revenu.montant
             : state.compte - revenu.montant,
       }))
-      get().ajouterMouvement(revenu.nom, revenu.montant, devientRecu ? "revenu" : "depense")
+      get().ajouterMouvement(
+         devientRecu ? revenu.nom : "Annulation — " + revenu.nom,
+         revenu.montant,
+         devientRecu ? "revenu" : "depense"
+      )
    },
+
+   modifierRevenu: (id, nom, montant) =>
+      set((state) => ({
+         revenus: state.revenus.map((r) =>
+            r.id === id ? { ...r, nom, montant } : r
+         )
+      })),
 
    ajouterDepense: (depense) =>
       set((state) => ({
          depenses: [...state.depenses, depense]
+      })),
+
+   retirerDepense: (id) =>
+      set((state) => ({
+         depenses: state.depenses.filter((depense) => depense.id !== id)
+      })),
+
+   modifierDepense: (id, nom, montant) =>
+      set((state) => ({
+         depenses: state.depenses.map((d) =>
+            d.id === id ? { ...d, nom, montant } : d
+         )
       })),
 
    marquerPayer: (id) => {
@@ -148,7 +167,11 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
             ? state.compte - depense.montant
             : state.compte + depense.montant,
       }))
-      get().ajouterMouvement(depense.nom, depense.montant, devientPayee ? "depense" : "revenu")
+      get().ajouterMouvement(
+         devientPayee ? depense.nom : "Annulation — " + depense.nom,
+         depense.montant,
+         devientPayee ? "depense" : "revenu"
+      )
    },
 
    ajouterArgentEnveloppe: (id, montant) => {

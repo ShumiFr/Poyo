@@ -73,10 +73,10 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [ ] Centre = disponible « sur » le total du compte
    - [ ] Couleurs par catégorie
 
-- **A2 · Légende détaillée** — `V1` ⬜
+- **A2 · Légende détaillée** — `V1` ✅
   En tant qu'utilisatrice, je veux la liste Disponible / Charges à venir / Enveloppes / Vœux avec montants afin de lire les totaux.
-   - [ ] 4 lignes : pastille, libellé, sous-titre (nb d'éléments), montant
-   - [ ] Montants issus des calculs dérivés (F2)
+   - [x] 4 lignes : pastille, libellé, nb d'éléments, montant
+   - [x] Montants issus des calculs dérivés (F2)
 
 - **A3 · Déplier / replier une catégorie** — `V2` ⬜
   En tant qu'utilisatrice, je veux détailler ou regrouper une catégorie du donut afin de voir soit le total, soit chaque poste.
@@ -95,19 +95,19 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 ## EPIC — Rentrées (revenus)
 
-- **R1 · Lister les rentrées en 2 sections** — `V1` 🔨
+- **R1 · Lister les rentrées en 2 sections** — `V1` ✅
   En tant qu'utilisatrice, je veux mes revenus séparés en « Réguliers » et « Ponctuelles ».
-   - [ ] Deux sections repliables, chacune avec son total
-   - [ ] « Ponctuelles » n'apparaît que s'il y en a
+   - [x] Deux sections repliables, chacune avec son total
+   - [x] « Ponctuelles » n'apparaît que s'il y en a
 
 - **R2 · Créer une rentrée** — `V1` ✅
   En tant qu'utilisatrice, je veux créer une rentrée (nom, type, montant).
    - [x] Formulaire nom / type / montant
    - [x] Ajoutée à la liste, non reçue par défaut
 
-- **R3 · Éditer une rentrée** — `V1` ⬜
+- **R3 · Éditer une rentrée** — `V1` ✅
   En tant qu'utilisatrice, je veux modifier le nom et le montant d'une rentrée.
-   - [ ] Cliquer le montant ouvre l'édition ; enregistrer met à jour
+   - [x] Cliquer le montant ouvre l'édition (`FormEdition`) ; enregistrer met à jour
 
 - **R4 · Marquer comme reçue** — `V1` ✅
   En tant qu'utilisatrice, je veux marquer un revenu comme reçu afin qu'il s'ajoute à mon compte.
@@ -115,10 +115,10 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Entrée « Rentrée » dans l'historique
    - [x] Carte en état « reçu » (✓)
 
-- **R5 · Annuler une réception** — `V1` 🔨
+- **R5 · Annuler une réception** — `V1` ✅
   En tant qu'utilisatrice, je veux annuler un « reçu » afin de corriger.
    - [x] Re-cliquer bascule : montant retiré du compte + mouvement inverse journalisé
-   - [ ] Libellé dédié « annulé » (aujourd'hui : même nom, tag Sortie)
+   - [x] Libellé « Annulation — <nom> » dans l'historique
 
 - **R6 · Total reçu du mois** — `V2` ⬜
   En tant qu'utilisatrice, je veux voir le total déjà reçu ce mois.
@@ -130,19 +130,19 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 ## EPIC — Dépenses (charges)
 
-- **D1 · Lister par famille** — `V1` 🔨
+- **D1 · Lister par famille** — `V1` ✅
   En tant qu'utilisatrice, je veux mes charges rangées en sections (Régulières, Courses, Prévisionnel, Ponctuelles).
-   - [ ] Sections repliables avec total
-   - [ ] Les sections vides ne s'affichent pas
+   - [x] Sections repliables avec total (Régulières / Ponctuelles ; Courses & Prévisionnel arriveront avec D6/D7)
+   - [x] Les sections vides ne s'affichent pas
 
 - **D2 · Créer une dépense** — `V1` ✅
   En tant qu'utilisatrice, je veux créer une dépense (nom, type, montant).
    - [x] Formulaire dans une modale ouverte depuis la page
    - [x] Ajoutée à la bonne section, non payée par défaut
 
-- **D3 · Éditer le montant** — `V1` ⬜
+- **D3 · Éditer le montant** — `V1` ✅
   En tant qu'utilisatrice, je veux modifier le montant d'une charge.
-   - [ ] Cliquer le montant ouvre l'édition ; enregistrer met à jour
+   - [x] Cliquer le montant ouvre l'édition (`FormEdition`) ; enregistrer met à jour
 
 - **D4 · Marquer comme payée** — `V1` ✅
   En tant qu'utilisatrice, je veux marquer une charge comme payée afin qu'elle soit déduite du compte.
@@ -150,10 +150,10 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Entrée « Sortie » dans l'historique ; carte grisée (classe `payee`)
    - [x] La charge sort du calcul « à venir » (filtre `!estPayer` dans `calculerDisponible`)
 
-- **D5 · Annuler un paiement** — `V1` 🔨
+- **D5 · Annuler un paiement** — `V1` ✅
   En tant qu'utilisatrice, je veux annuler un paiement afin de corriger.
    - [x] Re-cliquer bascule : montant rendu au compte + mouvement inverse journalisé
-   - [ ] Libellé dédié « paiement annulé » (aujourd'hui : même nom, tag Rentrée)
+   - [x] Libellé « Annulation — <nom> » dans l'historique
 
 - **D6 · Charge prévisionnelle ajustable** — `V2` ⬜
   En tant qu'utilisatrice, je veux un budget prévisionnel ajustable (± 10 €) puis « dépensé » afin de gérer un poste variable.
@@ -167,13 +167,13 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [ ] « Courses faites » déduit du compte + journalise (réversible)
    - [ ] Semaines non faites comptées dans le « à venir »
 
-- **D8 · Total « à venir »** — `V1` ⬜
+- **D8 · Total « à venir »** — `V1` ✅
   En tant qu'utilisatrice, je veux voir le total des charges à payer.
-   - [ ] En-tête = charges non payées + réserve courses
+   - [x] En-tête = charges non payées (+ réserve courses quand D7 existera)
 
-- **D9 · Supprimer une dépense** — `V1` ⬜
+- **D9 · Supprimer une dépense** — `V1` ✅
   En tant qu'utilisatrice, je veux supprimer une charge.
-   - [ ] Disparaît de sa section (filter par id)
+   - [x] Disparaît de sa section (filter par id)
 
 ## EPIC — Enveloppes
 
@@ -245,11 +245,10 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Chaque ligne : date, libellé, tag (Rentrée/Sortie/Mis de côté/Repris), montant coloré
    - [x] Signe et couleur selon le type de mouvement (table `affichage` par `TypeAction`)
 
-- **H2 · Journalisation automatique** — `V1` 🔨
+- **H2 · Journalisation automatique** — `V1` ✅
   En tant que système, je veux qu'une entrée soit créée à chaque action d'argent.
    - [x] Une fonction unique `ajouterMouvement()` centralise l'écriture (appelée via `get()`)
-   - [x] Branchée : entrée d'argent, ajout/retrait enveloppe, mise de côté/retrait vœu
-   - [ ] Reste à brancher au fil des stories : payer une charge (D4), recevoir un revenu (R4)
+   - [x] Branchée partout : entrée d'argent, enveloppes, vœux, revenu reçu (R4), charge payée (D4), annulations
 
 ## EPIC — Passage au nouveau mois
 
@@ -260,9 +259,9 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [ ] Les semaines de courses sont régénérées
    - [ ] Les soldes des enveloppes et vœux sont **conservés**
 
-- **M2 · Afficher le mois courant** — `V1` ⬜
+- **M2 · Afficher le mois courant** — `V1` ✅
   En tant qu'utilisatrice, je veux voir « Mois Année » dans l'en-tête.
-   - [ ] Libellé type « Juillet 2026 » dérivé de l'index du mois
+   - [x] Libellé « Août 2026 » via `libelleMois(mois, annee)` (state `mois`/`annee`, init date du jour ; M1 le fera avancer)
 
 ## EPIC — Saisie (composants transversaux)
 
