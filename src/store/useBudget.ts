@@ -19,6 +19,10 @@ export interface BudgetStore {
 
    //Depenses
    ajouterDepense: (depense: Depense) => void
+
+   //Enveloppes
+   ajouterArgentEnveloppe: (id: string, montant: number) => void
+   retirerArgentEnveloppe: (id: string, montant: number) => void
    /*retirerDepense: (id: string) => void
    marquerPayer: (id: string) => void
 
@@ -100,12 +104,32 @@ export const useBudget = create<BudgetStore>((set) => ({
    marquerRecu: (id) =>
       set((state) => ({
          revenus: state.revenus.map((revenu) =>
-            revenu.id === id ? { ...revenu, estRecu: !revenu.estRecu } : revenu
+            revenu.id === id
+               ? { ...revenu, estRecu: !revenu.estRecu }
+               : revenu
          )
       })),
 
    ajouterDepense: (depense) =>
       set((state) => ({
          depenses: [...state.depenses, depense]
+      })),
+
+   ajouterArgentEnveloppe: (id, montant) =>
+      set((state) => ({
+         enveloppes: state.enveloppes.map((enveloppe) =>
+            enveloppe.id === id
+               ? { ...enveloppe, montant: enveloppe.montant + montant }
+               : enveloppe
+         )
+      })),
+
+   retirerArgentEnveloppe: (id, montant) =>
+      set((state) => ({
+         enveloppes: state.enveloppes.map((enveloppe) =>
+            enveloppe.id === id
+               ? { ...enveloppe, montant: Math.max(0, enveloppe.montant - montant) }
+               : enveloppe
+         )
       }))
 }))

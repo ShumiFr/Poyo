@@ -1,3 +1,4 @@
+import format from '../lib/format'
 import type { Depense } from '../types'
 
 export default function DepenseCard({ depense }: { depense: Depense }) {
@@ -7,7 +8,7 @@ export default function DepenseCard({ depense }: { depense: Depense }) {
             <h3 className="h3">{depense.nom}</h3>
             {depense.type ? <p>{depense.montant} € / mois</p> : <p>Occasionnel</p>}
          </div>
-         <h3 className="h3-depense">{depense.montant} €</h3>
+         <h3 className="h3-depense">{format(depense.montant)}</h3>
       </div>
    )
 }

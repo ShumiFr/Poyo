@@ -178,19 +178,19 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 > Mouvements plafonnés : on ne réserve pas plus que le disponible, on ne retire pas plus que le contenu. Chaque mouvement est journalisé.
 
-- **E1 · Lister les enveloppes** — `V1` ⬜
+- **E1 · Lister les enveloppes** — `V1` ✅
   En tant qu'utilisatrice, je veux voir mes enveloppes (icône, couleur, montant).
-   - [ ] Une carte par enveloppe ; en-tête « X € libre » (= disponible)
+   - [x] Une carte par enveloppe (`EnveloppeCard`) ; en-tête « X € libre » (= disponible partagé)
 
-- **E2 · Ajouter dans une enveloppe** — `V1` ⬜
+- **E2 · Ajouter dans une enveloppe** — `V1` 🔨
   En tant qu'utilisatrice, je veux mettre de l'argent dans une enveloppe afin de le réserver.
-   - [ ] Pavé numérique ; montant plafonné au disponible
-   - [ ] Entrée « mis de côté » dans l'historique
+   - [x] Pavé numérique ; si le montant dépasse le disponible, popup de confirmation (place quand même, disponible passe négatif + alerte)
+   - [ ] Entrée « mis de côté » dans l'historique (attend H2)
 
-- **E3 · Retirer d'une enveloppe** — `V1` ⬜
+- **E3 · Retirer d'une enveloppe** — `V1` 🔨
   En tant qu'utilisatrice, je veux reprendre de l'argent d'une enveloppe afin de le rendre disponible.
-   - [ ] Plafonné au contenu de l'enveloppe
-   - [ ] Entrée « repris » dans l'historique
+   - [x] Plafonné au contenu de l'enveloppe (`Math.max(0, …)` dans l'action)
+   - [ ] Entrée « repris » dans l'historique (attend H2)
 
 - **E4 · Créer une enveloppe** — `V2` ⬜
   En tant qu'utilisatrice, je veux créer une enveloppe (nom, couleur, icône).
