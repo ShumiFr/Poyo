@@ -33,4 +33,14 @@ describe("calculerDisponible", () => {
    it("peut être négatif (le clamp à 0 est fait à l'affichage, pas ici)", () => {
       expect(calculerDisponible(100, [depense(500)], [], [])).toBe(-400)
    })
+
+   it("soustrait la réserve courses (semaines non faites uniquement)", () => {
+      const courses = [
+         { budget: 25, faite: false },
+         { budget: 25, faite: true },  // déjà faite → déjà sortie du compte
+         { budget: 30, faite: false },
+      ]
+      // 1000 − (25 + 30) = 945
+      expect(calculerDisponible(1000, [], [], [], courses)).toBe(945)
+   })
 })

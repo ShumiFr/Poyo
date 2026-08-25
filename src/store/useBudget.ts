@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Depense, Enveloppe, Flux, Frequence, Revenu, TypeAction, Voeu } from "../types";
+import type { Depense, Enveloppe, Flux, Frequence, Previsionnel, Revenu, SemaineCourses, TypeAction, Voeu } from "../types";
+import { genererSemaines } from "../lib/courses";
 
 export interface BudgetStore {
    compte: number,
@@ -11,10 +12,22 @@ export interface BudgetStore {
    depenses: Depense[],
    enveloppes: Enveloppe[],
    voeux: Voeu[],
+   courses: SemaineCourses[],
+   previsionnels: Previsionnel[],
    historique: Flux[]
 
    //Mois
    nouveauMois: (soldeReel: number) => void
+
+   //Courses (D7)
+   ajusterSemaine: (index: number, delta: number) => void
+   basculerSemaineFaite: (index: number) => void
+
+   //Prévisionnel (D6)
+   ajouterPrevisionnel: (nom: string, montant: number) => void
+   retirerPrevisionnel: (id: string) => void
+   ajusterPrevisionnel: (id: string, delta: number) => void
+   basculerPrevisionnelDepense: (id: string) => void
 
    //Historique
    ajouterMouvement: (nom: string, montant: number, type: TypeAction, refId?: string) => void
@@ -90,6 +103,10 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
          estTermine: false
       }
    ],
+   courses: genererSemaines(new Date().getMonth(), new Date().getFullYear()),
+   previsionnels: [
+      { id: "1", nom: "Loisirs & sorties", montant: 60, estDepense: false }
+   ],
    historique: [
       {
          id: "1",
@@ -106,18 +123,83 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
       if (ecart !== 0) {
          get().ajouterMouvement("Ajustement de solde", Math.abs(ecart), ecart > 0 ? "revenu" : "depense")
       }
+      set((state) => {
+         const nouveauMoisIndex = (state.mois + 1) % 12
+         const nouvelleAnnee = state.mois === 11 ? state.annee + 1 : state.annee
+         return {
+            mois: nouveauMoisIndex,
+            annee: nouvelleAnnee,
+            // le solde réel confirmé devient le compte et le solde reporté du nouveau mois
+            compte: soldeReel,
+            soldeReporte: soldeReel,
+            // les charges et revenus repassent à payer / recevoir
+            depenses: state.depenses.map((d) => ({ ...d, estPayer: false })),
+            revenus: state.revenus.map((r) => ({ ...r, estRecu: false })),
+            // les semaines de courses sont régénérées pour le nouveau mois
+            courses: genererSemaines(nouveauMoisIndex, nouvelleAnnee),
+            // les budgets prévisionnels repassent « non dépensés » (montant conservé)
+            previsionnels: state.previsionnels.map((p) => ({ ...p, estDepense: false })),
+            // enveloppes, vœux et historique sont conservés
+         }
+      })
+   },
+
+   ajusterSemaine: (index, delta) =>
       set((state) => ({
-         // le mois avance ; après décembre (11) on passe à janvier de l'année suivante
-         mois: (state.mois + 1) % 12,
-         annee: state.mois === 11 ? state.annee + 1 : state.annee,
-         // le solde réel confirmé devient le compte et le solde reporté du nouveau mois
-         compte: soldeReel,
-         soldeReporte: soldeReel,
-         // les charges et revenus repassent à payer / recevoir
-         depenses: state.depenses.map((d) => ({ ...d, estPayer: false })),
-         revenus: state.revenus.map((r) => ({ ...r, estRecu: false })),
-         // enveloppes, vœux et historique sont conservés
+         courses: state.courses.map((s, i) =>
+            i === index ? { ...s, budget: Math.max(0, s.budget + delta) } : s
+         )
+      })),
+
+   basculerSemaineFaite: (index) => {
+      const semaine = get().courses[index]
+      if (!semaine) return
+      const devientFaite = !semaine.faite
+      set((state) => ({
+         courses: state.courses.map((s, i) =>
+            i === index ? { ...s, faite: devientFaite } : s
+         ),
+         compte: devientFaite ? state.compte - semaine.budget : state.compte + semaine.budget,
       }))
+      get().ajouterMouvement(
+         devientFaite ? "Courses semaine " + (index + 1) : "Annulation — Courses semaine " + (index + 1),
+         semaine.budget,
+         devientFaite ? "depense" : "revenu"
+      )
+   },
+
+   ajouterPrevisionnel: (nom, montant) =>
+      set((state) => ({
+         previsionnels: [...state.previsionnels, { id: crypto.randomUUID(), nom, montant, estDepense: false }]
+      })),
+
+   retirerPrevisionnel: (id) =>
+      set((state) => ({
+         previsionnels: state.previsionnels.filter((p) => p.id !== id)
+      })),
+
+   ajusterPrevisionnel: (id, delta) =>
+      set((state) => ({
+         previsionnels: state.previsionnels.map((p) =>
+            p.id === id ? { ...p, montant: Math.max(0, p.montant + delta) } : p
+         )
+      })),
+
+   basculerPrevisionnelDepense: (id) => {
+      const prev = get().previsionnels.find((p) => p.id === id)
+      if (!prev) return
+      const devientDepense = !prev.estDepense
+      set((state) => ({
+         previsionnels: state.previsionnels.map((p) =>
+            p.id === id ? { ...p, estDepense: devientDepense } : p
+         ),
+         compte: devientDepense ? state.compte - prev.montant : state.compte + prev.montant,
+      }))
+      get().ajouterMouvement(
+         devientDepense ? prev.nom : "Annulation — " + prev.nom,
+         prev.montant,
+         devientDepense ? "depense" : "revenu"
+      )
    },
 
    ajouterMouvement: (nom, montant, type, refId) =>

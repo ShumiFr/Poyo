@@ -17,10 +17,12 @@ function RouteComponent() {
    const depenses = useBudget((state) => state.depenses)
    const voeux = useBudget((state) => state.voeux)
    const enveloppes = useBudget((state) => state.enveloppes)
+   const courses = useBudget((state) => state.courses)
+   const previsionnels = useBudget((state) => state.previsionnels)
 
    const [creation, setCreation] = useState(false)
 
-   const totalDisponible = calculerDisponible(compte, depenses, enveloppes, voeux)
+   const totalDisponible = calculerDisponible(compte, depenses, enveloppes, voeux, courses, previsionnels)
 
    return (
       <>

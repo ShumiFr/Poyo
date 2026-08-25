@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import calculerDisponible from "../lib/calculs";
+import { reserveCourses } from "../lib/courses";
 import { useBudget } from "../store/useBudget";
 import format from "../lib/format";
 import { Modal } from "../components/Modal";
@@ -18,6 +19,8 @@ function DashboardComponent() {
    const depenses = useBudget((state) => state.depenses)
    const enveloppes = useBudget((state) => state.enveloppes)
    const voeux = useBudget((state) => state.voeux)
+   const courses = useBudget((state) => state.courses)
+   const previsionnels = useBudget((state) => state.previsionnels)
    const ajouterAuCompte = useBudget((state) => state.ajouterAuCompte)
 
    const [open, setOpen] = useState(false)
@@ -25,15 +28,16 @@ function DashboardComponent() {
    // Montants dérivés
    const revenusPercus = revenus.filter((r) => r.estRecu).reduce((s, r) => s + r.montant, 0)
    const chargesPayees = depenses.filter((d) => d.estPayer).reduce((s, d) => s + d.montant, 0)
-   const chargesAVenir = depenses.filter((d) => !d.estPayer).reduce((s, d) => s + d.montant, 0)
+   const previsionnelPrevu = previsionnels.filter((p) => !p.estDepense).reduce((s, p) => s + p.montant, 0)
+   const chargesAVenir = depenses.filter((d) => !d.estPayer).reduce((s, d) => s + d.montant, 0) + reserveCourses(courses) + previsionnelPrevu
    const totalEnveloppes = enveloppes.reduce((s, e) => s + e.montant, 0)
    const totalVoeux = voeux.reduce((s, v) => s + v.montantActuel, 0)
 
    // Écart entre le compte réel et sa reconstitution (entrées rapides / ajustements) → le récap boucle toujours
    const autresEntrees = compte - (soldeReporte + revenusPercus - chargesPayees)
 
-   // Ce qu'il reste = compte − charges à venir − enveloppes − vœux (le disponible, une seule définition partout)
-   const reste = calculerDisponible(compte, depenses, enveloppes, voeux)
+   // Ce qu'il reste = compte − charges à venir − réserve courses − prévisionnel − enveloppes − vœux
+   const reste = calculerDisponible(compte, depenses, enveloppes, voeux, courses, previsionnels)
    const restePositif = Math.max(0, reste)
 
    // Donut : le compte réparti en reste / charges à venir / enveloppes / vœux

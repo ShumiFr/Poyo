@@ -140,7 +140,7 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 - **D1 · Lister par famille** — `V1` ✅
   En tant qu'utilisatrice, je veux mes charges rangées en sections (Régulières, Courses, Prévisionnel, Ponctuelles).
-   - [x] Sections repliables avec total (Régulières / Ponctuelles ; Courses & Prévisionnel arriveront avec D6/D7)
+   - [x] Sections repliables avec total (Régulières / Courses / Ponctuelles ; Prévisionnel arrivera avec D6)
    - [x] Les sections vides ne s'affichent pas
 
 - **D2 · Créer une dépense** — `V1` ✅
@@ -163,21 +163,24 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Re-cliquer bascule : montant rendu au compte + mouvement inverse journalisé
    - [x] Libellé « Annulation — <nom> » dans l'historique
 
-- **D6 · Charge prévisionnelle ajustable** — `V2` ⬜
+- **D6 · Charge prévisionnelle ajustable** — `V2` ✅
   En tant qu'utilisatrice, je veux un budget prévisionnel ajustable (± 10 €) puis « dépensé » afin de gérer un poste variable.
-   - [ ] Boutons − / + modifient le montant prévu
-   - [ ] « Dépensé ce mois » déduit du compte et journalise
+   - [x] Boutons − / + modifient le montant prévu (`ajusterPrevisionnel`, plancher 0)
+   - [x] « Dépensé ce mois » déduit du compte et journalise (réversible)
+   - [x] Non dépensé → compté dans le « à venir » et le disponible (comme la réserve courses)
+   - [x] Création/suppression ; repasse « non dépensé » au nouveau mois — couvert par des tests
 
-- **D7 · Budget courses par semaine** — `V2` ⬜
+- **D7 · Budget courses par semaine** — `V2` ✅
   En tant qu'utilisatrice, je veux un budget de courses réparti par semaine afin de lisser mes dépenses alimentaires.
-   - [ ] Nombre de semaines calculé selon le mois
-   - [ ] Chaque semaine a un budget ajustable (± 5 €)
-   - [ ] « Courses faites » déduit du compte + journalise (réversible)
-   - [ ] Semaines non faites comptées dans le « à venir »
+   - [x] Nombre de semaines calculé selon le mois (`lib/courses`, `Math.ceil(jours/7)`)
+   - [x] Chaque semaine a un budget ajustable (± 5 €, `ajusterSemaine`)
+   - [x] « Courses faites » déduit du compte + journalise (réversible, `basculerSemaineFaite`)
+   - [x] Semaines non faites comptées dans le « à venir » et le disponible (`reserveCourses`)
+   - [x] Régénérées au nouveau mois (M1) — couvert par des tests
 
 - **D8 · Total « à venir »** — `V1` ✅
   En tant qu'utilisatrice, je veux voir le total des charges à payer.
-   - [x] En-tête = charges non payées (+ réserve courses quand D7 existera)
+   - [x] En-tête = charges non payées + réserve courses (D7) + prévisionnel non dépensé (D6)
 
 - **D9 · Supprimer une dépense** — `V1` ✅
   En tant qu'utilisatrice, je veux supprimer une charge.
@@ -267,14 +270,14 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 ## EPIC — Passage au nouveau mois
 
-- **M1 · Démarrer un nouveau mois** — `V2` 🔨
+- **M1 · Démarrer un nouveau mois** — `V2` ✅
   En tant qu'utilisatrice, je veux repartir sur un mois neuf afin de recommencer mon suivi.
    - [x] Le mois affiché avance d'un cran (bascule d'année après décembre) — via confirmation
    - [x] Pop-up : confirmer/corriger le solde réel de fin de mois (prérempli au solde suivi)
    - [x] Un écart entre solde réel et solde suivi est journalisé en « Ajustement de solde »
    - [x] Le solde confirmé devient le `compte` et le `soldeReporte` du nouveau mois
    - [x] Charges et rentrées repassent « non payé / non reçu »
-   - [ ] Les semaines de courses sont régénérées (attend D7)
+   - [x] Les semaines de courses sont régénérées ; prévisionnels repassent « non dépensés »
    - [x] Les soldes des enveloppes et vœux sont **conservés** (historique aussi)
 
 - **M2 · Afficher le mois courant** — `V1` ✅

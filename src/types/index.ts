@@ -34,6 +34,18 @@ export interface Voeu {
    estTermine: boolean
 }
 
+export interface SemaineCourses {
+   budget: number
+   faite: boolean
+}
+
+export interface Previsionnel {
+   id: string
+   nom: string
+   montant: number
+   estDepense: boolean
+}
+
 export interface Flux {
    id: string
    date: Date

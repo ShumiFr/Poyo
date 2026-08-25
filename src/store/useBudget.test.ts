@@ -20,6 +20,8 @@ beforeEach(() => {
       depenses: [],
       enveloppes: [],
       voeux: [],
+      courses: [],
+      previsionnels: [],
       historique: [],
    })
 })
@@ -109,6 +111,52 @@ describe("dépense immédiate (page Dépenses)", () => {
       expect(s.compte).toBe(460)
       expect(s.enveloppes[0].montant).toBe(60)
       expect(s.depenses[0]).toMatchObject({ montant: 40, estPayer: true })
+   })
+})
+
+describe("courses (D7)", () => {
+   it("cocher « courses faites » déduit le budget du compte et journalise", () => {
+      useBudget.setState({ compte: 500, courses: [{ budget: 25, faite: false }] })
+      useBudget.getState().basculerSemaineFaite(0)
+
+      const s = useBudget.getState()
+      expect(s.compte).toBe(475)
+      expect(s.courses[0].faite).toBe(true)
+      expect(s.historique[0]).toMatchObject({ montant: 25, type: "depense" })
+   })
+
+   it("décocher rend l'argent au compte (réversible)", () => {
+      useBudget.setState({ compte: 475, courses: [{ budget: 25, faite: true }] })
+      useBudget.getState().basculerSemaineFaite(0)
+      expect(useBudget.getState().compte).toBe(500)
+      expect(useBudget.getState().courses[0].faite).toBe(false)
+   })
+
+   it("ajuster le budget ne descend jamais sous 0", () => {
+      useBudget.setState({ courses: [{ budget: 5, faite: false }] })
+      useBudget.getState().ajusterSemaine(0, -5)
+      expect(useBudget.getState().courses[0].budget).toBe(0)
+      useBudget.getState().ajusterSemaine(0, -5)
+      expect(useBudget.getState().courses[0].budget).toBe(0)
+   })
+})
+
+describe("prévisionnel (D6)", () => {
+   it("« dépensé ce mois » déduit le budget du compte et journalise", () => {
+      useBudget.setState({ compte: 500, previsionnels: [{ id: "p1", nom: "Loisirs", montant: 60, estDepense: false }] })
+      useBudget.getState().basculerPrevisionnelDepense("p1")
+
+      const s = useBudget.getState()
+      expect(s.compte).toBe(440)
+      expect(s.previsionnels[0].estDepense).toBe(true)
+      expect(s.historique[0]).toMatchObject({ montant: 60, type: "depense" })
+   })
+
+   it("ajuster le budget ne descend jamais sous 0", () => {
+      useBudget.setState({ previsionnels: [{ id: "p1", nom: "Loisirs", montant: 10, estDepense: false }] })
+      useBudget.getState().ajusterPrevisionnel("p1", -10)
+      useBudget.getState().ajusterPrevisionnel("p1", -10)
+      expect(useBudget.getState().previsionnels[0].montant).toBe(0)
    })
 })
 
