@@ -17,7 +17,7 @@ export interface BudgetStore {
    nouveauMois: (soldeReel: number) => void
 
    //Historique
-   ajouterMouvement: (nom: string, montant: number, type: TypeAction) => void
+   ajouterMouvement: (nom: string, montant: number, type: TypeAction, refId?: string) => void
 
    //Comptes
    ajouterAuCompte: (montant: number) => void
@@ -38,6 +38,7 @@ export interface BudgetStore {
    ajouterEnveloppe: (enveloppe: Enveloppe) => void
    ajouterArgentEnveloppe: (id: string, montant: number) => void
    retirerArgentEnveloppe: (id: string, montant: number) => void
+   depenserDepuisEnveloppe: (id: string, montant: number) => void
 
    //Voeux
    ajouterVoeu: (voeu: Voeu) => void
@@ -116,10 +117,10 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
       }))
    },
 
-   ajouterMouvement: (nom, montant, type) =>
+   ajouterMouvement: (nom, montant, type, refId) =>
       set((state) => ({
          historique: [
-            { id: crypto.randomUUID(), date: new Date(), nom, montant, type },
+            { id: crypto.randomUUID(), date: new Date(), nom, montant, type, refId },
             ...state.historique,
          ]
       })),
@@ -215,7 +216,7 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
          )
       }))
       const enveloppe = get().enveloppes.find((e) => e.id === id)
-      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeEntrant")
+      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeEntrant", id)
    },
 
    retirerArgentEnveloppe: (id, montant) => {
@@ -227,7 +228,22 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
          )
       }))
       const enveloppe = get().enveloppes.find((e) => e.id === id)
-      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeSortant")
+      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeSortant", id)
+   },
+
+   depenserDepuisEnveloppe: (id, montant) => {
+      const enveloppe = get().enveloppes.find((e) => e.id === id)
+      if (!enveloppe) return
+      // On ne dépense jamais plus que le contenu de l'enveloppe.
+      const sortie = Math.min(montant, enveloppe.montant)
+      set((state) => ({
+         // l'argent quitte l'enveloppe ET le compte (le disponible ne bouge pas)
+         compte: state.compte - sortie,
+         enveloppes: state.enveloppes.map((e) =>
+            e.id === id ? { ...e, montant: e.montant - sortie } : e
+         ),
+      }))
+      get().ajouterMouvement(enveloppe.nom, sortie, "depense", id)
    },
 
    ajouterVoeu: (voeu) =>
@@ -244,7 +260,7 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
          )
       }))
       const voeu = get().voeux.find((v) => v.id === id)
-      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuEntrant")
+      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuEntrant", id)
    },
 
    retirerArgentVoeu: (id, montant) => {
@@ -256,6 +272,6 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
          )
       }))
       const voeu = get().voeux.find((v) => v.id === id)
-      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuSortant")
+      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuSortant", id)
    }
 }), { name: "poyo-budget" }))

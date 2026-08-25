@@ -40,4 +40,5 @@ export interface Flux {
    nom: string
    montant: number
    type: TypeAction
+   refId?: string   // enveloppe/vœu concerné, pour un historique par carte
 }

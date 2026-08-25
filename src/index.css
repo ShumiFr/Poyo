@@ -122,6 +122,7 @@ button { font: inherit; cursor: pointer; }
 
 /* tête de carte : icône + nom + montant */
 .carte-tete { display: flex; align-items: center; gap: 12px; }
+.carte-tete-btn { width: 100%; background: none; border: 0; padding: 0; text-align: left; cursor: pointer; }
 .carte-tete h3 { flex: 1; }
 .carte-tete .montant { font-weight: 700; font-size: 17px; }
 .icone-box {

@@ -66,6 +66,30 @@ describe("enveloppes (E2/E3)", () => {
    })
 })
 
+describe("dépenser depuis une enveloppe (E6)", () => {
+   it("baisse l'enveloppe ET le compte, sans toucher au disponible", () => {
+      useBudget.setState({ compte: 500, enveloppes: [enveloppe(100)] })
+      // disponible avant = 500 − 100 (enveloppe) = 400
+      useBudget.getState().depenserDepuisEnveloppe("e1", 30)
+
+      const s = useBudget.getState()
+      expect(s.compte).toBe(470)
+      expect(s.enveloppes[0].montant).toBe(70)
+      // disponible après = 470 − 70 = 400 : inchangé
+      expect(s.compte - s.enveloppes[0].montant).toBe(400)
+      expect(s.historique[0]).toMatchObject({ montant: 30, type: "depense", refId: "e1" })
+   })
+
+   it("est plafonné au contenu de l'enveloppe", () => {
+      useBudget.setState({ compte: 500, enveloppes: [enveloppe(100)] })
+      useBudget.getState().depenserDepuisEnveloppe("e1", 250) // plus que le contenu
+
+      const s = useBudget.getState()
+      expect(s.enveloppes[0].montant).toBe(0)
+      expect(s.compte).toBe(400) // seulement 100 dépensés
+   })
+})
+
 describe("nouveauMois (M1)", () => {
    it("avance le mois, reporte le solde réel et journalise l'écart", () => {
       useBudget.setState({

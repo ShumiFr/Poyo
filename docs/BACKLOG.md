@@ -210,13 +210,13 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
   En tant qu'utilisatrice, je veux changer nom, couleur ou icône.
    - [ ] Réutilise le sélecteur style/couleur/icône de la création
 
-- **E6 · Dépenser directement depuis une enveloppe** — `V2` ⬜
+- **E6 · Dépenser directement depuis une enveloppe** — `V2` ✅
   En tant qu'utilisatrice, je veux payer une dépense avec l'argent d'une enveloppe afin qu'il quitte l'enveloppe ET le compte sans repasser par le disponible.
-   - [ ] Montant plafonné au contenu de l'enveloppe
-   - [ ] Diminue à la fois le solde de l'enveloppe et le `compte`
-   - [ ] N'augmente jamais le disponible (l'argent était déjà réservé)
-   - [ ] Entrée « Sortie (enveloppe) » dans l'historique
-   - [ ] Chaque carte enveloppe affiche son propre historique de paiements
+   - [x] Montant plafonné au contenu de l'enveloppe (`Math.min`)
+   - [x] Diminue à la fois le solde de l'enveloppe et le `compte` (`depenserDepuisEnveloppe`)
+   - [x] N'augmente jamais le disponible (les deux baisses se compensent) — couvert par un test
+   - [x] Entrée « Sortie » dans l'historique (type `depense`, `refId` = enveloppe)
+   - [x] Chaque carte affiche son historique (clic sur l'en-tête ; filtre par `refId`)
 
 ## EPIC — Vœux (objectifs d'épargne)
 
