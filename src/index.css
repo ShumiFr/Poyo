@@ -383,6 +383,15 @@ button { font: inherit; cursor: pointer; }
 .ligne-solde { display: flex; align-items: center; justify-content: space-between; }
 .ligne-solde .valeur { font-weight: 800; font-size: 18px; color: var(--ink); }
 
+/* récap de l'accueil (A6) */
+.recap-ligne { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+.recap-ligne span:last-child { font-weight: 600; }
+.recap-ligne.sous-total { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 12px; }
+.recap-ligne.sous-total span { font-weight: 700; color: var(--ink); }
+.recap-ligne.total { border-top: 2px solid var(--line); margin-top: 4px; padding-top: 12px; }
+.recap-ligne.total span { font-weight: 800; font-size: 18px; }
+.recap-ligne.total span:first-child { color: var(--ink); }
+
 .carte-donut { display: flex; justify-content: center; }
 .donut { position: relative; width: 220px; height: 220px; }
 .donut svg { display: block; }
@@ -395,9 +404,9 @@ button { font: inherit; cursor: pointer; }
    justify-content: center;
    text-align: center;
 }
-.donut-label { color: var(--muted); font-size: 13px; }
-.donut-valeur { color: var(--teal); font-size: 34px; font-weight: 800; line-height: 1.1; }
-.donut-sous { color: var(--muted); font-size: 13px; }
+.donut-label { color: var(--muted); font-size: 12px; }
+.donut-valeur { color: var(--teal); font-size: 24px; font-weight: 800; line-height: 1.1; white-space: nowrap; }
+.donut-sous { color: var(--muted); font-size: 12px; white-space: nowrap; }
 
 /* ------------------------------------------------------------
    Légende de l'accueil (A2)

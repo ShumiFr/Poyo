@@ -93,10 +93,13 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Le bouton ouvre le pavé numérique (S1)
    - [x] Valider augmente le compte + crée une entrée d'historique
 
-- **A6 · Solde reporté du mois dernier** — `V2` ✅
-  En tant qu'utilisatrice, je veux voir le solde reporté du mois précédent afin de savoir sur quelle base s'ajoutent mes revenus et dépenses.
-   - [x] Case « Solde du mois dernier » sur l'accueil (state `soldeReporte`)
-   - [x] Fixé au report (M1), sert de base au compte du mois
+- **A6 · Récap détaillé de l'accueil** — `V2` ✅
+  En tant qu'utilisatrice, je veux voir le détail ligne à ligne de mon argent afin de comprendre d'où vient « ce qu'il me reste ».
+   - [x] Solde du mois dernier (`soldeReporte`) + revenus perçus − charges payées = **sur le compte**
+   - [x] − charges à venir − enveloppes − vœux = **ce qu'il me reste** (= disponible, une seule définition partout)
+   - [x] Charges **payées** et **à venir** affichées séparément
+   - [x] Ligne « Autres entrées » pour que le récap boucle toujours sur le compte réel
+   - [x] Le donut répartit le compte ; centre = ce qu'il reste « sur » le compte
 
 ## EPIC — Rentrées (revenus)
 
@@ -287,12 +290,13 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 ---
 
-## État du code au moment de la rédaction
+## État du code
 
-- ✅ Routing TanStack file-based en place (`__root.tsx`, routes `/`, `/revenus`, `/depenses`, etc.)
-- ✅ Store `useRevenus` : liste, ajouter, retirer, marquer reçu
-- ✅ Écran Revenus + formulaire de création (`FormRevenu`)
-- 🔨 Store `useDepenses` + écran Dépenses + `DepenseCard` + modale de création au niveau page
-- ⬜ Tout le reste (voir stories ci-dessus)
+- ✅ Store central unique `useBudget` (compte, soldeReporte, mois/année, revenus, dépenses, enveloppes, vœux, historique) + persistance localStorage
+- ✅ Disponible calculé (`lib/calculs`), formatage € et mois (`lib/format`), registre d'icônes (`lib/styleEnveloppe`)
+- ✅ Tous les écrans stylés d'après la maquette (coquille + bottom-nav, cartes, bottom-sheets, pavé, donut)
+- ✅ Toute la V1 + V2 faites : E4/V4 (création), A1 (donut), M1 (nouveau mois), A6 (récap accueil)
+- 🧪 Tests Vitest : `lib/calculs.test.ts` + `store/useBudget.test.ts` (11 tests) — `npm test`
+- ⬜ Reste : E5, E6, D6/D7 (courses/prévisionnel), A3/A4 (interactions donut), S2
 
-**Prochaine étape logique** : le Socle (F1→F3), c'est-à-dire faire converger vers un compte central + disponible calculé, avant d'ajouter enveloppes/vœux qui en dépendent.
+**Convention** : à chaque story qui touche une logique de calcul ou une action du store, ajouter/mettre à jour un test.

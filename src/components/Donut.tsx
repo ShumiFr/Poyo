@@ -11,8 +11,8 @@ export default function Donut({
    centre: string
    sousCentre: string
 }) {
-   const R = 60          // rayon du cercle
-   const W = 22          // épaisseur de l'anneau
+   const R = 66          // rayon du cercle
+   const W = 16          // épaisseur de l'anneau (fine → grand trou central)
    const C = 2 * Math.PI * R
 
    // On accumule la position de chaque segment le long du cercle.
