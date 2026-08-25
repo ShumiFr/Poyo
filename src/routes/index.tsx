@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import calculerDisponible from "../lib/calculs";
 import { reserveCourses } from "../lib/courses";
@@ -24,7 +24,6 @@ function DashboardComponent() {
    const previsionnels = useBudget((state) => state.previsionnels)
    const ajouterAuCompte = useBudget((state) => state.ajouterAuCompte)
 
-   const navigate = useNavigate()
    const [open, setOpen] = useState(false)
    const [envDepliees, setEnvDepliees] = useState(false)
 
@@ -45,17 +44,16 @@ function DashboardComponent() {
 
    // Donut : le compte réparti en reste / charges à venir / enveloppes / vœux
    const totalRing = restePositif + chargesAVenir + totalEnveloppes + totalVoeux
-   const versEnveloppes = () => navigate({ to: "/enveloppes" })
-   // Enveloppes : soit un segment agrégé, soit un segment par enveloppe (déplié)
+   // Donut informatif : un segment par catégorie, étiquette au survol (pas cliquable)
    const segmentsEnveloppes = envDepliees
-      ? enveloppes.map((e) => ({ valeur: e.montant, couleur: COULEURS_HEX[e.couleur] ?? "#4f7f96", onClick: versEnveloppes }))
-      : [{ valeur: totalEnveloppes, couleur: "#4f7f96", onClick: versEnveloppes }]
+      ? enveloppes.map((e) => ({ valeur: e.montant, couleur: COULEURS_HEX[e.couleur] ?? "#4f7f96", label: e.nom + " · " + format(e.montant) }))
+      : [{ valeur: totalEnveloppes, couleur: "#4f7f96", label: "Enveloppes · " + format(totalEnveloppes) }]
 
    const segments = [
-      { valeur: restePositif, couleur: "var(--teal)", onClick: () => setOpen(true) },
-      { valeur: chargesAVenir, couleur: "var(--navy)", onClick: () => navigate({ to: "/depenses" }) },
+      { valeur: restePositif, couleur: "var(--teal)", label: "Disponible · " + format(restePositif) },
+      { valeur: chargesAVenir, couleur: "var(--navy)", label: "Charges à venir · " + format(chargesAVenir) },
       ...segmentsEnveloppes,
-      { valeur: totalVoeux, couleur: "var(--purple)", onClick: () => navigate({ to: "/souhaits" }) },
+      { valeur: totalVoeux, couleur: "var(--purple)", label: "Vœux · " + format(totalVoeux) },
    ]
 
    return (
@@ -66,7 +64,6 @@ function DashboardComponent() {
                total={totalRing}
                centre={format(restePositif)}
                sousCentre={"sur " + format(compte)}
-               onCentre={() => setOpen(true)}
             />
          </div>
 

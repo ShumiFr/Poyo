@@ -84,10 +84,8 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Déplié = un segment par enveloppe (couleur propre) ; replié = un segment agrégé
    - [ ] (extension possible : même dépliage pour charges / vœux)
 
-- **A4 · Cliquer un segment pour naviguer** — `V2` ✅
-  En tant qu'utilisatrice, je veux cliquer une part afin d'ouvrir l'écran de cette catégorie.
-   - [x] charges → Dépenses, enveloppes → Enveloppes, vœux → Vœux (`useNavigate`)
-   - [x] Part « disponible » / centre du donut → entrée d'argent
+- **A4 · Cliquer un segment pour naviguer** — `V2` ❌ (abandonné)
+  Choix produit : le donut reste **purement informatif** (non cliquable). À la place, survol desktop → étiquette « catégorie · montant » par segment (le clic navigation a été retiré à la demande de l'utilisatrice).
 
 - **A5 · Entrée d'argent rapide** — `V1` ✅
   En tant qu'utilisatrice, je veux ajouter une somme à mon compte afin d'enregistrer une rentrée imprévue.
