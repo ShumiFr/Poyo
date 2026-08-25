@@ -402,6 +402,13 @@ button { font: inherit; cursor: pointer; }
 .recap-ligne.total { border-top: 2px solid var(--line); margin-top: 4px; padding-top: 12px; }
 .recap-ligne.total span { font-weight: 800; font-size: 18px; }
 .recap-ligne.total span:first-child { color: var(--ink); }
+.recap-manque {
+   margin-top: 8px;
+   text-align: right;
+   color: var(--red);
+   font-weight: 600;
+   font-size: 14px;
+}
 
 .carte-donut { display: flex; justify-content: center; }
 .donut { position: relative; width: 220px; height: 220px; }

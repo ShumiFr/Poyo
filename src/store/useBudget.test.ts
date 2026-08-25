@@ -141,6 +141,25 @@ describe("courses (D7)", () => {
    })
 })
 
+describe("acheter un vœu (V5)", () => {
+   it("déduit le montant réel, termine le vœu, et rectifie l'écart via le disponible", () => {
+      // épargné 200 pour une cible 180, compte 500 → disponible = 500 − 200 = 300
+      useBudget.setState({
+         compte: 500,
+         voeux: [{ id: "v1", nom: "Casque", montantTotal: 180, montantActuel: 200, estTermine: false }],
+      })
+
+      useBudget.getState().acheterVoeu("v1", 170) // acheté moins cher que prévu
+
+      const s = useBudget.getState()
+      expect(s.compte).toBe(330)               // 500 − 170
+      expect(s.voeux[0].montantActuel).toBe(0)
+      expect(s.voeux[0].estTermine).toBe(true)
+      // disponible après = 330 − 0 = 330 : +30 rendus (200 épargnés − 170 payés)
+      expect(s.historique[0]).toMatchObject({ montant: 170, type: "depense", refId: "v1" })
+   })
+})
+
 describe("prévisionnel (D6)", () => {
    it("« dépensé ce mois » déduit le budget du compte et journalise", () => {
       useBudget.setState({ compte: 500, previsionnels: [{ id: "p1", nom: "Loisirs", montant: 60, estDepense: false }] })

@@ -101,9 +101,10 @@ function DashboardComponent() {
                <span>Ce qu'il me reste</span>
                <span className="text-teal">{format(restePositif)}</span>
             </div>
+            {reste < 0 && (
+               <div className="recap-manque">Il manque {format(-reste)}</div>
+            )}
          </div>
-
-         {reste < 0 && <p className="screen-resume neg">Il manque {format(-reste)}</p>}
 
          <button className="btn btn-primary btn-full" onClick={() => setOpen(true)}>+ Entrée d'argent</button>
 

@@ -60,6 +60,7 @@ export interface BudgetStore {
    ajouterVoeu: (voeu: Voeu) => void
    ajouterArgentVoeu: (id: string, montant: number) => void
    retirerArgentVoeu: (id: string, montant: number) => void
+   acheterVoeu: (id: string, montantReel: number) => void
 }
 
 export const useBudget = create<BudgetStore>()(persist((set, get) => ({
@@ -378,5 +379,18 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
       }))
       const voeu = get().voeux.find((v) => v.id === id)
       get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuSortant", id)
+   },
+
+   acheterVoeu: (id, montantReel) => {
+      const voeu = get().voeux.find((v) => v.id === id)
+      if (!voeu) return
+      set((state) => ({
+         // le montant réel sort du compte ; l'écart avec l'épargne se rectifie tout seul via le disponible
+         compte: state.compte - montantReel,
+         voeux: state.voeux.map((v) =>
+            v.id === id ? { ...v, montantActuel: 0, estTermine: true } : v
+         ),
+      }))
+      get().ajouterMouvement("Achat — " + voeu.nom, montantReel, "depense", id)
    }
 }), { name: "poyo-budget" }))

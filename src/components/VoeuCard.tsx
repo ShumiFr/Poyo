@@ -8,12 +8,16 @@ import type { Voeu } from '../types'
 export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible: number }) {
    const ajouterArgent = useBudget((state) => state.ajouterArgentVoeu)
    const retirerArgent = useBudget((state) => state.retirerArgentVoeu)
+   const acheterVoeu = useBudget((state) => state.acheterVoeu)
 
    const [ouvert, setOuvert] = useState(false)
    const [ouvertRetrait, setOuvertRetrait] = useState(false)
    const [montantEnAttente, setMontantEnAttente] = useState<number | null>(null)
+   const [ouvertAchat, setOuvertAchat] = useState(false)
+   const [prixReel, setPrixReel] = useState("")
 
    const pourcentage = Math.min(100, (voeu.montantActuel / voeu.montantTotal) * 100)
+   const atteint = voeu.montantActuel >= voeu.montantTotal
 
    function handleValider(montant: number) {
       setOuvert(false)
@@ -29,6 +33,28 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
    function handleRetrait(montant: number) {
       retirerArgent(voeu.id, montant)
       setOuvertRetrait(false)
+   }
+
+   function ouvrirAchat() {
+      setPrixReel(String(voeu.montantTotal))   // prérempli au prix visé
+      setOuvertAchat(true)
+   }
+
+   function confirmerAchat() {
+      acheterVoeu(voeu.id, Number(prixReel.replace(",", ".")))
+      setOuvertAchat(false)
+   }
+
+   // Vœu déjà acheté : carte grisée, sans actions
+   if (voeu.estTermine) {
+      return (
+         <div className="card payee">
+            <div className="voeu-tete">
+               <h3>{voeu.nom}</h3>
+               <span className="sur">Acheté ✓</span>
+            </div>
+         </div>
+      )
    }
 
    return (
@@ -50,6 +76,12 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
             <button className="btn bg-purple" onClick={() => setOuvert(true)}>Mettre de côté</button>
          </div>
 
+         {atteint && (
+            <button className="btn btn-green btn-full" style={{ marginTop: 10 }} onClick={ouvrirAchat}>
+               🎉 Acheter
+            </button>
+         )}
+
          <Modal isOpen={ouvert} onClose={() => setOuvert(false)}>
             <PaveNumerique
                titre={"Mettre de côté · " + voeu.nom}
@@ -70,6 +102,22 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
                onAnnuler={() => setOuvertRetrait(false)}
                onValider={handleRetrait}
             />
+         </Modal>
+
+         <Modal isOpen={ouvertAchat} onClose={() => setOuvertAchat(false)}>
+            <h2>Acheter · {voeu.nom}</h2>
+            <p className="sous">Confirme le montant réel de l'achat</p>
+            <ul className="legende">
+               <li><span className="libelle">Mis de côté</span><span className="valeur">{format(voeu.montantActuel)}</span></li>
+            </ul>
+            <div className="champ">
+               <label>Montant réel payé</label>
+               <input value={prixReel} onChange={(e) => setPrixReel(e.target.value)} />
+            </div>
+            <div className="pave-actions">
+               <button className="btn" onClick={() => setOuvertAchat(false)}>Annuler</button>
+               <button className="btn btn-green" onClick={confirmerAchat}>Acheter</button>
+            </div>
          </Modal>
 
          <Modal isOpen={montantEnAttente !== null} onClose={() => setMontantEnAttente(null)}>

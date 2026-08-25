@@ -247,12 +247,12 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
   En tant qu'utilisatrice, je veux créer un projet (nom, objectif).
    - [x] Nom + objectif (> 0) requis ; commence à 0 € épargné
 
-- **V5 · Marquer un vœu comme acheté (avec ajustement)** — `V2` ⬜
+- **V5 · Marquer un vœu comme acheté (avec ajustement)** — `V2` ✅
   En tant qu'utilisatrice, je veux valider l'achat une fois la cible atteinte afin que le montant sorte du compte.
-   - [ ] Disponible seulement quand `montantActuel >= montantTotal`
-   - [ ] Confirmation du montant réel (l'article a pu augmenter ou baisser) avant de décompter
-   - [ ] Le montant réel est déduit du `compte` ; l'écart éventuel est rectifié (rendu au disponible ou repris)
-   - [ ] Entrée « Achat (vœu) » dans l'historique ; le vœu passe « terminé »
+   - [x] Bouton « Acheter » visible seulement quand `montantActuel >= montantTotal`
+   - [x] Confirmation du montant réel (prérempli à la cible, modifiable) avant de décompter
+   - [x] Le montant réel est déduit du `compte` ; l'écart se rectifie via le disponible (`acheterVoeu`)
+   - [x] Entrée « Achat — <nom> » (refId) dans l'historique ; le vœu passe « terminé » (grisé) — testé
 
 ## EPIC — Historique (journal)
 
