@@ -1,15 +1,17 @@
-type Segment = { valeur: number; couleur: string }
+type Segment = { valeur: number; couleur: string; onClick?: () => void }
 
 export default function Donut({
    segments,
    total,
    centre,
    sousCentre,
+   onCentre,
 }: {
    segments: Segment[]
    total: number
    centre: string
    sousCentre: string
+   onCentre?: () => void
 }) {
    const R = 66          // rayon du cercle
    const W = 16          // épaisseur de l'anneau (fine → grand trou central)
@@ -36,6 +38,8 @@ export default function Donut({
                      strokeDasharray={`${longueur} ${C - longueur}`}
                      strokeDashoffset={-offset}
                      transform="rotate(-90 80 80)"
+                     onClick={s.onClick}
+                     style={s.onClick ? { cursor: "pointer" } : undefined}
                   />
                )
                offset += longueur
@@ -43,7 +47,7 @@ export default function Donut({
             })}
          </svg>
 
-         <div className="donut-centre">
+         <div className="donut-centre" onClick={onCentre} style={onCentre ? { cursor: "pointer" } : undefined}>
             <div className="donut-label">Ce qu'il reste</div>
             <div className="donut-valeur">{centre}</div>
             <div className="donut-sous">{sousCentre}</div>

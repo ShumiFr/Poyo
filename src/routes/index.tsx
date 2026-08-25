@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import calculerDisponible from "../lib/calculs";
 import { reserveCourses } from "../lib/courses";
+import { COULEURS_HEX } from "../lib/styleEnveloppe";
 import { useBudget } from "../store/useBudget";
 import format from "../lib/format";
 import { Modal } from "../components/Modal";
@@ -23,7 +24,9 @@ function DashboardComponent() {
    const previsionnels = useBudget((state) => state.previsionnels)
    const ajouterAuCompte = useBudget((state) => state.ajouterAuCompte)
 
+   const navigate = useNavigate()
    const [open, setOpen] = useState(false)
+   const [envDepliees, setEnvDepliees] = useState(false)
 
    // Montants dérivés
    const revenusPercus = revenus.filter((r) => r.estRecu).reduce((s, r) => s + r.montant, 0)
@@ -42,11 +45,17 @@ function DashboardComponent() {
 
    // Donut : le compte réparti en reste / charges à venir / enveloppes / vœux
    const totalRing = restePositif + chargesAVenir + totalEnveloppes + totalVoeux
+   const versEnveloppes = () => navigate({ to: "/enveloppes" })
+   // Enveloppes : soit un segment agrégé, soit un segment par enveloppe (déplié)
+   const segmentsEnveloppes = envDepliees
+      ? enveloppes.map((e) => ({ valeur: e.montant, couleur: COULEURS_HEX[e.couleur] ?? "#4f7f96", onClick: versEnveloppes }))
+      : [{ valeur: totalEnveloppes, couleur: "#4f7f96", onClick: versEnveloppes }]
+
    const segments = [
-      { valeur: restePositif, couleur: "var(--teal)" },
-      { valeur: chargesAVenir, couleur: "var(--navy)" },
-      { valeur: totalEnveloppes, couleur: "#4f7f96" },
-      { valeur: totalVoeux, couleur: "var(--purple)" },
+      { valeur: restePositif, couleur: "var(--teal)", onClick: () => setOpen(true) },
+      { valeur: chargesAVenir, couleur: "var(--navy)", onClick: () => navigate({ to: "/depenses" }) },
+      ...segmentsEnveloppes,
+      { valeur: totalVoeux, couleur: "var(--purple)", onClick: () => navigate({ to: "/souhaits" }) },
    ]
 
    return (
@@ -57,6 +66,7 @@ function DashboardComponent() {
                total={totalRing}
                centre={format(restePositif)}
                sousCentre={"sur " + format(compte)}
+               onCentre={() => setOpen(true)}
             />
          </div>
 
@@ -90,7 +100,14 @@ function DashboardComponent() {
                <span className="text-red">− {format(chargesAVenir)}</span>
             </div>
             <div className="recap-ligne">
-               <span>Enveloppes</span>
+               <span>
+                  Enveloppes
+                  {enveloppes.length > 0 && (
+                     <button className="recap-toggle" onClick={() => setEnvDepliees(!envDepliees)}>
+                        {envDepliees ? "−" : "+"}
+                     </button>
+                  )}
+               </span>
                <span className="text-red">− {format(totalEnveloppes)}</span>
             </div>
             <div className="recap-ligne">

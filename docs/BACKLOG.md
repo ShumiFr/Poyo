@@ -78,15 +78,16 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] 4 lignes : pastille, libellé, nb d'éléments, montant
    - [x] Montants issus des calculs dérivés (F2)
 
-- **A3 · Déplier / replier une catégorie** — `V2` ⬜
+- **A3 · Déplier / replier une catégorie** — `V2` ✅
   En tant qu'utilisatrice, je veux détailler ou regrouper une catégorie du donut afin de voir soit le total, soit chaque poste.
-   - [ ] Bouton +/− par ligne extensible
-   - [ ] Déplié = un segment par poste ; replié = un segment agrégé
+   - [x] Bouton +/− sur la ligne « Enveloppes » du récap
+   - [x] Déplié = un segment par enveloppe (couleur propre) ; replié = un segment agrégé
+   - [ ] (extension possible : même dépliage pour charges / vœux)
 
-- **A4 · Cliquer un segment pour naviguer** — `V2` ⬜
+- **A4 · Cliquer un segment pour naviguer** — `V2` ✅
   En tant qu'utilisatrice, je veux cliquer une part afin d'ouvrir l'écran de cette catégorie.
-   - [ ] charges → Dépenses, enveloppes → Enveloppes, etc.
-   - [ ] Part « disponible » → entrée d'argent
+   - [x] charges → Dépenses, enveloppes → Enveloppes, vœux → Vœux (`useNavigate`)
+   - [x] Part « disponible » / centre du donut → entrée d'argent
 
 - **A5 · Entrée d'argent rapide** — `V1` ✅
   En tant qu'utilisatrice, je veux ajouter une somme à mon compte afin d'enregistrer une rentrée imprévue.
