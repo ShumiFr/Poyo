@@ -5,6 +5,7 @@ import { useBudget } from "../store/useBudget";
 import format from "../lib/format";
 import { Modal } from "../components/Modal";
 import PaveNumerique from "../components/PaveNumerique";
+import Donut from "../components/Donut";
 
 export const Route = createFileRoute('/')({
    component: DashboardComponent,
@@ -26,8 +27,26 @@ function DashboardComponent() {
    const totalEnveloppes = enveloppes.reduce((s, e) => s + e.montant, 0)
    const totalVoeux = voeux.reduce((s, v) => s + v.montantActuel, 0)
 
+   const dispoPositif = Math.max(0, totalDisponible)
+   const totalCompte = dispoPositif + chargesAVenir + totalEnveloppes + totalVoeux
+   const segments = [
+      { valeur: dispoPositif, couleur: "var(--teal)" },
+      { valeur: chargesAVenir, couleur: "var(--navy)" },
+      { valeur: totalEnveloppes, couleur: "#4f7f96" },
+      { valeur: totalVoeux, couleur: "var(--purple)" },
+   ]
+
    return (
       <>
+         <div className="card carte-donut">
+            <Donut
+               segments={segments}
+               total={totalCompte}
+               centre={format(dispoPositif)}
+               sousCentre={"sur " + format(totalCompte)}
+            />
+         </div>
+
          <div className="card">
             <ul className="legende">
                <li>

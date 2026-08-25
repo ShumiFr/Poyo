@@ -67,11 +67,11 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 ## EPIC — Accueil (vue d'ensemble)
 
-- **A1 · Anneau de répartition (donut)** — `V2` ⬜
+- **A1 · Anneau de répartition (donut)** — `V2` ✅
   En tant qu'utilisatrice, je veux voir mon argent réparti en anneau afin de comprendre ma situation d'un coup d'œil.
-   - [ ] Chaque segment proportionnel à son montant
-   - [ ] Centre = disponible « sur » le total du compte
-   - [ ] Couleurs par catégorie
+   - [x] Chaque segment proportionnel à son montant (SVG `stroke-dasharray`, composant `Donut`)
+   - [x] Centre = disponible « sur » le total du compte (dispo + charges + enveloppes + vœux)
+   - [x] Couleurs par catégorie (teal / navy / steel / purple)
 
 - **A2 · Légende détaillée** — `V1` ✅
   En tant qu'utilisatrice, je veux la liste Disponible / Charges à venir / Enveloppes / Vœux avec montants afin de lire les totaux.
