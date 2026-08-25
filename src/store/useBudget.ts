@@ -4,6 +4,7 @@ import type { Depense, Enveloppe, Flux, Revenu, TypeAction, Voeu } from "../type
 
 export interface BudgetStore {
    compte: number,
+   soldeReporte: number,
    mois: number,
    annee: number,
    revenus: Revenu[],
@@ -11,6 +12,9 @@ export interface BudgetStore {
    enveloppes: Enveloppe[],
    voeux: Voeu[],
    historique: Flux[]
+
+   //Mois
+   nouveauMois: (soldeReel: number) => void
 
    //Historique
    ajouterMouvement: (nom: string, montant: number, type: TypeAction) => void
@@ -43,6 +47,7 @@ export interface BudgetStore {
 
 export const useBudget = create<BudgetStore>()(persist((set, get) => ({
    compte: 0,
+   soldeReporte: 0,
    mois: new Date().getMonth(),
    annee: new Date().getFullYear(),
    revenus: [
@@ -90,6 +95,26 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
          type: "depense"
       }
    ],
+
+   nouveauMois: (soldeReel) => {
+      // Écart entre le solde réel confirmé et celui suivi par l'app.
+      const ecart = soldeReel - get().compte
+      if (ecart !== 0) {
+         get().ajouterMouvement("Ajustement de solde", Math.abs(ecart), ecart > 0 ? "revenu" : "depense")
+      }
+      set((state) => ({
+         // le mois avance ; après décembre (11) on passe à janvier de l'année suivante
+         mois: (state.mois + 1) % 12,
+         annee: state.mois === 11 ? state.annee + 1 : state.annee,
+         // le solde réel confirmé devient le compte et le solde reporté du nouveau mois
+         compte: soldeReel,
+         soldeReporte: soldeReel,
+         // les charges et revenus repassent à payer / recevoir
+         depenses: state.depenses.map((d) => ({ ...d, estPayer: false })),
+         revenus: state.revenus.map((r) => ({ ...r, estRecu: false })),
+         // enveloppes, vœux et historique sont conservés
+      }))
+   },
 
    ajouterMouvement: (nom, montant, type) =>
       set((state) => ({

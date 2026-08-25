@@ -380,6 +380,9 @@ button { font: inherit; cursor: pointer; }
 /* ------------------------------------------------------------
    Donut de l'accueil (A1)
    ------------------------------------------------------------ */
+.ligne-solde { display: flex; align-items: center; justify-content: space-between; }
+.ligne-solde .valeur { font-weight: 800; font-size: 18px; color: var(--ink); }
+
 .carte-donut { display: flex; justify-content: center; }
 .donut { position: relative; width: 220px; height: 220px; }
 .donut svg { display: block; }

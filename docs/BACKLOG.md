@@ -93,6 +93,11 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Le bouton ouvre le pavé numérique (S1)
    - [x] Valider augmente le compte + crée une entrée d'historique
 
+- **A6 · Solde reporté du mois dernier** — `V2` ✅
+  En tant qu'utilisatrice, je veux voir le solde reporté du mois précédent afin de savoir sur quelle base s'ajoutent mes revenus et dépenses.
+   - [x] Case « Solde du mois dernier » sur l'accueil (state `soldeReporte`)
+   - [x] Fixé au report (M1), sert de base au compte du mois
+
 ## EPIC — Rentrées (revenus)
 
 - **R1 · Lister les rentrées en 2 sections** — `V1` ✅
@@ -120,9 +125,9 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Re-cliquer bascule : montant retiré du compte + mouvement inverse journalisé
    - [x] Libellé « Annulation — <nom> » dans l'historique
 
-- **R6 · Total reçu du mois** — `V2` ⬜
+- **R6 · Total reçu du mois** — `V2` ✅
   En tant qu'utilisatrice, je veux voir le total déjà reçu ce mois.
-   - [ ] En-tête « X € reçu » = somme des rentrées reçues
+   - [x] En-tête « X € reçu » = somme des rentrées reçues
 
 - **R7 · Supprimer une rentrée** — `V1` ✅
   En tant qu'utilisatrice, je veux supprimer une rentrée.
@@ -252,12 +257,15 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 
 ## EPIC — Passage au nouveau mois
 
-- **M1 · Démarrer un nouveau mois** — `V2` ⬜
+- **M1 · Démarrer un nouveau mois** — `V2` 🔨
   En tant qu'utilisatrice, je veux repartir sur un mois neuf afin de recommencer mon suivi.
-   - [ ] Le mois affiché avance d'un cran
-   - [ ] Charges et rentrées repassent « non payé / non reçu »
-   - [ ] Les semaines de courses sont régénérées
-   - [ ] Les soldes des enveloppes et vœux sont **conservés**
+   - [x] Le mois affiché avance d'un cran (bascule d'année après décembre) — via confirmation
+   - [x] Pop-up : confirmer/corriger le solde réel de fin de mois (prérempli au solde suivi)
+   - [x] Un écart entre solde réel et solde suivi est journalisé en « Ajustement de solde »
+   - [x] Le solde confirmé devient le `compte` et le `soldeReporte` du nouveau mois
+   - [x] Charges et rentrées repassent « non payé / non reçu »
+   - [ ] Les semaines de courses sont régénérées (attend D7)
+   - [x] Les soldes des enveloppes et vœux sont **conservés** (historique aussi)
 
 - **M2 · Afficher le mois courant** — `V1` ✅
   En tant qu'utilisatrice, je veux voir « Mois Année » dans l'en-tête.

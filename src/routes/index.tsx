@@ -13,6 +13,7 @@ export const Route = createFileRoute('/')({
 
 function DashboardComponent() {
    const compte = useBudget((state) => state.compte)
+   const soldeReporte = useBudget((state) => state.soldeReporte)
    const depenses = useBudget((state) => state.depenses)
    const enveloppes = useBudget((state) => state.enveloppes)
    const voeux = useBudget((state) => state.voeux)
@@ -38,6 +39,11 @@ function DashboardComponent() {
 
    return (
       <>
+         <div className="card ligne-solde">
+            <span className="libelle-col">Solde du mois dernier<div className="sous">Reporté en début de mois</div></span>
+            <span className="valeur">{format(soldeReporte)}</span>
+         </div>
+
          <div className="card carte-donut">
             <Donut
                segments={segments}
