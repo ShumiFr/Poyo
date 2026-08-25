@@ -144,7 +144,7 @@ button { font: inherit; cursor: pointer; }
    ------------------------------------------------------------ */
 .champ { margin-bottom: 14px; }
 .champ label { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; }
-.champ input {
+.champ input, .champ select {
    width: 100%;
    font: inherit;
    padding: 12px 14px;
@@ -153,7 +153,7 @@ button { font: inherit; cursor: pointer; }
    background: var(--card);
    color: var(--ink);
 }
-.champ input:focus { outline: 2px solid var(--teal); outline-offset: -1px; }
+.champ input:focus, .champ select:focus { outline: 2px solid var(--teal); outline-offset: -1px; }
 
 .type-toggle { display: flex; gap: 10px; }
 .type-toggle button {

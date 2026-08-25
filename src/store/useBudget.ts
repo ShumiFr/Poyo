@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Depense, Enveloppe, Flux, Revenu, TypeAction, Voeu } from "../types";
+import type { Depense, Enveloppe, Flux, Frequence, Revenu, TypeAction, Voeu } from "../types";
 
 export interface BudgetStore {
    compte: number,
@@ -33,6 +33,8 @@ export interface BudgetStore {
    retirerDepense: (id: string) => void
    marquerPayer: (id: string) => void
    modifierDepense: (id: string, nom: string, montant: number) => void
+   // dépense immédiate : source = "compte" ou l'id d'une enveloppe
+   depenserImmediat: (nom: string, montant: number, type: Frequence, source: string) => void
 
    //Enveloppes
    ajouterEnveloppe: (enveloppe: Enveloppe) => void
@@ -182,6 +184,19 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
             d.id === id ? { ...d, nom, montant } : d
          )
       })),
+
+   depenserImmediat: (nom, montant, type, source) => {
+      // On garde une trace sous forme de dépense déjà payée (grisée)
+      const depense: Depense = { id: crypto.randomUUID(), nom, montant, type, estPayer: true }
+      set((state) => ({ depenses: [...state.depenses, depense] }))
+      if (source === "compte") {
+         set((state) => ({ compte: state.compte - montant }))
+         get().ajouterMouvement(nom, montant, "depense")
+      } else {
+         // source = id d'une enveloppe : l'argent sort de l'enveloppe ET du compte
+         get().depenserDepuisEnveloppe(source, montant)
+      }
+   },
 
    marquerPayer: (id) => {
       const depense = get().depenses.find((d) => d.id === id)

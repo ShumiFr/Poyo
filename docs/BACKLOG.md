@@ -183,6 +183,13 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
   En tant qu'utilisatrice, je veux supprimer une charge.
    - [x] Disparaît de sa section (filter par id)
 
+- **D10 · Dépense immédiate avec source** — `V2` ✅
+  En tant qu'utilisatrice, je veux créer une dépense depuis la page Dépenses et choisir de la payer depuis le compte ou une enveloppe.
+   - [x] Sélecteur « Payer depuis » : Plus tard (charge à pointer) / Le compte / une enveloppe
+   - [x] « Le compte » : déduit le compte tout de suite + journalise ; charge laissée en « payée »
+   - [x] « Enveloppe » : sort de l'enveloppe ET du compte (réutilise E6), disponible inchangé
+   - [x] `depenserImmediat(nom, montant, type, source)` — couvert par des tests
+
 ## EPIC — Enveloppes
 
 > Mouvements plafonnés : on ne réserve pas plus que le disponible, on ne retire pas plus que le contenu. Chaque mouvement est journalisé.

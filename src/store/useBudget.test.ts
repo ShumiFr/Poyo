@@ -90,6 +90,28 @@ describe("dépenser depuis une enveloppe (E6)", () => {
    })
 })
 
+describe("dépense immédiate (page Dépenses)", () => {
+   it("depuis le compte : déduit le compte et laisse une charge payée", () => {
+      useBudget.setState({ compte: 500 })
+      useBudget.getState().depenserImmediat("Dentiste", 60, "occasionnel", "compte")
+
+      const s = useBudget.getState()
+      expect(s.compte).toBe(440)
+      expect(s.depenses[0]).toMatchObject({ nom: "Dentiste", montant: 60, estPayer: true })
+      expect(s.historique[0]).toMatchObject({ montant: 60, type: "depense" })
+   })
+
+   it("depuis une enveloppe : sort de l'enveloppe ET du compte", () => {
+      useBudget.setState({ compte: 500, enveloppes: [enveloppe(100)] })
+      useBudget.getState().depenserImmediat("Plein essence", 40, "occasionnel", "e1")
+
+      const s = useBudget.getState()
+      expect(s.compte).toBe(460)
+      expect(s.enveloppes[0].montant).toBe(60)
+      expect(s.depenses[0]).toMatchObject({ montant: 40, estPayer: true })
+   })
+})
+
 describe("nouveauMois (M1)", () => {
    it("avance le mois, reporte le solde réel et journalise l'écart", () => {
       useBudget.setState({
