@@ -3,6 +3,7 @@ import { useBudget } from '../store/useBudget'
 import { Modal } from './Modal'
 import PaveNumerique from './PaveNumerique'
 import format from '../lib/format'
+import { ICONES } from '../lib/styleEnveloppe'
 import type { Enveloppe } from '../types'
 
 export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: Enveloppe, disponible: number }) {
@@ -29,10 +30,12 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
       setOuvertRetrait(false)
    }
 
+   const Icone = ICONES[enveloppe.icone] ?? ICONES["shopping-cart"]
+
    return (
       <div className="card">
          <div className="carte-tete">
-            <span className={"icone-box text-" + enveloppe.couleur}>{enveloppe.icone}</span>
+            <span className={"icone-box text-" + enveloppe.couleur}><Icone size={20} /></span>
             <h3>{enveloppe.nom}</h3>
             <span className={"montant text-" + enveloppe.couleur}>{format(enveloppe.montant)}</span>
          </div>

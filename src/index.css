@@ -170,6 +170,29 @@ button { font: inherit; cursor: pointer; }
 .form-actions { display: flex; gap: 10px; margin-top: 8px; }
 .form-actions .btn { flex: 1; }
 
+/* sélecteur de couleur */
+.palette { display: flex; flex-wrap: wrap; gap: 10px; }
+.pastille-choix {
+   width: 42px; height: 42px;
+   border-radius: var(--radius-sm);
+   border: 2px solid transparent;
+}
+.pastille-choix.actif { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* sélecteur d'icône */
+.grille-icones { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.icone-choix {
+   aspect-ratio: 1;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   border: 1px solid var(--line);
+   border-radius: var(--radius-sm);
+   background: var(--card);
+   color: var(--ink-2);
+}
+.icone-choix.actif { border-color: currentColor; background: color-mix(in srgb, currentColor 12%, transparent); }
+
 /* ------------------------------------------------------------
    En-tête de section repliable
    ------------------------------------------------------------ */
@@ -291,6 +314,8 @@ button { font: inherit; cursor: pointer; }
 .sheet {
    width: 430px;
    max-width: 100%;
+   max-height: 92svh;
+   overflow-y: auto;
    background: var(--card);
    border-radius: 20px 20px 0 0;
    padding: 12px 20px calc(24px + env(safe-area-inset-bottom));

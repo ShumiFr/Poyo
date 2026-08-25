@@ -193,10 +193,10 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Plafonné au contenu de l'enveloppe (`Math.max(0, …)` dans l'action)
    - [x] Entrée « repris » dans l'historique
 
-- **E4 · Créer une enveloppe** — `V2` ⬜
+- **E4 · Créer une enveloppe** — `V2` ✅
   En tant qu'utilisatrice, je veux créer une enveloppe (nom, couleur, icône).
-   - [ ] Choix d'une couleur (palette) et d'une icône (bibliothèque)
-   - [ ] Montant de départ optionnel, plafonné au disponible
+   - [x] Choix d'une couleur (palette 10) et d'une icône (grille 18, registre `styleEnveloppe`)
+   - [x] Montant de départ optionnel, plafonné au disponible (`Math.min`)
 
 - **E5 · Modifier le style d'une enveloppe** — `V2` ⬜
   En tant qu'utilisatrice, je veux changer nom, couleur ou icône.
@@ -225,9 +225,9 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
   En tant qu'utilisatrice, je veux reprendre de l'argent d'un vœu afin de le réaffecter.
    - [x] Plafonné au montant épargné (`Math.max(0, …)`) ; entrée « repris »
 
-- **V4 · Créer un vœu** — `V2` ⬜
+- **V4 · Créer un vœu** — `V2` ✅
   En tant qu'utilisatrice, je veux créer un projet (nom, objectif).
-   - [ ] Nom + objectif (> 0) requis ; commence à 0 € épargné
+   - [x] Nom + objectif (> 0) requis ; commence à 0 € épargné
 
 - **V5 · Marquer un vœu comme acheté (avec ajustement)** — `V2` ⬜
   En tant qu'utilisatrice, je veux valider l'achat une fois la cible atteinte afin que le montant sorte du compte.

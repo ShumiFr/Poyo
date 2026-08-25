@@ -31,10 +31,12 @@ export interface BudgetStore {
    modifierDepense: (id: string, nom: string, montant: number) => void
 
    //Enveloppes
+   ajouterEnveloppe: (enveloppe: Enveloppe) => void
    ajouterArgentEnveloppe: (id: string, montant: number) => void
    retirerArgentEnveloppe: (id: string, montant: number) => void
 
    //Voeux
+   ajouterVoeu: (voeu: Voeu) => void
    ajouterArgentVoeu: (id: string, montant: number) => void
    retirerArgentVoeu: (id: string, montant: number) => void
 }
@@ -174,6 +176,11 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
       )
    },
 
+   ajouterEnveloppe: (enveloppe) =>
+      set((state) => ({
+         enveloppes: [...state.enveloppes, enveloppe]
+      })),
+
    ajouterArgentEnveloppe: (id, montant) => {
       set((state) => ({
          enveloppes: state.enveloppes.map((enveloppe) =>
@@ -197,6 +204,11 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
       const enveloppe = get().enveloppes.find((e) => e.id === id)
       get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeSortant")
    },
+
+   ajouterVoeu: (voeu) =>
+      set((state) => ({
+         voeux: [...state.voeux, voeu]
+      })),
 
    ajouterArgentVoeu: (id, montant) => {
       set((state) => ({
