@@ -3,27 +3,35 @@ import { useBudget } from '../store/useBudget'
 import { COULEURS, CLES_ICONES, ICONES } from '../lib/styleEnveloppe'
 import type { Enveloppe } from '../types'
 
-export default function FormEnveloppe({ disponible, onFini }: { disponible: number, onFini?: () => void }) {
+export default function FormEnveloppe({
+   disponible,
+   enveloppe,
+   onFini,
+}: {
+   disponible: number
+   enveloppe?: Enveloppe   // fourni = mode édition
+   onFini?: () => void
+}) {
    const ajouterEnveloppe = useBudget((state) => state.ajouterEnveloppe)
+   const modifierEnveloppe = useBudget((state) => state.modifierEnveloppe)
 
-   const [nom, setNom] = useState('')
-   const [couleur, setCouleur] = useState(COULEURS[0])
-   const [icone, setIcone] = useState(CLES_ICONES[0])
+   const edition = enveloppe !== undefined
+
+   const [nom, setNom] = useState(enveloppe?.nom ?? '')
+   const [couleur, setCouleur] = useState(enveloppe?.couleur ?? COULEURS[0])
+   const [icone, setIcone] = useState(enveloppe?.icone ?? CLES_ICONES[0])
    const [montant, setMontant] = useState('')
 
    const invalide = nom.trim() === ''
 
-   function creer() {
-      // Montant de départ optionnel, plafonné au disponible.
-      const depart = Math.min(Math.max(0, Number(montant.replace(',', '.')) || 0), Math.max(0, disponible))
-      const enveloppe: Enveloppe = {
-         id: crypto.randomUUID(),
-         nom: nom.trim(),
-         montant: depart,
-         couleur,
-         icone,
+   function valider() {
+      if (edition) {
+         modifierEnveloppe(enveloppe!.id, nom.trim(), couleur, icone)
+      } else {
+         // Montant de départ optionnel, plafonné au disponible.
+         const depart = Math.min(Math.max(0, Number(montant.replace(',', '.')) || 0), Math.max(0, disponible))
+         ajouterEnveloppe({ id: crypto.randomUUID(), nom: nom.trim(), montant: depart, couleur, icone })
       }
-      ajouterEnveloppe(enveloppe)
       onFini?.()
    }
 
@@ -68,14 +76,18 @@ export default function FormEnveloppe({ disponible, onFini }: { disponible: numb
             </div>
          </div>
 
-         <div className="champ">
-            <label>Montant de départ (optionnel)</label>
-            <input value={montant} placeholder="0" onChange={(e) => setMontant(e.target.value)} />
-         </div>
+         {!edition && (
+            <div className="champ">
+               <label>Montant de départ (optionnel)</label>
+               <input value={montant} placeholder="0" onChange={(e) => setMontant(e.target.value)} />
+            </div>
+         )}
 
          <div className="form-actions">
             <button className="btn" type="button" onClick={() => onFini?.()}>Annuler</button>
-            <button className={"btn bg-" + couleur} type="button" disabled={invalide} onClick={creer}>Créer</button>
+            <button className={"btn bg-" + couleur} type="button" disabled={invalide} onClick={valider}>
+               {edition ? "Enregistrer" : "Créer"}
+            </button>
          </div>
       </div>
    )

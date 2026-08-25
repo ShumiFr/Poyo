@@ -38,6 +38,7 @@ export interface BudgetStore {
 
    //Enveloppes
    ajouterEnveloppe: (enveloppe: Enveloppe) => void
+   modifierEnveloppe: (id: string, nom: string, couleur: string, icone: string) => void
    ajouterArgentEnveloppe: (id: string, montant: number) => void
    retirerArgentEnveloppe: (id: string, montant: number) => void
    depenserDepuisEnveloppe: (id: string, montant: number) => void
@@ -220,6 +221,13 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
    ajouterEnveloppe: (enveloppe) =>
       set((state) => ({
          enveloppes: [...state.enveloppes, enveloppe]
+      })),
+
+   modifierEnveloppe: (id, nom, couleur, icone) =>
+      set((state) => ({
+         enveloppes: state.enveloppes.map((e) =>
+            e.id === id ? { ...e, nom, couleur, icone } : e
+         )
       })),
 
    ajouterArgentEnveloppe: (id, montant) => {

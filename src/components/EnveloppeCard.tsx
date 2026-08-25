@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { Clock, Pencil } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
 import { Modal } from './Modal'
 import PaveNumerique from './PaveNumerique'
+import FormEnveloppe from './FormEnveloppe'
 import format from '../lib/format'
 import { ICONES } from '../lib/styleEnveloppe'
 import type { Enveloppe, TypeAction } from '../types'
@@ -22,6 +24,7 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
    const [ouvertRetrait, setOuvertRetrait] = useState(false)
    const [ouvertDepense, setOuvertDepense] = useState(false)
    const [ouvertHisto, setOuvertHisto] = useState(false)
+   const [ouvertEdit, setOuvertEdit] = useState(false)
    const [montantEnAttente, setMontantEnAttente] = useState<number | null>(null)
 
    const mouvements = historique.filter((f) => f.refId === enveloppe.id)
@@ -51,11 +54,13 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
 
    return (
       <div className="card">
-         <button className="carte-tete carte-tete-btn" onClick={() => setOuvertHisto(true)}>
+         <div className="carte-tete">
             <span className={"icone-box text-" + enveloppe.couleur}><Icone size={20} /></span>
-            <h3>{enveloppe.nom}</h3>
+            <h3 style={{ flex: 1 }}>{enveloppe.nom}</h3>
             <span className={"montant text-" + enveloppe.couleur}>{format(enveloppe.montant)}</span>
-         </button>
+            <button className="carre-mini" onClick={() => setOuvertHisto(true)} aria-label="Historique"><Clock size={15} /></button>
+            <button className="carre-mini" onClick={() => setOuvertEdit(true)} aria-label="Modifier"><Pencil size={15} /></button>
+         </div>
 
          <div className="carte-actions">
             <button className="btn" onClick={() => setOuvertRetrait(true)}>Retirer</button>
@@ -106,6 +111,12 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
                   <span className={f.type === "depense" || f.type === "enveloppeSortant" ? "text-red" : "text-green"}>{format(f.montant)}</span>
                </div>
             ))}
+         </Modal>
+
+         <Modal isOpen={ouvertEdit} onClose={() => setOuvertEdit(false)}>
+            <h2>Modifier · {enveloppe.nom}</h2>
+            <p className="sous">Change le nom, la couleur ou l'icône</p>
+            <FormEnveloppe disponible={disponible} enveloppe={enveloppe} onFini={() => setOuvertEdit(false)} />
          </Modal>
 
          <Modal isOpen={montantEnAttente !== null} onClose={() => setMontantEnAttente(null)}>

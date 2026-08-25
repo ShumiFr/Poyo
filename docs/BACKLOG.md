@@ -213,9 +213,9 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Choix d'une couleur (palette 10) et d'une icône (grille 18, registre `styleEnveloppe`)
    - [x] Montant de départ optionnel, plafonné au disponible (`Math.min`)
 
-- **E5 · Modifier le style d'une enveloppe** — `V2` ⬜
+- **E5 · Modifier le style d'une enveloppe** — `V2` ✅
   En tant qu'utilisatrice, je veux changer nom, couleur ou icône.
-   - [ ] Réutilise le sélecteur style/couleur/icône de la création
+   - [x] Réutilise le sélecteur de la création (`FormEnveloppe` en mode édition) ; crayon sur la carte ; `modifierEnveloppe`
 
 - **E6 · Dépenser directement depuis une enveloppe** — `V2` ✅
   En tant qu'utilisatrice, je veux payer une dépense avec l'argent d'une enveloppe afin qu'il quitte l'enveloppe ET le compte sans repasser par le disponible.
