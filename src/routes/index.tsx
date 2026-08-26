@@ -44,16 +44,16 @@ function DashboardComponent() {
 
    // Donut : le compte réparti en reste / charges à venir / enveloppes / vœux
    const totalRing = restePositif + chargesAVenir + totalEnveloppes + totalVoeux
-   // Donut informatif : un segment par catégorie, étiquette au survol (pas cliquable)
+   // Donut informatif : un segment par catégorie (repli / dépli des enveloppes)
    const segmentsEnveloppes = envDepliees
-      ? enveloppes.map((e) => ({ valeur: e.montant, couleur: COULEURS_HEX[e.couleur] ?? "#4f7f96", label: e.nom + " · " + format(e.montant) }))
-      : [{ valeur: totalEnveloppes, couleur: "#4f7f96", label: "Enveloppes · " + format(totalEnveloppes) }]
+      ? enveloppes.map((e) => ({ valeur: e.montant, couleur: COULEURS_HEX[e.couleur] ?? "#4f7f96" }))
+      : [{ valeur: totalEnveloppes, couleur: "#4f7f96" }]
 
    const segments = [
-      { valeur: restePositif, couleur: "var(--teal)", label: "Disponible · " + format(restePositif) },
-      { valeur: chargesAVenir, couleur: "var(--navy)", label: "Charges à venir · " + format(chargesAVenir) },
+      { valeur: restePositif, couleur: "var(--teal)" },
+      { valeur: chargesAVenir, couleur: "var(--navy)" },
       ...segmentsEnveloppes,
-      { valeur: totalVoeux, couleur: "var(--purple)", label: "Vœux · " + format(totalVoeux) },
+      { valeur: totalVoeux, couleur: "var(--purple)" },
    ]
 
    return (

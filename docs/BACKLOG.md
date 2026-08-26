@@ -85,7 +85,7 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [ ] (extension possible : même dépliage pour charges / vœux)
 
 - **A4 · Cliquer un segment pour naviguer** — `V2` ❌ (abandonné)
-  Choix produit : le donut reste **purement informatif** (non cliquable). À la place, survol desktop → étiquette « catégorie · montant » par segment (le clic navigation a été retiré à la demande de l'utilisatrice).
+  Choix produit : le donut reste **purement informatif** (ni clic ni survol pour l'instant). Le clic navigation et l'étiquette au survol ont été retirés ; l'info au survol est à retravailler plus tard (les segments fins rendent le hover peu fiable).
 
 - **A5 · Entrée d'argent rapide** — `V1` ✅
   En tant qu'utilisatrice, je veux ajouter une somme à mon compte afin d'enregistrer une rentrée imprévue.
