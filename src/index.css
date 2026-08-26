@@ -259,6 +259,29 @@ button { font: inherit; cursor: pointer; }
 .libelle-col { flex: 1; }
 .libelle-col h3 { font-size: 17px; }
 
+/* ligne compacte de semaine de courses (D7) */
+.semaine-row {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   background: var(--card);
+   border: 1px solid var(--line);
+   border-radius: var(--radius-sm);
+   padding: 10px 14px;
+   margin-bottom: 8px;
+}
+.semaine-row.faite { opacity: .6; }
+.semaine-nom { flex: 1; font-weight: 600; color: var(--ink); }
+.semaine-check {
+   width: 28px; height: 28px; flex: none;
+   display: inline-flex; align-items: center; justify-content: center;
+   border: 1px solid var(--line);
+   border-radius: 999px;
+   background: var(--card);
+   color: #fff;
+}
+.semaine-check.ok { background: var(--navy); border-color: transparent; }
+
 /* mini bouton icône (historique / modifier sur les cartes) */
 .carre-mini {
    width: 30px; height: 30px; flex: none;

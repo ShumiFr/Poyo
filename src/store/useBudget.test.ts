@@ -139,6 +139,12 @@ describe("courses (D7)", () => {
       useBudget.getState().ajusterSemaine(0, -5)
       expect(useBudget.getState().courses[0].budget).toBe(0)
    })
+
+   it("définir un montant exact remplace le budget de la semaine", () => {
+      useBudget.setState({ courses: [{ budget: 25, faite: false }] })
+      useBudget.getState().definirBudgetSemaine(0, 37.5)
+      expect(useBudget.getState().courses[0].budget).toBe(37.5)
+   })
 })
 
 describe("acheter un vœu (V5)", () => {

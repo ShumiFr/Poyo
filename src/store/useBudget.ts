@@ -21,6 +21,7 @@ export interface BudgetStore {
 
    //Courses (D7)
    ajusterSemaine: (index: number, delta: number) => void
+   definirBudgetSemaine: (index: number, montant: number) => void
    basculerSemaineFaite: (index: number) => void
 
    //Prévisionnel (D6)
@@ -149,6 +150,13 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
       set((state) => ({
          courses: state.courses.map((s, i) =>
             i === index ? { ...s, budget: Math.max(0, s.budget + delta) } : s
+         )
+      })),
+
+   definirBudgetSemaine: (index, montant) =>
+      set((state) => ({
+         courses: state.courses.map((s, i) =>
+            i === index ? { ...s, budget: Math.max(0, montant) } : s
          )
       })),
 

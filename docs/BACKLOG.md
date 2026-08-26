@@ -172,7 +172,8 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 - **D7 · Budget courses par semaine** — `V2` ✅
   En tant qu'utilisatrice, je veux un budget de courses réparti par semaine afin de lisser mes dépenses alimentaires.
    - [x] Nombre de semaines calculé selon le mois (`lib/courses`, `Math.ceil(jours/7)`)
-   - [x] Chaque semaine a un budget ajustable (± 5 €, `ajusterSemaine`)
+   - [x] Chaque semaine a un budget saisissable au montant exact (`definirBudgetSemaine`, clic sur le montant)
+   - [x] Affichage compact (une ligne par semaine : nom · montant · coche)
    - [x] « Courses faites » déduit du compte + journalise (réversible, `basculerSemaineFaite`)
    - [x] Semaines non faites comptées dans le « à venir » et le disponible (`reserveCourses`)
    - [x] Régénérées au nouveau mois (M1) — couvert par des tests
