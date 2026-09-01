@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Clock, Pencil } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
-import { Modal } from './Modal'
-import ModalePave from './ModalePave'
-import ConfirmationDepassement from './ConfirmationDepassement'
-import FormEnveloppe from './FormEnveloppe'
+import { Modal } from '../components/Modal'
+import ModalePave from '../components/ModalePave'
+import ConfirmationDepassement from '../components/ConfirmationDepassement'
+import Form from '../components/Form'
+import { champsEnveloppe } from '../lib/champs'
 import format from '../lib/format'
 import { ICONES } from '../lib/styleEnveloppe'
 import type { Enveloppe, TypeAction } from '../types'
@@ -19,6 +20,7 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
    const ajouterArgent = useBudget((state) => state.ajouterArgentEnveloppe)
    const retirerArgent = useBudget((state) => state.retirerArgentEnveloppe)
    const depenser = useBudget((state) => state.depenserDepuisEnveloppe)
+   const modifierEnveloppe = useBudget((state) => state.modifierEnveloppe)
    const historique = useBudget((state) => state.historique)
 
    const [ouvert, setOuvert] = useState(false)
@@ -114,7 +116,15 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
          <Modal isOpen={ouvertEdit} onClose={() => setOuvertEdit(false)}>
             <h2>Modifier · {enveloppe.nom}</h2>
             <p className="sous">Change le nom, la couleur ou l'icône</p>
-            <FormEnveloppe disponible={disponible} enveloppe={enveloppe} onFini={() => setOuvertEdit(false)} />
+            <Form
+               champs={champsEnveloppe(true)}
+               valeursInitiales={{ nom: enveloppe.nom, couleur: enveloppe.couleur, icone: enveloppe.icone }}
+               couleur={enveloppe.couleur}
+               libelle="Enregistrer"
+               estValide={(v) => v.nom.trim() !== ""}
+               onAnnuler={() => setOuvertEdit(false)}
+               onValider={(v) => { modifierEnveloppe(enveloppe.id, v.nom.trim(), v.couleur, v.icone); setOuvertEdit(false) }}
+            />
          </Modal>
 
          <ConfirmationDepassement

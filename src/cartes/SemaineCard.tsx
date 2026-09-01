@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Check } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
-import { Modal } from './Modal'
-import Champ from './Champ'
+import { Modal } from '../components/Modal'
+import Champ from '../components/Champ'
 import format, { enNombre } from '../lib/format'
 import type { SemaineCourses } from '../types'
 

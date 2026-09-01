@@ -3,13 +3,13 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
 import Section from '../components/Section'
-import FormRevenu from '../components/FormRevenu'
-import FormEdition from '../components/FormEdition'
+import Form from '../components/Form'
 import MontantEditable from '../components/MontantEditable'
 import BoutonBascule from '../components/BoutonBascule'
 import { Modal } from '../components/Modal'
-import format from '../lib/format'
-import type { Revenu } from '../types'
+import { champsRevenu, champsNomMontant } from '../lib/champs'
+import format, { enNombre } from '../lib/format'
+import type { Frequence, Revenu } from '../types'
 
 export const Route = createFileRoute('/revenus')({
    component: RouteComponent,
@@ -17,6 +17,7 @@ export const Route = createFileRoute('/revenus')({
 
 function RouteComponent() {
    const revenus = useBudget((state) => state.revenus)
+   const ajouterRevenu = useBudget((state) => state.ajouterRevenu)
    const marquerRecu = useBudget((state) => state.marquerRecu)
    const modifierRevenu = useBudget((state) => state.modifierRevenu)
 
@@ -64,7 +65,17 @@ function RouteComponent() {
          <Modal isOpen={creation} onClose={() => setCreation(false)}>
             <h2>Nouvelle rentrée</h2>
             <p className="sous">Un revenu à recevoir</p>
-            <FormRevenu onFini={() => setCreation(false)} />
+            <Form
+               champs={champsRevenu}
+               valeursInitiales={{ nom: "", type: "regulier", montant: "" }}
+               couleur="green"
+               estValide={(v) => v.nom.trim() !== "" && enNombre(v.montant) > 0}
+               onAnnuler={() => setCreation(false)}
+               onValider={(v) => {
+                  ajouterRevenu({ id: crypto.randomUUID(), nom: v.nom.trim(), montant: enNombre(v.montant), type: v.type as Frequence, estRecu: false })
+                  setCreation(false)
+               }}
+            />
          </Modal>
 
          <Modal isOpen={enEdition !== null} onClose={() => setEnEdition(null)}>
@@ -72,11 +83,14 @@ function RouteComponent() {
                <>
                   <h2>Modifier · {enEdition.nom}</h2>
                   <p className="sous">Nom et montant du revenu</p>
-                  <FormEdition
-                     nomInitial={enEdition.nom}
-                     montantInitial={enEdition.montant}
+                  <Form
+                     champs={champsNomMontant}
+                     valeursInitiales={{ nom: enEdition.nom, montant: String(enEdition.montant) }}
+                     couleur="green"
+                     libelle="Enregistrer"
+                     estValide={(v) => v.nom.trim() !== "" && enNombre(v.montant) > 0}
                      onAnnuler={() => setEnEdition(null)}
-                     onEnregistrer={(nom, montant) => { modifierRevenu(enEdition.id, nom, montant); setEnEdition(null) }}
+                     onValider={(v) => { modifierRevenu(enEdition.id, v.nom.trim(), enNombre(v.montant)); setEnEdition(null) }}
                   />
                </>
             )}

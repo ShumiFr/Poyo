@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
-import { Modal } from './Modal'
-import FormEdition from './FormEdition'
-import MontantEditable from './MontantEditable'
-import BoutonBascule from './BoutonBascule'
-import format from '../lib/format'
+import { Modal } from '../components/Modal'
+import Form from '../components/Form'
+import MontantEditable from '../components/MontantEditable'
+import BoutonBascule from '../components/BoutonBascule'
+import { champsNomMontant } from '../lib/champs'
+import format, { enNombre } from '../lib/format'
 import type { Depense } from '../types'
 
 export default function DepenseCard({ depense }: { depense: Depense }) {
@@ -37,12 +38,14 @@ export default function DepenseCard({ depense }: { depense: Depense }) {
          <Modal isOpen={enEdition} onClose={() => setEnEdition(false)}>
             <h2>Modifier · {depense.nom}</h2>
             <p className="sous">Nom et montant de la dépense</p>
-            <FormEdition
-               nomInitial={depense.nom}
-               montantInitial={depense.montant}
+            <Form
+               champs={champsNomMontant}
+               valeursInitiales={{ nom: depense.nom, montant: String(depense.montant) }}
                couleur="red"
+               libelle="Enregistrer"
+               estValide={(v) => v.nom.trim() !== "" && enNombre(v.montant) > 0}
                onAnnuler={() => setEnEdition(false)}
-               onEnregistrer={(nom, montant) => { modifierDepense(depense.id, nom, montant); setEnEdition(false) }}
+               onValider={(v) => { modifierDepense(depense.id, v.nom.trim(), enNombre(v.montant)); setEnEdition(false) }}
             />
          </Modal>
       </div>

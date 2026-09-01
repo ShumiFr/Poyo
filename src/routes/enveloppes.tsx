@@ -2,11 +2,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
-import EnveloppeCard from '../components/EnveloppeCard'
-import FormEnveloppe from '../components/FormEnveloppe'
+import EnveloppeCard from '../cartes/EnveloppeCard'
+import Form from '../components/Form'
 import { Modal } from '../components/Modal'
+import { champsEnveloppe } from '../lib/champs'
+import { COULEURS, CLES_ICONES } from '../lib/styleEnveloppe'
 import calculerDisponible from '../lib/calculs'
-import format from '../lib/format'
+import format, { enNombre } from '../lib/format'
 
 export const Route = createFileRoute('/enveloppes')({
    component: RouteComponent,
@@ -19,6 +21,7 @@ function RouteComponent() {
    const enveloppes = useBudget((state) => state.enveloppes)
    const courses = useBudget((state) => state.courses)
    const previsionnels = useBudget((state) => state.previsionnels)
+   const ajouterEnveloppe = useBudget((state) => state.ajouterEnveloppe)
 
    const [creation, setCreation] = useState(false)
 
@@ -40,7 +43,19 @@ function RouteComponent() {
          <Modal isOpen={creation} onClose={() => setCreation(false)}>
             <h2>Nouvelle enveloppe</h2>
             <p className="sous">Choisis son style</p>
-            <FormEnveloppe disponible={totalDisponible} onFini={() => setCreation(false)} />
+            <Form
+               champs={champsEnveloppe(false)}
+               valeursInitiales={{ nom: "", couleur: COULEURS[0], icone: CLES_ICONES[0], montant: "" }}
+               couleur={COULEURS[0]}
+               estValide={(v) => v.nom.trim() !== ""}
+               onAnnuler={() => setCreation(false)}
+               onValider={(v) => {
+                  // Montant de départ optionnel, plafonné au disponible.
+                  const depart = Math.min(Math.max(0, enNombre(v.montant) || 0), Math.max(0, totalDisponible))
+                  ajouterEnveloppe({ id: crypto.randomUUID(), nom: v.nom.trim(), montant: depart, couleur: v.couleur, icone: v.icone })
+                  setCreation(false)
+               }}
+            />
          </Modal>
       </>
    )

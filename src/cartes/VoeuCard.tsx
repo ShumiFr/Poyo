@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useBudget } from '../store/useBudget'
-import { Modal } from './Modal'
-import ModalePave from './ModalePave'
-import ConfirmationDepassement from './ConfirmationDepassement'
+import { Modal } from '../components/Modal'
+import ModalePave from '../components/ModalePave'
+import ConfirmationDepassement from '../components/ConfirmationDepassement'
 import format, { enNombre } from '../lib/format'
 import type { Voeu } from '../types'
 

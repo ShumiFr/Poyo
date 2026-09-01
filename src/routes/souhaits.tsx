@@ -2,11 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
-import VoeuCard from '../components/VoeuCard'
-import FormVoeu from '../components/FormVoeu'
+import VoeuCard from '../cartes/VoeuCard'
+import Form from '../components/Form'
 import { Modal } from '../components/Modal'
+import { champsVoeu } from '../lib/champs'
 import calculerDisponible from '../lib/calculs'
-import format from '../lib/format'
+import format, { enNombre } from '../lib/format'
 
 export const Route = createFileRoute('/souhaits')({
    component: RouteComponent,
@@ -19,6 +20,7 @@ function RouteComponent() {
    const voeux = useBudget((state) => state.voeux)
    const courses = useBudget((state) => state.courses)
    const previsionnels = useBudget((state) => state.previsionnels)
+   const ajouterVoeu = useBudget((state) => state.ajouterVoeu)
 
    const [creation, setCreation] = useState(false)
 
@@ -40,7 +42,17 @@ function RouteComponent() {
          <Modal isOpen={creation} onClose={() => setCreation(false)}>
             <h2>Nouveau vœu</h2>
             <p className="sous">Un projet à financer petit à petit</p>
-            <FormVoeu onFini={() => setCreation(false)} />
+            <Form
+               champs={champsVoeu}
+               valeursInitiales={{ nom: "", objectif: "" }}
+               couleur="purple"
+               estValide={(v) => v.nom.trim() !== "" && enNombre(v.objectif) > 0}
+               onAnnuler={() => setCreation(false)}
+               onValider={(v) => {
+                  ajouterVoeu({ id: crypto.randomUUID(), nom: v.nom.trim(), montantTotal: enNombre(v.objectif), montantActuel: 0, estTermine: false })
+                  setCreation(false)
+               }}
+            />
          </Modal>
       </>
    )

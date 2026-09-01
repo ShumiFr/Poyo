@@ -307,7 +307,7 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 - ✅ Disponible calculé (`lib/calculs`), formatage € et mois (`lib/format`), registre d'icônes (`lib/styleEnveloppe`)
 - ✅ Tous les écrans stylés d'après la maquette (coquille + bottom-nav, cartes, bottom-sheets, pavé, donut)
 - ✅ Toute la V1 + V2 faites : E4/V4 (création), A1 (donut), M1 (nouveau mois), A6 (récap accueil)
-- ✅ Composants réutilisables : `Section`, `ModalePave`, `ConfirmationDepassement`, `Champ`, `ChoixType`, `ActionsForm`, `MontantEditable`, `BoutonBascule` + helper `enNombre()` (refacto anti-copier-coller)
+- ✅ Archi par rôle : `components/` = réutilisable seulement (dont **un seul `Form` générique** + `Section`, `ModalePave`, `ConfirmationDepassement`, `Champ`, `ChoixType`, `ActionsForm`, `MontantEditable`, `BoutonBascule`, `Modal`, `PaveNumerique`, `Donut`) ; `cartes/` = les 5 cartes ; `lib/champs.ts` = config des champs par formulaire ; helper `enNombre()`
 - 🧪 Tests Vitest : `lib/calculs.test.ts` + `store/useBudget.test.ts` (23 tests) — `npm test`
 - ⬜ Reste : re-travailler l'info au survol du donut (A4, mise de côté pour l'instant)
 
