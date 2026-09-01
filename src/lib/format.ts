@@ -8,6 +8,11 @@ export default function format(number: number): string {
    }).format(number)
 }
 
+// Convertit une saisie texte ("12,5") en nombre (12.5). Vaut NaN si vide/invalide.
+export function enNombre(texte: string): number {
+   return Number(texte.replace(",", "."))
+}
+
 // Libellé « Août 2026 » à partir d'un index de mois (0-11) et d'une année.
 export function libelleMois(mois: number, annee: number): string {
    const texte = new Date(annee, mois).toLocaleDateString('fr-FR', {

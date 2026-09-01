@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { Plus, Check, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
 import { Modal } from './Modal'
 import FormEdition from './FormEdition'
+import MontantEditable from './MontantEditable'
+import BoutonBascule from './BoutonBascule'
 import format from '../lib/format'
 import type { Depense } from '../types'
 
@@ -20,14 +22,13 @@ export default function DepenseCard({ depense }: { depense: Depense }) {
                <h3>{depense.nom}</h3>
                <div className="sous">{depense.type === "regulier" ? format(depense.montant) + " / mois" : "Ponctuelle"}</div>
             </span>
-            <button className="montant-edit text-red" onClick={() => setEnEdition(true)}>{format(depense.montant)}</button>
-            <button
-               className="carre bg-red"
+            <MontantEditable montant={depense.montant} couleur="red" onClick={() => setEnEdition(true)} />
+            <BoutonBascule
+               actif={depense.estPayer}
+               couleur="red"
                onClick={() => marquerPayer(depense.id)}
-               aria-label={depense.estPayer ? "Annuler le paiement" : "Payer"}
-            >
-               {depense.estPayer ? <Check size={18} /> : <Plus size={18} />}
-            </button>
+               label={depense.estPayer ? "Annuler le paiement" : "Payer"}
+            />
             <button className="carre" onClick={() => retirerDepense(depense.id)} aria-label="Supprimer">
                <Trash2 size={16} />
             </button>

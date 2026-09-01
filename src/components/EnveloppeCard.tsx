@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Clock, Pencil } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
 import { Modal } from './Modal'
-import PaveNumerique from './PaveNumerique'
+import ModalePave from './ModalePave'
+import ConfirmationDepassement from './ConfirmationDepassement'
 import FormEnveloppe from './FormEnveloppe'
 import format from '../lib/format'
 import { ICONES } from '../lib/styleEnveloppe'
@@ -68,38 +69,35 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
             <button className={"btn bg-" + enveloppe.couleur} onClick={() => setOuvert(true)}>Ajouter</button>
          </div>
 
-         <Modal isOpen={ouvert} onClose={() => setOuvert(false)}>
-            <PaveNumerique
-               titre={"Ajouter · " + enveloppe.nom}
-               sousTitre={"Disponible : " + format(disponible)}
-               couleur={enveloppe.couleur}
-               libelleValider="Ajouter"
-               onAnnuler={() => setOuvert(false)}
-               onValider={handleValider}
-            />
-         </Modal>
+         <ModalePave
+            ouvert={ouvert}
+            onFermer={() => setOuvert(false)}
+            titre={"Ajouter · " + enveloppe.nom}
+            sousTitre={"Disponible : " + format(disponible)}
+            couleur={enveloppe.couleur}
+            libelleValider="Ajouter"
+            onValider={handleValider}
+         />
 
-         <Modal isOpen={ouvertRetrait} onClose={() => setOuvertRetrait(false)}>
-            <PaveNumerique
-               titre={"Retirer · " + enveloppe.nom}
-               sousTitre={"Dans l'enveloppe : " + format(enveloppe.montant)}
-               couleur={enveloppe.couleur}
-               libelleValider="Retirer"
-               onAnnuler={() => setOuvertRetrait(false)}
-               onValider={handleRetrait}
-            />
-         </Modal>
+         <ModalePave
+            ouvert={ouvertRetrait}
+            onFermer={() => setOuvertRetrait(false)}
+            titre={"Retirer · " + enveloppe.nom}
+            sousTitre={"Dans l'enveloppe : " + format(enveloppe.montant)}
+            couleur={enveloppe.couleur}
+            libelleValider="Retirer"
+            onValider={handleRetrait}
+         />
 
-         <Modal isOpen={ouvertDepense} onClose={() => setOuvertDepense(false)}>
-            <PaveNumerique
-               titre={"Dépenser · " + enveloppe.nom}
-               sousTitre={"Dans l'enveloppe : " + format(enveloppe.montant)}
-               couleur="red"
-               libelleValider="Dépenser"
-               onAnnuler={() => setOuvertDepense(false)}
-               onValider={handleDepense}
-            />
-         </Modal>
+         <ModalePave
+            ouvert={ouvertDepense}
+            onFermer={() => setOuvertDepense(false)}
+            titre={"Dépenser · " + enveloppe.nom}
+            sousTitre={"Dans l'enveloppe : " + format(enveloppe.montant)}
+            couleur="red"
+            libelleValider="Dépenser"
+            onValider={handleDepense}
+         />
 
          <Modal isOpen={ouvertHisto} onClose={() => setOuvertHisto(false)}>
             <h2>Historique · {enveloppe.nom}</h2>
@@ -119,18 +117,13 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
             <FormEnveloppe disponible={disponible} enveloppe={enveloppe} onFini={() => setOuvertEdit(false)} />
          </Modal>
 
-         <Modal isOpen={montantEnAttente !== null} onClose={() => setMontantEnAttente(null)}>
-            <h2>Dépassement du disponible</h2>
-            <p className="sous">Vérifie avant de placer</p>
-            <ul className="legende">
-               <li><span className="libelle">Disponible sur le compte</span><span className="valeur">{format(disponible)}</span></li>
-               <li><span className="libelle">Montant à placer</span><span className="valeur text-red">{format(montantEnAttente ?? 0)}</span></li>
-            </ul>
-            <div className="pave-actions">
-               <button className="btn" onClick={() => setMontantEnAttente(null)}>Annuler</button>
-               <button className="btn btn-primary" onClick={confirmerDepassement}>Valider</button>
-            </div>
-         </Modal>
+         <ConfirmationDepassement
+            montant={montantEnAttente}
+            disponible={disponible}
+            couleur={enveloppe.couleur}
+            onAnnuler={() => setMontantEnAttente(null)}
+            onValider={confirmerDepassement}
+         />
       </div>
    )
 }

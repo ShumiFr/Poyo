@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { useBudget } from '../store/useBudget'
+import Champ from './Champ'
+import ActionsForm from './ActionsForm'
+import { enNombre } from '../lib/format'
 import { COULEURS, CLES_ICONES, ICONES } from '../lib/styleEnveloppe'
 import type { Enveloppe } from '../types'
 
@@ -29,7 +32,7 @@ export default function FormEnveloppe({
          modifierEnveloppe(enveloppe!.id, nom.trim(), couleur, icone)
       } else {
          // Montant de départ optionnel, plafonné au disponible.
-         const depart = Math.min(Math.max(0, Number(montant.replace(',', '.')) || 0), Math.max(0, disponible))
+         const depart = Math.min(Math.max(0, enNombre(montant) || 0), Math.max(0, disponible))
          ajouterEnveloppe({ id: crypto.randomUUID(), nom: nom.trim(), montant: depart, couleur, icone })
       }
       onFini?.()
@@ -37,10 +40,7 @@ export default function FormEnveloppe({
 
    return (
       <div>
-         <div className="champ">
-            <label>Nom</label>
-            <input value={nom} placeholder="Ex. Vacances" onChange={(e) => setNom(e.target.value)} />
-         </div>
+         <Champ label="Nom" valeur={nom} placeholder="Ex. Vacances" onChange={setNom} />
 
          <div className="champ">
             <label>Couleur</label>
@@ -77,18 +77,16 @@ export default function FormEnveloppe({
          </div>
 
          {!edition && (
-            <div className="champ">
-               <label>Montant de départ (optionnel)</label>
-               <input value={montant} placeholder="0" onChange={(e) => setMontant(e.target.value)} />
-            </div>
+            <Champ label="Montant de départ (optionnel)" valeur={montant} placeholder="0" onChange={setMontant} />
          )}
 
-         <div className="form-actions">
-            <button className="btn" type="button" onClick={() => onFini?.()}>Annuler</button>
-            <button className={"btn bg-" + couleur} type="button" disabled={invalide} onClick={valider}>
-               {edition ? "Enregistrer" : "Créer"}
-            </button>
-         </div>
+         <ActionsForm
+            onAnnuler={() => onFini?.()}
+            onValider={valider}
+            couleur={couleur}
+            libelle={edition ? "Enregistrer" : "Créer"}
+            invalide={invalide}
+         />
       </div>
    )
 }

@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { useBudget } from '../store/useBudget'
+import Champ from './Champ'
+import ActionsForm from './ActionsForm'
+import { enNombre } from '../lib/format'
 import type { Voeu } from '../types'
 
 export default function FormVoeu({ onFini }: { onFini?: () => void }) {
@@ -8,7 +11,7 @@ export default function FormVoeu({ onFini }: { onFini?: () => void }) {
    const [nom, setNom] = useState('')
    const [objectif, setObjectif] = useState('')
 
-   const cible = Number(objectif.replace(',', '.'))
+   const cible = enNombre(objectif)
    const invalide = nom.trim() === '' || cible <= 0
 
    function creer() {
@@ -25,20 +28,10 @@ export default function FormVoeu({ onFini }: { onFini?: () => void }) {
 
    return (
       <div>
-         <div className="champ">
-            <label>Nom</label>
-            <input value={nom} placeholder="Ex. Nouveau vélo" onChange={(e) => setNom(e.target.value)} />
-         </div>
+         <Champ label="Nom" valeur={nom} placeholder="Ex. Nouveau vélo" onChange={setNom} />
+         <Champ label="Objectif" valeur={objectif} placeholder="0" onChange={setObjectif} />
 
-         <div className="champ">
-            <label>Objectif</label>
-            <input value={objectif} placeholder="0" onChange={(e) => setObjectif(e.target.value)} />
-         </div>
-
-         <div className="form-actions">
-            <button className="btn" type="button" onClick={() => onFini?.()}>Annuler</button>
-            <button className="btn bg-purple" type="button" disabled={invalide} onClick={creer}>Créer</button>
-         </div>
+         <ActionsForm onAnnuler={() => onFini?.()} onValider={creer} couleur="purple" invalide={invalide} />
       </div>
    )
 }

@@ -1,7 +1,10 @@
 import { useState } from "react";
 import type { Depense } from "../types";
 import { useBudget } from "../store/useBudget";
-import format from "../lib/format";
+import Champ from "./Champ";
+import ChoixType from "./ChoixType";
+import ActionsForm from "./ActionsForm";
+import format, { enNombre } from "../lib/format";
 
 export default function FormDepense({ onFini }: { onFini?: () => void }) {
    const ajouterDepense = useBudget((state) => state.ajouterDepense)
@@ -13,7 +16,7 @@ export default function FormDepense({ onFini }: { onFini?: () => void }) {
    const [type, setType] = useState<'regulier' | 'occasionnel'>('regulier')
    const [source, setSource] = useState("plus-tard")   // "plus-tard" | "compte" | id d'enveloppe
 
-   const valeur = Number(montant.replace(",", "."))
+   const valeur = enNombre(montant)
    const invalide = nom.trim() === "" || valeur <= 0
 
    function creer() {
@@ -28,23 +31,9 @@ export default function FormDepense({ onFini }: { onFini?: () => void }) {
 
    return (
       <div>
-         <div className="champ">
-            <label>Nom</label>
-            <input value={nom} placeholder="Ex. Salle de sport" onChange={(e) => setNom(e.target.value)} />
-         </div>
-
-         <div className="champ">
-            <label>Type</label>
-            <div className="type-toggle rouge">
-               <button type="button" className={type === "regulier" ? "actif" : ""} onClick={() => setType("regulier")}>Permanente</button>
-               <button type="button" className={type === "occasionnel" ? "actif" : ""} onClick={() => setType("occasionnel")}>Ponctuelle</button>
-            </div>
-         </div>
-
-         <div className="champ">
-            <label>Montant</label>
-            <input value={montant} placeholder="0" onChange={(e) => setMontant(e.target.value)} />
-         </div>
+         <Champ label="Nom" valeur={nom} placeholder="Ex. Salle de sport" onChange={setNom} />
+         <ChoixType type={type} onChange={setType} rouge />
+         <Champ label="Montant" valeur={montant} placeholder="0" onChange={setMontant} />
 
          <div className="champ">
             <label>Payer depuis</label>
@@ -57,10 +46,7 @@ export default function FormDepense({ onFini }: { onFini?: () => void }) {
             </select>
          </div>
 
-         <div className="form-actions">
-            <button className="btn" type="button" onClick={() => onFini?.()}>Annuler</button>
-            <button className="btn btn-red" type="button" disabled={invalide} onClick={creer}>Créer</button>
-         </div>
+         <ActionsForm onAnnuler={() => onFini?.()} onValider={creer} couleur="red" invalide={invalide} />
       </div>
    )
 }

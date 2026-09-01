@@ -293,10 +293,11 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
    - [x] Reçoit `titre`, `sousTitre` et `onValider(montant)` (callback) en props
    - [x] Saisie décimale : virgule unique, 2 décimales max, conversion `,`→`.` centralisée
 
-- **S2 · Feuille de formulaire réutilisable** — `V2` ⬜
+- **S2 · Feuille de formulaire réutilisable** — `V2` ✅
   En tant qu'utilisatrice, je veux un formulaire cohérent pour créer/éditer.
-   - [ ] Blocs optionnels : nom, choix de type, sélecteur couleur/icône, montant
-   - [ ] Bouton « valider » désactivé tant que la saisie est invalide
+   - [x] Blocs réutilisables : `Champ` (label + input), `ChoixType` (Permanente/Ponctuelle) ; sélecteur couleur/icône dans `FormEnveloppe`
+   - [x] Bouton « valider » désactivé tant que la saisie est invalide (dans chaque formulaire)
+   - [x] Refacto : `Section`, `ModalePave`, `ConfirmationDepassement` extraits pour supprimer le copier-coller
 
 ---
 
@@ -306,7 +307,8 @@ Le code actuel utilise des stores séparés (`useRevenus`, `useDepenses`). La ci
 - ✅ Disponible calculé (`lib/calculs`), formatage € et mois (`lib/format`), registre d'icônes (`lib/styleEnveloppe`)
 - ✅ Tous les écrans stylés d'après la maquette (coquille + bottom-nav, cartes, bottom-sheets, pavé, donut)
 - ✅ Toute la V1 + V2 faites : E4/V4 (création), A1 (donut), M1 (nouveau mois), A6 (récap accueil)
-- 🧪 Tests Vitest : `lib/calculs.test.ts` + `store/useBudget.test.ts` (11 tests) — `npm test`
-- ⬜ Reste : E5, E6, D6/D7 (courses/prévisionnel), A3/A4 (interactions donut), S2
+- ✅ Composants réutilisables : `Section`, `ModalePave`, `ConfirmationDepassement`, `Champ`, `ChoixType`, `ActionsForm`, `MontantEditable`, `BoutonBascule` + helper `enNombre()` (refacto anti-copier-coller)
+- 🧪 Tests Vitest : `lib/calculs.test.ts` + `store/useBudget.test.ts` (23 tests) — `npm test`
+- ⬜ Reste : re-travailler l'info au survol du donut (A4, mise de côté pour l'instant)
 
 **Convention** : à chaque story qui touche une logique de calcul ou une action du store, ajouter/mettre à jour un test.

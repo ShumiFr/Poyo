@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Delete } from "lucide-react";
+import { enNombre } from "../lib/format";
 
 export default function PaveNumerique({
    titre,
@@ -18,7 +19,7 @@ export default function PaveNumerique({
 }) {
    const [value, setValue] = useState("")
 
-   const montant = Number(value.replace(",", "."))
+   const montant = enNombre(value)
    const invalide = montant <= 0
 
    const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]

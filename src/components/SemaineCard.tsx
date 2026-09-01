@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Check } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
 import { Modal } from './Modal'
-import format from '../lib/format'
+import Champ from './Champ'
+import format, { enNombre } from '../lib/format'
 import type { SemaineCourses } from '../types'
 
 export default function SemaineCard({ index, semaine }: { index: number, semaine: SemaineCourses }) {
@@ -18,7 +19,7 @@ export default function SemaineCard({ index, semaine }: { index: number, semaine
    }
 
    function enregistrer() {
-      definirBudget(index, Number(saisie.replace(",", ".")))
+      definirBudget(index, enNombre(saisie))
       setOuvertEdit(false)
    }
 
@@ -41,10 +42,7 @@ export default function SemaineCard({ index, semaine }: { index: number, semaine
          <Modal isOpen={ouvertEdit} onClose={() => setOuvertEdit(false)}>
             <h2>Budget · Semaine {index + 1}</h2>
             <p className="sous">Montant prévu pour cette semaine</p>
-            <div className="champ">
-               <label>Montant</label>
-               <input value={saisie} onChange={(e) => setSaisie(e.target.value)} />
-            </div>
+            <Champ label="Montant" valeur={saisie} onChange={setSaisie} />
             <div className="pave-actions">
                <button className="btn" onClick={() => setOuvertEdit(false)}>Annuler</button>
                <button className="btn btn-primary" onClick={enregistrer}>Enregistrer</button>

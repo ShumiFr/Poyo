@@ -5,8 +5,7 @@ import { reserveCourses } from "../lib/courses";
 import { COULEURS_HEX } from "../lib/styleEnveloppe";
 import { useBudget } from "../store/useBudget";
 import format from "../lib/format";
-import { Modal } from "../components/Modal";
-import PaveNumerique from "../components/PaveNumerique";
+import ModalePave from "../components/ModalePave";
 import Donut from "../components/Donut";
 
 export const Route = createFileRoute('/')({
@@ -122,16 +121,15 @@ function DashboardComponent() {
 
          <button className="btn btn-primary btn-full" onClick={() => setOpen(true)}>+ Entrée d'argent</button>
 
-         <Modal isOpen={open} onClose={() => setOpen(false)}>
-            <PaveNumerique
-               titre="Entrée d'argent"
-               sousTitre="Ajouté à ce qu'il reste"
-               couleur="green"
-               libelleValider="Ajouter"
-               onAnnuler={() => setOpen(false)}
-               onValider={(montant) => { ajouterAuCompte(montant); setOpen(false) }}
-            />
-         </Modal>
+         <ModalePave
+            ouvert={open}
+            onFermer={() => setOpen(false)}
+            titre="Entrée d'argent"
+            sousTitre="Ajouté à ce qu'il reste"
+            couleur="green"
+            libelleValider="Ajouter"
+            onValider={(montant) => { ajouterAuCompte(montant); setOpen(false) }}
+         />
       </>
    )
 }

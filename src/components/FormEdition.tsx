@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Champ from './Champ'
+import ActionsForm from './ActionsForm'
+import { enNombre } from '../lib/format'
 
 export default function FormEdition({
    nomInitial,
@@ -16,27 +19,21 @@ export default function FormEdition({
    const [nom, setNom] = useState(nomInitial)
    const [montant, setMontant] = useState(String(montantInitial))
 
-   const valeur = Number(montant.replace(',', '.'))
+   const valeur = enNombre(montant)
    const invalide = nom.trim() === '' || valeur <= 0
 
    return (
       <div>
-         <div className="champ">
-            <label>Nom</label>
-            <input value={nom} onChange={(e) => setNom(e.target.value)} />
-         </div>
+         <Champ label="Nom" valeur={nom} onChange={setNom} />
+         <Champ label="Montant" valeur={montant} onChange={setMontant} />
 
-         <div className="champ">
-            <label>Montant</label>
-            <input value={montant} onChange={(e) => setMontant(e.target.value)} />
-         </div>
-
-         <div className="form-actions">
-            {onAnnuler && <button className="btn" onClick={onAnnuler}>Annuler</button>}
-            <button className={"btn bg-" + couleur} disabled={invalide} onClick={() => onEnregistrer(nom.trim(), valeur)}>
-               Enregistrer
-            </button>
-         </div>
+         <ActionsForm
+            onAnnuler={() => onAnnuler?.()}
+            onValider={() => onEnregistrer(nom.trim(), valeur)}
+            couleur={couleur}
+            libelle="Enregistrer"
+            invalide={invalide}
+         />
       </div>
    )
 }

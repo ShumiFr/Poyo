@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useBudget } from '../store/useBudget'
 import { Modal } from './Modal'
-import PaveNumerique from './PaveNumerique'
-import format from '../lib/format'
+import ModalePave from './ModalePave'
+import ConfirmationDepassement from './ConfirmationDepassement'
+import format, { enNombre } from '../lib/format'
 import type { Voeu } from '../types'
 
 export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible: number }) {
@@ -41,7 +42,7 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
    }
 
    function confirmerAchat() {
-      acheterVoeu(voeu.id, Number(prixReel.replace(",", ".")))
+      acheterVoeu(voeu.id, enNombre(prixReel))
       setOuvertAchat(false)
    }
 
@@ -82,27 +83,25 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
             </button>
          )}
 
-         <Modal isOpen={ouvert} onClose={() => setOuvert(false)}>
-            <PaveNumerique
-               titre={"Mettre de côté · " + voeu.nom}
-               sousTitre={"Disponible : " + format(disponible)}
-               couleur="purple"
-               libelleValider="Mettre de côté"
-               onAnnuler={() => setOuvert(false)}
-               onValider={handleValider}
-            />
-         </Modal>
+         <ModalePave
+            ouvert={ouvert}
+            onFermer={() => setOuvert(false)}
+            titre={"Mettre de côté · " + voeu.nom}
+            sousTitre={"Disponible : " + format(disponible)}
+            couleur="purple"
+            libelleValider="Mettre de côté"
+            onValider={handleValider}
+         />
 
-         <Modal isOpen={ouvertRetrait} onClose={() => setOuvertRetrait(false)}>
-            <PaveNumerique
-               titre={"Retirer · " + voeu.nom}
-               sousTitre={"Mis de côté : " + format(voeu.montantActuel)}
-               couleur="purple"
-               libelleValider="Retirer"
-               onAnnuler={() => setOuvertRetrait(false)}
-               onValider={handleRetrait}
-            />
-         </Modal>
+         <ModalePave
+            ouvert={ouvertRetrait}
+            onFermer={() => setOuvertRetrait(false)}
+            titre={"Retirer · " + voeu.nom}
+            sousTitre={"Mis de côté : " + format(voeu.montantActuel)}
+            couleur="purple"
+            libelleValider="Retirer"
+            onValider={handleRetrait}
+         />
 
          <Modal isOpen={ouvertAchat} onClose={() => setOuvertAchat(false)}>
             <h2>Acheter · {voeu.nom}</h2>
@@ -120,18 +119,13 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
             </div>
          </Modal>
 
-         <Modal isOpen={montantEnAttente !== null} onClose={() => setMontantEnAttente(null)}>
-            <h2>Dépassement du disponible</h2>
-            <p className="sous">Vérifie avant de placer</p>
-            <ul className="legende">
-               <li><span className="libelle">Disponible sur le compte</span><span className="valeur">{format(disponible)}</span></li>
-               <li><span className="libelle">Montant à placer</span><span className="valeur text-red">{format(montantEnAttente ?? 0)}</span></li>
-            </ul>
-            <div className="pave-actions">
-               <button className="btn" onClick={() => setMontantEnAttente(null)}>Annuler</button>
-               <button className="btn bg-purple" onClick={confirmerDepassement}>Valider</button>
-            </div>
-         </Modal>
+         <ConfirmationDepassement
+            montant={montantEnAttente}
+            disponible={disponible}
+            couleur="purple"
+            onAnnuler={() => setMontantEnAttente(null)}
+            onValider={confirmerDepassement}
+         />
       </div>
    )
 }

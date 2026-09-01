@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useBudget } from "../store/useBudget";
+import Champ from "./Champ";
+import ChoixType from "./ChoixType";
+import ActionsForm from "./ActionsForm";
+import { enNombre } from "../lib/format";
 import type { Revenu } from "../types";
 
 export default function FormRevenu({ onFini }: { onFini?: () => void }) {
@@ -8,7 +12,7 @@ export default function FormRevenu({ onFini }: { onFini?: () => void }) {
    const [type, setType] = useState<'regulier' | 'occasionnel'>('regulier')
    const ajouterRevenu = useBudget((state) => state.ajouterRevenu)
 
-   const valeur = Number(montant.replace(",", "."))
+   const valeur = enNombre(montant)
    const invalide = nom.trim() === "" || valeur <= 0
 
    function creer() {
@@ -25,28 +29,11 @@ export default function FormRevenu({ onFini }: { onFini?: () => void }) {
 
    return (
       <div>
-         <div className="champ">
-            <label>Nom</label>
-            <input value={nom} placeholder="Ex. Prime" onChange={(e) => setNom(e.target.value)} />
-         </div>
+         <Champ label="Nom" valeur={nom} placeholder="Ex. Prime" onChange={setNom} />
+         <ChoixType type={type} onChange={setType} />
+         <Champ label="Montant" valeur={montant} placeholder="0" onChange={setMontant} />
 
-         <div className="champ">
-            <label>Type</label>
-            <div className="type-toggle">
-               <button type="button" className={type === "regulier" ? "actif" : ""} onClick={() => setType("regulier")}>Permanente</button>
-               <button type="button" className={type === "occasionnel" ? "actif" : ""} onClick={() => setType("occasionnel")}>Ponctuelle</button>
-            </div>
-         </div>
-
-         <div className="champ">
-            <label>Montant</label>
-            <input value={montant} placeholder="0" onChange={(e) => setMontant(e.target.value)} />
-         </div>
-
-         <div className="form-actions">
-            <button className="btn" type="button" onClick={() => onFini?.()}>Annuler</button>
-            <button className="btn btn-green" type="button" disabled={invalide} onClick={creer}>Créer</button>
-         </div>
+         <ActionsForm onAnnuler={() => onFini?.()} onValider={creer} couleur="green" invalide={invalide} />
       </div>
    )
 }
