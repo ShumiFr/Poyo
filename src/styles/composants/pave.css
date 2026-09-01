@@ -1,0 +1,18 @@
+.pave-montant {
+   @apply text-center font-extrabold;
+   font-size: 40px;
+   color: var(--accent);
+   margin: 8px 0 20px;
+}
+.pave-grid { @apply grid gap-2.5; grid-template-columns: repeat(3, 1fr); }
+.pave-grid button {
+   @apply font-semibold;
+   background: var(--carte-2);
+   border: 1px solid var(--ligne);
+   border-radius: 10px;
+   padding: 18px 0;
+   font-size: 20px;
+   color: var(--encre);
+}
+.pave-actions { @apply flex gap-2; margin-top: 16px; }
+.pave-actions .btn { @apply flex-1; }

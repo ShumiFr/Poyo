@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import calculerDisponible from "../lib/calculs";
 import { reserveCourses } from "../lib/courses";
-import { COULEURS_HEX } from "../lib/styleEnveloppe";
 import { useBudget } from "../store/useBudget";
 import format from "../lib/format";
 import ModalePave from "../components/ModalePave";
@@ -24,7 +23,6 @@ function DashboardComponent() {
    const ajouterAuCompte = useBudget((state) => state.ajouterAuCompte)
 
    const [open, setOpen] = useState(false)
-   const [envDepliees, setEnvDepliees] = useState(false)
 
    // Montants dérivés
    const revenusPercus = revenus.filter((r) => r.estRecu).reduce((s, r) => s + r.montant, 0)
@@ -36,6 +34,8 @@ function DashboardComponent() {
 
    // Écart entre le compte réel et sa reconstitution (entrées rapides / ajustements) → le récap boucle toujours
    const autresEntrees = compte - (soldeReporte + revenusPercus - chargesPayees)
+   // On regroupe tout ce qui rentre sur une seule ligne « Revenus perçus »
+   const revenusAffiches = revenusPercus + autresEntrees
 
    // Ce qu'il reste = compte − charges à venir − réserve courses − prévisionnel − enveloppes − vœux
    const reste = calculerDisponible(compte, depenses, enveloppes, voeux, courses, previsionnels)
@@ -43,16 +43,11 @@ function DashboardComponent() {
 
    // Donut : le compte réparti en reste / charges à venir / enveloppes / vœux
    const totalRing = restePositif + chargesAVenir + totalEnveloppes + totalVoeux
-   // Donut informatif : un segment par catégorie (repli / dépli des enveloppes)
-   const segmentsEnveloppes = envDepliees
-      ? enveloppes.map((e) => ({ valeur: e.montant, couleur: COULEURS_HEX[e.couleur] ?? "#4f7f96" }))
-      : [{ valeur: totalEnveloppes, couleur: "#4f7f96" }]
-
    const segments = [
-      { valeur: restePositif, couleur: "var(--teal)" },
-      { valeur: chargesAVenir, couleur: "var(--navy)" },
-      ...segmentsEnveloppes,
-      { valeur: totalVoeux, couleur: "var(--purple)" },
+      { valeur: restePositif, couleur: "var(--accent)" },
+      { valeur: chargesAVenir, couleur: "var(--orange)" },
+      { valeur: totalEnveloppes, couleur: "var(--teal)" },
+      { valeur: totalVoeux, couleur: "var(--violet)" },
    ]
 
    return (
@@ -64,6 +59,12 @@ function DashboardComponent() {
                centre={format(restePositif)}
                sousCentre={"sur " + format(compte)}
             />
+            <div className="donut-legende">
+               <span><span className="pastille" style={{ background: "var(--accent)" }} />Reste</span>
+               <span><span className="pastille" style={{ background: "var(--orange)" }} />Charges</span>
+               <span><span className="pastille" style={{ background: "var(--teal)" }} />Enveloppes</span>
+               <span><span className="pastille" style={{ background: "var(--violet)" }} />Vœux</span>
+            </div>
          </div>
 
          <div className="card recap">
@@ -71,48 +72,33 @@ function DashboardComponent() {
                <span>Solde du mois dernier</span>
                <span>{format(soldeReporte)}</span>
             </div>
-            <div className="recap-ligne">
+            <div className="recap-ligne vert">
                <span>Revenus perçus</span>
-               <span className="text-green">+ {format(revenusPercus)}</span>
+               <span>+ {format(revenusAffiches)}</span>
             </div>
-            <div className="recap-ligne">
+            <div className="recap-ligne rouge">
                <span>Charges payées</span>
-               <span className="text-red">− {format(chargesPayees)}</span>
+               <span>− {format(chargesPayees)}</span>
             </div>
-            {autresEntrees !== 0 && (
-               <div className="recap-ligne">
-                  <span>Autres entrées</span>
-                  <span className={autresEntrees > 0 ? "text-green" : "text-red"}>
-                     {autresEntrees > 0 ? "+ " : "− "}{format(Math.abs(autresEntrees))}
-                  </span>
-               </div>
-            )}
             <div className="recap-ligne sous-total">
                <span>Sur le compte</span>
                <span>{format(compte)}</span>
             </div>
-            <div className="recap-ligne">
+            <div className="recap-ligne rouge charges">
                <span>Charges à venir</span>
-               <span className="text-red">− {format(chargesAVenir)}</span>
+               <span>− {format(chargesAVenir)}</span>
             </div>
-            <div className="recap-ligne">
-               <span>
-                  Enveloppes
-                  {enveloppes.length > 0 && (
-                     <button className="recap-toggle" onClick={() => setEnvDepliees(!envDepliees)}>
-                        {envDepliees ? "−" : "+"}
-                     </button>
-                  )}
-               </span>
-               <span className="text-red">− {format(totalEnveloppes)}</span>
+            <div className="recap-ligne rouge enveloppes">
+               <span>Enveloppes</span>
+               <span>− {format(totalEnveloppes)}</span>
             </div>
-            <div className="recap-ligne">
+            <div className="recap-ligne rouge voeux">
                <span>Vœux</span>
-               <span className="text-red">− {format(totalVoeux)}</span>
+               <span>− {format(totalVoeux)}</span>
             </div>
             <div className="recap-ligne total">
                <span>Ce qu'il me reste</span>
-               <span className="text-teal">{format(restePositif)}</span>
+               <span>{format(restePositif)}</span>
             </div>
             {reste < 0 && (
                <div className="recap-manque">Il manque {format(-reste)}</div>

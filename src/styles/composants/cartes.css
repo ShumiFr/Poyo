@@ -1,0 +1,53 @@
+.card {
+   background: var(--carte);
+   border: 1px solid var(--ligne);
+   border-radius: 14px;
+   box-shadow: var(--shadow);
+   @apply p-4 mb-3;
+}
+.card h3 { font-size: 17px; }
+.card .sous { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+/* tête de carte : icône + nom + montant */
+.carte-tete { @apply flex items-center gap-3; }
+.carte-tete-btn { @apply w-full border-0 p-0 text-left; background: none; cursor: pointer; }
+.carte-tete h3 { @apply flex-1; }
+.carte-tete .montant { font-weight: 700; font-size: 17px; }
+.icone-box {
+   @apply inline-flex items-center justify-center;
+   width: 40px; height: 40px;
+   border-radius: 10px;
+   background: color-mix(in srgb, currentColor 14%, transparent);
+}
+.libelle-col { @apply flex-1; }
+.libelle-col h3 { font-size: 17px; }
+.carte-actions { @apply flex gap-2; margin-top: 14px; }
+.carte-actions .btn { @apply flex-1; }
+
+/* montant cliquable (édition) : souligné, dans la couleur de la catégorie */
+.montant-edit {
+   @apply border-0 font-bold underline;
+   background: none;
+   font-size: 17px;
+   text-underline-offset: 3px;
+   color: inherit;
+}
+
+/* états de carte */
+.card.payee { opacity: .5; }
+.card.recu { border-color: var(--vert); background: color-mix(in srgb, var(--vert) 8%, transparent); }
+.card.depense { border-color: color-mix(in srgb, var(--rouge) 35%, var(--ligne)); }
+
+/* ligne compacte de semaine de courses */
+.semaine-row {
+   @apply flex items-center gap-3;
+   background: var(--carte);
+   border: 1px solid var(--ligne);
+   border-radius: 10px;
+   padding: 10px 14px;
+   margin-bottom: 8px;
+}
+.semaine-row.faite { opacity: .55; }
+.semaine-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--teal); flex: none; }
+.semaine-nom { @apply flex-1 font-semibold; color: var(--encre); }
+.semaine-nom .sous { display: block; color: var(--muted); font-size: 12px; font-weight: 400; margin-top: 1px; }

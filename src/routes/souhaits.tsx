@@ -25,12 +25,16 @@ function RouteComponent() {
    const [creation, setCreation] = useState(false)
 
    const totalDisponible = calculerDisponible(compte, depenses, enveloppes, voeux, courses, previsionnels)
+   const totalMisDeCote = voeux.reduce((s, v) => s + v.montantActuel, 0)
 
    return (
       <>
          <div className="screen-titre-row">
             <h2>Vœux</h2>
-            <span className="screen-resume info">{format(Math.max(0, totalDisponible))} libre</span>
+         </div>
+         <div className="voeux-pilules">
+            <span className="pilule pilule-accent">{format(Math.max(0, totalDisponible))} libres</span>
+            <span className="pilule pilule-violet">{format(totalMisDeCote)} mis de côté</span>
          </div>
 
          {voeux.map((voeu) => (

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Clock, Pencil } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
 import { Modal } from '../components/Modal'
 import ModalePave from '../components/ModalePave'
@@ -54,20 +53,25 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
    }
 
    const Icone = ICONES[enveloppe.icone] ?? ICONES["shopping-cart"]
+   const dernier = mouvements[0]
+   const sousTitre = dernier
+      ? "Dernier mouvement " + new Date(dernier.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      : "Aucun mouvement"
 
    return (
       <div className="card">
-         <div className="carte-tete">
+         <button className="carte-tete carte-tete-btn" onClick={() => setOuvertHisto(true)}>
             <span className={"icone-box text-" + enveloppe.couleur}><Icone size={20} /></span>
-            <h3 style={{ flex: 1 }}>{enveloppe.nom}</h3>
+            <span className="libelle-col">
+               <h3>{enveloppe.nom}</h3>
+               <div className="sous">{sousTitre}</div>
+            </span>
             <span className={"montant text-" + enveloppe.couleur}>{format(enveloppe.montant)}</span>
-            <button className="carre-mini" onClick={() => setOuvertHisto(true)} aria-label="Historique"><Clock size={15} /></button>
-            <button className="carre-mini" onClick={() => setOuvertEdit(true)} aria-label="Modifier"><Pencil size={15} /></button>
-         </div>
+         </button>
 
          <div className="carte-actions">
             <button className="btn" onClick={() => setOuvertRetrait(true)}>Retirer</button>
-            <button className="btn btn-red" onClick={() => setOuvertDepense(true)}>Dépenser</button>
+            <button className={"btn btn-tinte text-" + enveloppe.couleur} onClick={() => setOuvertDepense(true)}>Dépenser</button>
             <button className={"btn bg-" + enveloppe.couleur} onClick={() => setOuvert(true)}>Ajouter</button>
          </div>
 
@@ -111,6 +115,7 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
                   <span className={f.type === "depense" || f.type === "enveloppeSortant" ? "text-red" : "text-green"}>{format(f.montant)}</span>
                </div>
             ))}
+            <button className="btn btn-full" style={{ marginTop: 16 }} onClick={() => { setOuvertHisto(false); setOuvertEdit(true) }}>Modifier l'enveloppe</button>
          </Modal>
 
          <Modal isOpen={ouvertEdit} onClose={() => setOuvertEdit(false)}>

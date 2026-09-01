@@ -1,0 +1,18 @@
+.carte-donut { @apply flex flex-col items-center; }
+.donut { @apply relative; width: 220px; height: 220px; }
+.donut svg { display: block; }
+.donut-centre {
+   @apply absolute inset-0 flex flex-col items-center justify-center text-center;
+}
+.donut-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.donut-valeur {
+   color: var(--accent);
+   font-size: 30px; font-weight: 800; line-height: 1.1;
+   white-space: nowrap;
+}
+.donut-sous { color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+/* légende sous le donut */
+.donut-legende { @apply flex flex-wrap items-center justify-center gap-4; margin-top: 14px; }
+.donut-legende span { @apply inline-flex items-center gap-1.5; color: var(--muted); font-size: 12px; }
+.donut-legende .pastille { width: 9px; height: 9px; border-radius: 999px; }

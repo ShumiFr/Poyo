@@ -1,0 +1,10 @@
+.section-header {
+   @apply flex items-center justify-between w-full font-bold uppercase;
+   background: none;
+   border: 0;
+   padding: 14px 4px 8px;
+   color: var(--muted);
+   font-size: 12px;
+   letter-spacing: .06em;
+}
+.section-header .total { color: var(--encre-2); }

@@ -1,6 +1,6 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
-import { useState } from "react";
-import { Clock, ArrowDown, FileText, Mail, Flag, AlignLeft, RefreshCw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Clock, ArrowDown, FileText, Mail, Flag, AlignLeft, RefreshCw, Sun, Moon } from "lucide-react";
 import { useBudget } from "../store/useBudget";
 import { Modal } from "../components/Modal";
 import { libelleMois } from "../lib/format";
@@ -23,6 +23,13 @@ function RootComponent() {
    const annee = useBudget((state) => state.annee);
    const compte = useBudget((state) => state.compte);
    const nouveauMois = useBudget((state) => state.nouveauMois);
+   const theme = useBudget((state) => state.theme);
+   const basculerTheme = useBudget((state) => state.basculerTheme);
+
+   // Applique le thème (classe .dark sur <html>) à chaque changement.
+   useEffect(() => {
+      document.documentElement.classList.toggle("dark", theme === "sombre");
+   }, [theme]);
 
    const [confirme, setConfirme] = useState(false);
    const [solde, setSolde] = useState("");
@@ -47,7 +54,12 @@ function RootComponent() {
                <div className="titre">Poyo</div>
                <div className="mois">{libelleMois(mois, annee)}</div>
             </div>
-            <button className="btn-mois" onClick={ouvrir}><RefreshCw size={16} /> Nouveau mois</button>
+            <div className="app-actions">
+               <button className="btn-theme" onClick={basculerTheme} aria-label="Changer de thème">
+                  {theme === "sombre" ? <Sun size={18} /> : <Moon size={18} />}
+               </button>
+               <button className="btn-mois" onClick={ouvrir}><RefreshCw size={16} /> Nouveau mois</button>
+            </div>
          </header>
 
          <Modal isOpen={confirme} onClose={() => setConfirme(false)}>
@@ -77,7 +89,7 @@ function RootComponent() {
                   activeProps={{ className: "actif" }}
                >
                   <item.Icone size={20} />
-                  {item.label}
+                  <span className="lib">{item.label}</span>
                </Link>
             ))}
          </nav>

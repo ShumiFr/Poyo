@@ -24,7 +24,7 @@ function SectionPrevisionnel() {
    const total = previsionnels.reduce((somme, p) => somme + p.montant, 0)
 
    return (
-      <Section titre="Prévisionnel · ajustable" total={total}>
+      <Section titre="Prévisionnel · ajustable" total={total} couleur="var(--cat-navy)">
          {previsionnels.map((p) => <PrevisionnelCard key={p.id} prev={p} />)}
          <button className="btn-ajout" onClick={() => setCreation(true)}><Plus size={18} /> Nouveau prévisionnel</button>
 
@@ -71,18 +71,18 @@ function RouteComponent() {
             <span className="screen-resume neg">{format(aVenir)} à venir</span>
          </div>
 
-         <Section titre="Régulières" total={total(regulieres)}>
+         <Section titre="Régulières" total={total(regulieres)} couleur="var(--rouge)">
             {regulieres.map((depense) => <DepenseCard key={depense.id} depense={depense} />)}
          </Section>
 
-         <Section titre={"Courses · " + courses.length + " semaines"} total={totalCourses}>
+         <Section titre={"Courses · " + courses.length + " semaines"} total={totalCourses} couleur="var(--teal)">
             {courses.map((semaine, i) => <SemaineCard key={i} index={i} semaine={semaine} />)}
          </Section>
 
          <SectionPrevisionnel />
 
          {ponctuelles.length > 0 && (
-            <Section titre="Ponctuelles" total={total(ponctuelles)}>
+            <Section titre="Ponctuelles" total={total(ponctuelles)} couleur="var(--rouge)">
                {ponctuelles.map((depense) => <DepenseCard key={depense.id} depense={depense} />)}
             </Section>
          )}

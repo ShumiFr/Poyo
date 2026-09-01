@@ -1,0 +1,59 @@
+.btn {
+   @apply font-semibold;
+   border: 1px solid var(--ligne);
+   background: var(--carte-2);
+   color: var(--encre);
+   border-radius: 10px;
+   padding: 12px 16px;
+}
+.btn-full { @apply w-full; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.btn-primary { background: var(--accent); color: var(--accent-contraste); border-color: transparent; }
+.btn-green { background: var(--vert); color: #fff; border-color: transparent; }
+.btn-red { background: var(--rouge); color: #fff; border-color: transparent; }
+/* bouton teinté : fond = couleur atténuée, texte = couleur (via text-<couleur>) */
+.btn-tinte { background: color-mix(in srgb, currentColor 16%, transparent); border-color: transparent; }
+
+/* bouton discret en pointillés (Nouvelle rentrée / dépense / vœu) */
+.btn-ajout {
+   @apply w-full inline-flex items-center justify-center gap-2 font-semibold;
+   background: none;
+   border: 1.5px dashed var(--ligne);
+   color: var(--muted);
+   border-radius: 14px;
+   padding: 16px;
+}
+
+/* carré (reçu / payer) */
+.carre {
+   @apply inline-flex items-center justify-center;
+   width: 44px; height: 44px;
+   flex: none;
+   border: 1px solid var(--ligne);
+   border-radius: 10px;
+   background: var(--carte-2);
+}
+
+/* mini carré (historique / modifier) */
+.carre-mini {
+   @apply inline-flex items-center justify-center;
+   width: 30px; height: 30px;
+   flex: none;
+   border: 1px solid var(--ligne);
+   border-radius: 8px;
+   background: var(--carte-2);
+   color: var(--muted);
+}
+
+/* coche des semaines de courses */
+.semaine-check {
+   @apply inline-flex items-center justify-center;
+   width: 28px; height: 28px;
+   flex: none;
+   border: 1px solid var(--ligne);
+   border-radius: 999px;
+   background: var(--carte-2);
+   color: #fff;
+}
+.semaine-check.ok { background: var(--teal); border-color: transparent; }

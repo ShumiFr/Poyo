@@ -25,11 +25,15 @@ export default function SemaineCard({ index, semaine }: { index: number, semaine
 
    return (
       <div className={semaine.faite ? "semaine-row faite" : "semaine-row"}>
-         <span className="semaine-nom">Semaine {index + 1}</span>
+         <span className="semaine-dot" />
+         <span className="semaine-nom">
+            Semaine {index + 1}
+            <span className="sous">Budget prévu</span>
+         </span>
 
          {semaine.faite
-            ? <span className="montant text-navy">{format(semaine.budget)}</span>
-            : <button className="montant-edit text-navy" onClick={ouvrirEdit}>{format(semaine.budget)}</button>}
+            ? <span className="montant text-teal">{format(semaine.budget)}</span>
+            : <button className="montant-edit text-teal" onClick={ouvrirEdit}>{format(semaine.budget)}</button>}
 
          <button
             className={semaine.faite ? "semaine-check ok" : "semaine-check"}

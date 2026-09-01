@@ -1,0 +1,34 @@
+/* récap ligne à ligne */
+.recap-ligne { @apply flex items-center justify-between; padding: 8px 0; }
+.recap-ligne span:last-child { font-weight: 600; }
+.recap-ligne.vert span { color: var(--vert); }
+.recap-ligne.rouge span { color: var(--rouge); }
+/* le nom prend la couleur de sa part dans le donut ; le montant reste rouge */
+.recap-ligne.charges span:first-child { color: var(--orange); }
+.recap-ligne.enveloppes span:first-child { color: var(--teal); }
+.recap-ligne.voeux span:first-child { color: var(--violet-soft); }
+.recap-ligne.sous-total { border-top: 1px solid var(--ligne); margin-top: 4px; padding-top: 12px; }
+.recap-ligne.sous-total span { font-weight: 700; color: var(--encre); }
+.recap-ligne.total { border-top: 2px solid var(--ligne); margin-top: 4px; padding-top: 12px; }
+.recap-ligne.total span { font-weight: 800; font-size: 18px; }
+.recap-ligne.total span:first-child { color: var(--encre); }
+.recap-ligne.total span:last-child { color: var(--accent); }
+
+.recap-manque {
+   @apply text-right font-semibold;
+   margin-top: 8px;
+   color: var(--rouge);
+   font-size: 14px;
+}
+
+/* légende (accueil A2 + modales de confirmation) */
+.legende { @apply m-0 p-0; list-style: none; }
+.legende li {
+   @apply flex items-center gap-3;
+   padding: 14px 4px;
+   border-bottom: 1px solid var(--ligne);
+}
+.legende .pastille { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.legende .libelle { @apply flex-1; }
+.legende .libelle .sous { color: var(--muted); font-size: 13px; }
+.legende .valeur { font-weight: 700; color: var(--encre); }

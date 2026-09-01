@@ -1,0 +1,29 @@
+/* Couleurs de catégorie (text-* pour le texte, bg-* pour les boutons pleins). */
+.text-navy { color: var(--cat-navy); }
+.text-steel { color: var(--cat-steel); }
+.text-teal { color: var(--cat-teal); }
+.text-green { color: var(--cat-green); }
+.text-sage { color: var(--cat-sage); }
+.text-gold { color: var(--cat-gold); }
+.text-red { color: var(--cat-red); }
+.text-rose { color: var(--cat-rose); }
+.text-purple { color: var(--cat-purple); }
+.text-lilac { color: var(--cat-lilac); }
+.text-blue { color: var(--cat-blue); }
+
+.bg-navy, .bg-steel, .bg-teal, .bg-green, .bg-sage, .bg-gold,
+.bg-red, .bg-rose, .bg-purple, .bg-lilac, .bg-blue {
+   color: #fff;
+   border-color: transparent;
+}
+.bg-navy { background: var(--cat-navy); }
+.bg-steel { background: var(--cat-steel); }
+.bg-teal { background: var(--cat-teal); }
+.bg-green { background: var(--cat-green); }
+.bg-sage { background: var(--cat-sage); }
+.bg-gold { background: var(--cat-gold); }
+.bg-red { background: var(--cat-red); }
+.bg-rose { background: var(--cat-rose); }
+.bg-purple { background: var(--cat-purple); }
+.bg-lilac { background: var(--cat-lilac); }
+.bg-blue { background: var(--cat-blue); }

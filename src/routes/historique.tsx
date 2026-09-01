@@ -10,10 +10,10 @@ type Style = { tag: string; signe: string; ligne: string; montant: string; Icone
 const affichage: Record<TypeAction, Style> = {
    revenu:           { tag: 'Rentrée',     signe: '+', ligne: 'f-green',  montant: 'text-green',  Icone: ArrowUp },
    depense:          { tag: 'Sortie',      signe: '−', ligne: 'f-red',    montant: 'text-red',    Icone: ArrowDown },
-   enveloppeEntrant: { tag: 'Mis de côté', signe: '',  ligne: 'f-navy',   montant: 'text-navy',   Icone: ArrowRight },
-   enveloppeSortant: { tag: 'Repris',      signe: '',  ligne: 'f-purple', montant: 'text-purple', Icone: ArrowLeft },
-   voeuEntrant:      { tag: 'Mis de côté', signe: '',  ligne: 'f-navy',   montant: 'text-navy',   Icone: ArrowRight },
-   voeuSortant:      { tag: 'Repris',      signe: '',  ligne: 'f-purple', montant: 'text-purple', Icone: ArrowLeft },
+   enveloppeEntrant: { tag: 'Mis de côté', signe: '',  ligne: 'f-navy',   montant: 'text-teal',   Icone: ArrowRight },
+   enveloppeSortant: { tag: 'Repris',      signe: '',  ligne: 'f-purple', montant: 'text-lilac',  Icone: ArrowLeft },
+   voeuEntrant:      { tag: 'Mis de côté', signe: '',  ligne: 'f-navy',   montant: 'text-teal',   Icone: ArrowRight },
+   voeuSortant:      { tag: 'Repris',      signe: '',  ligne: 'f-purple', montant: 'text-lilac',  Icone: ArrowLeft },
 }
 
 export const Route = createFileRoute('/historique')({
@@ -25,6 +25,11 @@ function RouteComponent() {
 
    return (
       <>
+         <div className="screen-titre-row">
+            <h2>Historique</h2>
+         </div>
+         <p className="sous" style={{ margin: "-8px 0 16px" }}>{historique.length} mouvements ce mois</p>
+
          {historique.map((flux) => {
             const s = affichage[flux.type]
             return (

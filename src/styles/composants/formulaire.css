@@ -1,0 +1,53 @@
+.champ { margin-bottom: 14px; }
+.champ label {
+   @apply block font-semibold;
+   font-size: 13px;
+   color: var(--encre-2);
+   margin-bottom: 6px;
+}
+.champ input, .champ select {
+   @apply w-full;
+   font: inherit;
+   padding: 12px 14px;
+   border: 1px solid var(--ligne);
+   border-radius: 10px;
+   background: var(--carte-2);
+   color: var(--encre);
+}
+.champ input:focus, .champ select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+.type-toggle { @apply flex gap-2; }
+.type-toggle button {
+   @apply flex-1 font-semibold;
+   padding: 12px;
+   border: 1px solid var(--ligne);
+   border-radius: 10px;
+   background: var(--carte-2);
+   color: var(--encre);
+}
+.type-toggle button.actif { background: var(--vert); color: #fff; border-color: transparent; }
+.type-toggle.rouge button.actif { background: var(--rouge); }
+
+.form-actions { @apply flex gap-2; margin-top: 8px; }
+.form-actions .btn { @apply flex-1; }
+
+/* sélecteur de couleur */
+.palette { @apply flex flex-wrap gap-2.5; }
+.pastille-choix {
+   width: 42px; height: 42px;
+   border-radius: 10px;
+   border: 2px solid transparent;
+}
+.pastille-choix.actif { outline: 2px solid var(--encre); outline-offset: 2px; }
+
+/* sélecteur d'icône */
+.grille-icones { @apply grid gap-2; grid-template-columns: repeat(6, 1fr); }
+.icone-choix {
+   @apply inline-flex items-center justify-center;
+   aspect-ratio: 1;
+   border: 1px solid var(--ligne);
+   border-radius: 10px;
+   background: var(--carte-2);
+   color: var(--encre-2);
+}
+.icone-choix.actif { border-color: currentColor; background: color-mix(in srgb, currentColor 14%, transparent); }

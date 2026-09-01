@@ -1,0 +1,25 @@
+.overlay {
+   @apply fixed inset-0 flex items-end justify-center;
+   background: var(--overlay);
+   z-index: 40;
+}
+.sheet {
+   @apply overflow-y-auto;
+   width: 430px;
+   max-width: 100%;
+   max-height: 92svh;
+   background: var(--carte);
+   border-radius: 20px 20px 0 0;
+   padding: 12px 20px calc(24px + env(safe-area-inset-bottom));
+   box-shadow: 0 -8px 30px rgba(0, 0, 0, .3);
+   animation: sheet-up .22s ease-out;
+}
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.sheet .grabber {
+   width: 40px; height: 4px;
+   border-radius: 999px;
+   background: var(--ligne);
+   margin: 0 auto 16px;
+}
+.sheet h2 { font-size: 20px; margin-bottom: 2px; }
+.sheet .sous { color: var(--muted); font-size: 14px; margin-bottom: 16px; }

@@ -57,8 +57,8 @@ function RouteComponent() {
             <span className="screen-resume pos">{format(totalRecu)} reçu</span>
          </div>
 
-         <Section titre="Réguliers" total={total(reguliers)}>{reguliers.map(ligne)}</Section>
-         {ponctuelles.length > 0 && <Section titre="Ponctuelles" total={total(ponctuelles)}>{ponctuelles.map(ligne)}</Section>}
+         <Section titre="Réguliers" total={total(reguliers)} couleur="var(--vert)">{reguliers.map(ligne)}</Section>
+         {ponctuelles.length > 0 && <Section titre="Ponctuelles" total={total(ponctuelles)} couleur="var(--vert)">{ponctuelles.map(ligne)}</Section>}
 
          <button className="btn-ajout" onClick={() => setCreation(true)}><Plus size={18} /> Nouvelle rentrée</button>
 

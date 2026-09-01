@@ -1,0 +1,70 @@
+/* En-tête d'application (Poyo + mois + actions) */
+.app-header {
+   @apply flex items-start justify-between;
+   padding: 20px 16px 8px;
+}
+.app-header .titre { font-size: 26px; letter-spacing: -.5px; }
+.app-header .mois { color: var(--muted); font-size: 14px; margin-top: 2px; }
+.app-actions { @apply flex items-center gap-2; }
+
+.btn-mois {
+   @apply inline-flex items-center gap-2 font-semibold;
+   background: var(--carte);
+   color: var(--encre);
+   border: 1px solid var(--ligne);
+   border-radius: 10px;
+   padding: 10px 14px;
+   box-shadow: var(--shadow);
+}
+.btn-mois svg { color: var(--accent); }
+
+/* Bouton jour / nuit */
+.btn-theme {
+   @apply inline-flex items-center justify-center;
+   width: 42px; height: 42px;
+   border-radius: 999px;
+   background: var(--carte);
+   color: var(--accent);
+   border: 1px solid var(--ligne);
+}
+
+/* Contenu d'écran */
+.screen {
+   @apply flex-1 overflow-y-auto;
+   padding: 8px 16px 96px;
+}
+.screen-titre-row {
+   @apply flex items-baseline justify-between;
+   margin: 8px 0 16px;
+}
+.screen-titre-row h2 { font-size: 22px; }
+.screen-resume { font-weight: 700; }
+.screen-resume.pos { color: var(--vert); }
+.screen-resume.neg { color: var(--rouge); }
+.screen-resume.info { color: var(--muted); }
+
+/* Barre d'onglets du bas : actif = pastille accent avec libellé, inactif = icône seule */
+.bottom-nav {
+   @apply fixed bottom-0 flex justify-around;
+   left: 50%;
+   transform: translateX(-50%);
+   width: 430px;
+   max-width: 100%;
+   background: var(--carte);
+   border-top: 1px solid var(--ligne);
+   padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+   z-index: 20;
+}
+.bottom-nav a {
+   @apply inline-flex items-center justify-center gap-2 no-underline font-semibold;
+   color: var(--muted);
+   font-size: 13px;
+   padding: 8px 12px;
+   border-radius: 999px;
+}
+.bottom-nav a .lib { display: none; }
+.bottom-nav a.actif {
+   background: color-mix(in srgb, var(--accent) 18%, transparent);
+   color: var(--accent);
+}
+.bottom-nav a.actif .lib { display: inline; }

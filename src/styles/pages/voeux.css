@@ -1,0 +1,18 @@
+.voeux-pilules { @apply flex flex-wrap gap-2; margin-bottom: 16px; }
+.pilule { @apply inline-flex items-center font-semibold; padding: 6px 12px; border-radius: 999px; font-size: 13px; }
+.pilule-accent { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.pilule-violet { background: color-mix(in srgb, var(--violet) 18%, transparent); color: var(--violet); }
+
+.voeu-tete { @apply flex items-baseline justify-between; }
+.voeu-tete .sur { color: var(--muted); font-size: 13px; }
+.voeu-montant { @apply font-extrabold; font-size: 22px; margin-top: 4px; }
+.voeu-montant .pct { @apply font-semibold; font-size: 13px; color: var(--muted); }
+
+.barre {
+   @apply overflow-hidden;
+   background: color-mix(in srgb, var(--violet) 18%, transparent);
+   border-radius: 999px;
+   height: 8px;
+   margin: 10px 0 14px;
+}
+.barre-remplie { background: var(--violet-soft); height: 100%; border-radius: 999px; }

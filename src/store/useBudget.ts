@@ -8,6 +8,7 @@ export interface BudgetStore {
    soldeReporte: number,
    mois: number,
    annee: number,
+   theme: 'sombre' | 'clair',
    revenus: Revenu[],
    depenses: Depense[],
    enveloppes: Enveloppe[],
@@ -15,6 +16,9 @@ export interface BudgetStore {
    courses: SemaineCourses[],
    previsionnels: Previsionnel[],
    historique: Flux[]
+
+   //Thème
+   basculerTheme: () => void
 
    //Mois
    nouveauMois: (soldeReel: number) => void
@@ -69,6 +73,7 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
    soldeReporte: 0,
    mois: new Date().getMonth(),
    annee: new Date().getFullYear(),
+   theme: 'sombre',
    revenus: [
       {
          id: "1",
@@ -118,6 +123,9 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
          type: "depense"
       }
    ],
+
+   basculerTheme: () =>
+      set((state) => ({ theme: state.theme === 'sombre' ? 'clair' : 'sombre' })),
 
    nouveauMois: (soldeReel) => {
       // Écart entre le solde réel confirmé et celui suivi par l'app.

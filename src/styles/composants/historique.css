@@ -1,0 +1,23 @@
+.flux {
+   @apply flex items-center justify-between gap-3;
+   background: var(--carte);
+   border: 1px solid var(--ligne);
+   border-left-width: 4px;
+   border-radius: 10px;
+   padding: 12px 14px;
+   margin-bottom: 10px;
+}
+.flux .libelle { font-weight: 700; color: var(--encre); }
+.flux .sous { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.flux .montant { font-weight: 700; white-space: nowrap; }
+.flux-icone {
+   @apply inline-flex items-center justify-center;
+   width: 30px; height: 30px;
+   flex: none;
+   border-radius: 8px;
+   background: color-mix(in srgb, currentColor 16%, transparent);
+}
+.flux.f-green { border-left-color: var(--vert); background: color-mix(in srgb, var(--vert) 7%, var(--carte)); }
+.flux.f-red { border-left-color: var(--rouge); background: color-mix(in srgb, var(--rouge) 7%, var(--carte)); }
+.flux.f-navy { border-left-color: var(--teal); background: color-mix(in srgb, var(--teal) 7%, var(--carte)); }
+.flux.f-purple { border-left-color: var(--violet); background: color-mix(in srgb, var(--violet) 7%, var(--carte)); }
