@@ -1,0 +1,70 @@
+name: Build Android APK
+
+# Se lance manuellement (bouton "Run workflow") ou à chaque push sur main.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      # Version du NDK Android installée plus bas ; NDK_HOME est ce que Tauri lit.
+      NDK_VERSION: "27.2.12479018"
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      # --- Frontend (Node) ---
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Installer les dépendances npm
+        run: npm ci
+
+      # --- Java (pour Gradle) ---
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # --- SDK + NDK Android ---
+      - name: Installer le SDK Android
+        uses: android-actions/setup-android@v3
+
+      - name: Installer le NDK
+        run: |
+          sdkmanager "ndk;${NDK_VERSION}" "platforms;android-34" "build-tools;34.0.0"
+          echo "NDK_HOME=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
+
+      # --- Rust + cibles Android ---
+      - name: Installer Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      # --- Génération du projet Android puis build de l'APK debug ---
+      - name: Initialiser le projet Android
+        run: npm run tauri android init -- --ci
+
+      - name: Construire l'APK (debug)
+        run: npm run tauri android build -- --debug --apk
+
+      # --- Publication de l'APK en artifact téléchargeable ---
+      - name: Publier l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: poyo-debug-apk
+          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error

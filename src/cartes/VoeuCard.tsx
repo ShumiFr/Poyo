@@ -79,7 +79,7 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
 
          {atteint && (
             <button className="btn btn-green btn-full" style={{ marginTop: 10 }} onClick={ouvrirAchat}>
-               🎉 Acheter
+               Acheter
             </button>
          )}
 
