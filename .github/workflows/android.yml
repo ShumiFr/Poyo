@@ -1,10 +1,10 @@
 name: Build Android APK
 
-# Se lance manuellement (bouton "Run workflow") ou à chaque push sur main.
+# Se lance manuellement (bouton "Run workflow") ou à chaque push sur main/dev.
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, dev]
 
 jobs:
   build:
