@@ -385,6 +385,63 @@ describe("cascade — modifier un mois passé (étape B)", () => {
       expect(s.moisListe[1].revenus).toHaveLength(0)   // ponctuelle : pas de report
    })
 
+   it("supprimer une charge PAYÉE d'un mois passé rend l'argent et remonte les mois suivants", () => {
+      useBudget.setState({
+         moisListe: [
+            moisBase({ mois: 4, compte: 300, depenses: [{ ...depense(200), estPayer: true }] }),
+            moisBase({ mois: 5, compte: 700, soldeReporte: 300 }),
+         ],
+         indexActif: 0,
+         historique: [],
+      })
+
+      useBudget.getState().retirerDepense("d1")   // on supprime une charge de 200 déjà payée
+
+      const s = useBudget.getState()
+      expect(s.moisListe[0].compte).toBe(500)        // mai : 300 + 200 rendus
+      expect(s.moisListe[1].soldeReporte).toBe(500)  // juin démarre 200 plus haut
+      expect(s.moisListe[1].compte).toBe(900)        // juin : 700 + 200
+   })
+
+   it("supprimer une charge NON payée ne change pas le compte", () => {
+      useBudget.setState({
+         moisListe: [
+            moisBase({ mois: 4, compte: 300, depenses: [depense(200)] }),   // non payée
+            moisBase({ mois: 5, compte: 700, soldeReporte: 300 }),
+         ],
+         indexActif: 0,
+         historique: [],
+      })
+
+      useBudget.getState().retirerDepense("d1")
+
+      const s = useBudget.getState()
+      expect(s.moisListe[0].compte).toBe(300)        // inchangé (jamais sortie du compte)
+      expect(s.moisListe[1].soldeReporte).toBe(300)  // le mois suivant ne bouge pas
+   })
+
+   it("supprimer un revenu REÇU le retire aussi du compte", () => {
+      useBudget.setState({
+         moisListe: [moisBase({ mois: 4, compte: 1400, revenus: [{ ...revenu(1400), estRecu: true }] })],
+         indexActif: 0,
+         historique: [],
+      })
+
+      useBudget.getState().retirerRevenu("r1")
+      expect(useBudget.getState().moisListe[0].compte).toBe(0)
+   })
+
+   it("modifier le montant d'une charge payée ajuste le compte de la différence", () => {
+      useBudget.setState({
+         moisListe: [moisBase({ mois: 4, compte: 300, depenses: [{ ...depense(200), estPayer: true }] })],
+         indexActif: 0,
+         historique: [],
+      })
+
+      useBudget.getState().modifierDepense("d1", "Loyer", 250)   // +50 par rapport à 200
+      expect(useBudget.getState().moisListe[0].compte).toBe(250)   // 300 − 50
+   })
+
    it("modifier le mois en cours ne crée aucune propagation (rien après lui)", () => {
       useBudget.setState({
          moisListe: [moisBase({ mois: 4, compte: 500 }), moisBase({ mois: 5, compte: 800 })],

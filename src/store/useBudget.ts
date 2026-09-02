@@ -347,9 +347,16 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
       }),
 
    retirerRevenu: (id) =>
-      set((state) => majActif(state, {
-         revenus: moisActif(state).revenus.filter((revenu) => revenu.id !== id)
-      })),
+      set((state) => {
+         const a = moisActif(state);
+         const revenu = a.revenus.find((r) => r.id === id);
+         // S'il était déjà reçu, l'argent doit ressortir du compte.
+         const compte = revenu?.estRecu ? a.compte - revenu.montant : a.compte;
+         return majActif(state, {
+            revenus: a.revenus.filter((r) => r.id !== id),
+            compte,
+         });
+      }),
 
    marquerRecu: (id) => {
       const revenu = moisActif(get()).revenus.find((r) => r.id === id);
@@ -374,9 +381,16 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    },
 
    modifierRevenu: (id, nom, montant) =>
-      set((state) => majActif(state, {
-         revenus: moisActif(state).revenus.map((r) => r.id === id ? { ...r, nom, montant } : r)
-      })),
+      set((state) => {
+         const a = moisActif(state);
+         const revenu = a.revenus.find((r) => r.id === id);
+         // S'il est déjà reçu, on ajuste le compte de la différence de montant.
+         const diff = revenu?.estRecu ? montant - revenu.montant : 0;
+         return majActif(state, {
+            revenus: a.revenus.map((r) => r.id === id ? { ...r, nom, montant } : r),
+            compte: a.compte + diff,
+         });
+      }),
 
    ajouterDepense: (depense) =>
       set((state) => {
@@ -393,14 +407,28 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
       }),
 
    retirerDepense: (id) =>
-      set((state) => majActif(state, {
-         depenses: moisActif(state).depenses.filter((depense) => depense.id !== id)
-      })),
+      set((state) => {
+         const a = moisActif(state);
+         const depense = a.depenses.find((d) => d.id === id);
+         // Si elle était déjà payée, l'argent revient au compte.
+         const compte = depense?.estPayer ? a.compte + depense.montant : a.compte;
+         return majActif(state, {
+            depenses: a.depenses.filter((d) => d.id !== id),
+            compte,
+         });
+      }),
 
    modifierDepense: (id, nom, montant) =>
-      set((state) => majActif(state, {
-         depenses: moisActif(state).depenses.map((d) => d.id === id ? { ...d, nom, montant } : d)
-      })),
+      set((state) => {
+         const a = moisActif(state);
+         const depense = a.depenses.find((d) => d.id === id);
+         // Si elle est déjà payée, on ajuste le compte de la différence de montant.
+         const diff = depense?.estPayer ? montant - depense.montant : 0;
+         return majActif(state, {
+            depenses: a.depenses.map((d) => d.id === id ? { ...d, nom, montant } : d),
+            compte: a.compte - diff,
+         });
+      }),
 
    depenserImmediat: (nom, montant, type, source) => {
       // On garde une trace sous forme de dépense déjà payée (grisée)
