@@ -1,11 +1,22 @@
 import { supabase } from "./supabase";
 import { useBudget } from "../store/useBudget";
+import { genererSemaines } from "./courses";
 import type { MoisBudget } from "../types";
+
+// Chaque mois doit avoir ses semaines de courses. Les mois vierges du passé
+// avaient été créés sans (0 semaine) : on les remplit à 0 €.
+function garantirCourses(moisListe: MoisBudget[]): MoisBudget[] {
+   return moisListe.map((m) =>
+      m.courses && m.courses.length > 0 ? m : { ...m, courses: genererSemaines(m.mois, m.annee, 0) }
+   );
+}
 
 // Convertit un budget de l'ancien format (un seul mois « à plat ») vers le
 // nouveau (une liste de mois). Les données déjà au nouveau format passent tel quel.
 function normaliserBudget(data: Record<string, unknown>): Record<string, unknown> {
-   if (Array.isArray(data.moisListe)) return data;   // déjà au nouveau format
+   if (Array.isArray(data.moisListe)) {
+      return { ...data, moisListe: garantirCourses(data.moisListe as MoisBudget[]) };
+   }
 
    const moisCourant: MoisBudget = {
       mois: (data.mois as number) ?? new Date().getMonth(),
@@ -26,7 +37,7 @@ function normaliserBudget(data: Record<string, unknown>): Record<string, unknown
    const moisListe = [...anciennesArchives, moisCourant];
 
    return {
-      moisListe,
+      moisListe: garantirCourses(moisListe),
       indexActif: moisListe.length - 1,
       theme: data.theme ?? "sombre",
       historique: data.historique ?? [],

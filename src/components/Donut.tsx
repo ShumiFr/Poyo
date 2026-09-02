@@ -21,8 +21,8 @@ export default function Donut({
    return (
       <div className="donut">
          <svg viewBox="0 0 160 160" width="220" height="220">
-            {/* piste de fond */}
-            <circle cx="80" cy="80" r={R} fill="none" stroke="var(--line)" strokeWidth={W} />
+            {/* piste de fond grise (toujours visible, même quand il n'y a rien) */}
+            <circle cx="80" cy="80" r={R} fill="none" stroke="var(--ligne)" strokeWidth={W} />
 
             {total > 0 && segments.map((s, i) => {
                const longueur = (s.valeur / total) * C

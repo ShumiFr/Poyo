@@ -183,7 +183,9 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
          const vide: MoisBudget = {
             mois: moisIndex, annee,
             soldeReporte: 0, compte: 0,
-            revenus: [], depenses: [], enveloppes: [], voeux: [], courses: [], previsionnels: [],
+            revenus: [], depenses: [], enveloppes: [], voeux: [],
+            courses: genererSemaines(moisIndex, annee, 0),   // les semaines existent, à 0 €
+            previsionnels: [],
          };
          return { moisListe: [vide, ...state.moisListe], indexActif: 0 };
       }),
@@ -209,11 +211,15 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
          // On crée tous les mois vierges manquants, de la cible jusqu'au premier existant.
          const vides: MoisBudget[] = [];
          for (let k = cible; k < cle(premier); k++) {
+            const m = ((k % 12) + 12) % 12;
+            const a = Math.floor(k / 12);
             vides.push({
-               mois: ((k % 12) + 12) % 12,
-               annee: Math.floor(k / 12),
+               mois: m,
+               annee: a,
                soldeReporte: 0, compte: 0,
-               revenus: [], depenses: [], enveloppes: [], voeux: [], courses: [], previsionnels: [],
+               revenus: [], depenses: [], enveloppes: [], voeux: [],
+               courses: genererSemaines(m, a, 0),   // semaines présentes, à 0 €
+               previsionnels: [],
             });
          }
          return { moisListe: [...vides, ...state.moisListe], indexActif: 0 };

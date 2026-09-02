@@ -253,7 +253,9 @@ describe("navigation entre les mois", () => {
       expect(vide.annee).toBe(2026)
       expect(vide.compte).toBe(0)               // tout est à 0
       expect(vide.depenses).toHaveLength(0)     // aucune charge régulière (rien n'existait)
-      expect(vide.courses).toHaveLength(0)
+      // les semaines de courses existent mais sont à 0 €
+      expect(vide.courses.length).toBeGreaterThan(0)
+      expect(vide.courses.every((c) => c.budget === 0)).toBe(true)
    })
 
    it("précédent passe l'année en arrière depuis janvier", () => {
