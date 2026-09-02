@@ -210,25 +210,46 @@ describe("nouveauMois (M1)", () => {
 })
 
 describe("navigation entre les mois", () => {
-   it("précédent / suivant se déplacent sans sortir des bornes", () => {
-      // Trois mois : mai, juin, juillet (juillet = en cours)
+   it("suivant ne dépasse jamais le mois en cours", () => {
       useBudget.setState({
-         moisListe: [
-            moisBase({ mois: 4 }), moisBase({ mois: 5 }), moisBase({ mois: 6 }),
-         ],
-         indexActif: 2,
+         moisListe: [moisBase({ mois: 4 }), moisBase({ mois: 5 }), moisBase({ mois: 6 })],
+         indexActif: 0,
+      })
+      useBudget.getState().moisSuivant()
+      useBudget.getState().moisSuivant()
+      useBudget.getState().moisSuivant()
+      expect(useBudget.getState().indexActif).toBe(2)   // bloqué au mois en cours (le dernier)
+   })
+
+   it("précédent au tout début crée un mois vierge (tout à 0)", () => {
+      useBudget.setState({
+         moisListe: [moisBase({ mois: 5, annee: 2026, compte: 800, depenses: [depense(200)] })],
+         indexActif: 0,
       })
 
       useBudget.getState().moisPrecedent()
-      expect(useBudget.getState().indexActif).toBe(1)
-      useBudget.getState().moisPrecedent()
-      useBudget.getState().moisPrecedent()
-      expect(useBudget.getState().indexActif).toBe(0)   // bloqué au premier
 
-      useBudget.getState().moisSuivant()
-      useBudget.getState().moisSuivant()
-      useBudget.getState().moisSuivant()
-      expect(useBudget.getState().indexActif).toBe(2)   // bloqué au mois en cours
+      const s = useBudget.getState()
+      expect(s.moisListe).toHaveLength(2)
+      expect(s.indexActif).toBe(0)              // on affiche le nouveau mois
+      const vide = s.moisListe[0]
+      expect(vide.mois).toBe(4)                 // avril, le mois d'avant
+      expect(vide.annee).toBe(2026)
+      expect(vide.compte).toBe(0)               // tout est à 0
+      expect(vide.depenses).toHaveLength(0)     // aucune charge régulière (rien n'existait)
+      expect(vide.courses).toHaveLength(0)
+   })
+
+   it("précédent passe l'année en arrière depuis janvier", () => {
+      useBudget.setState({
+         moisListe: [moisBase({ mois: 0, annee: 2026 })],
+         indexActif: 0,
+      })
+      useBudget.getState().moisPrecedent()
+
+      const vide = useBudget.getState().moisListe[0]
+      expect(vide.mois).toBe(11)   // décembre
+      expect(vide.annee).toBe(2025)
    })
 
 })

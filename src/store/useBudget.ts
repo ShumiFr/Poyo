@@ -170,9 +170,21 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    basculerTheme: () =>
       set((state) => ({ theme: state.theme === 'sombre' ? 'clair' : 'sombre' })),
 
-   // On recule dans le temps, sans jamais dépasser le premier mois.
+   // On recule dans le temps. Si on est déjà au tout premier mois de la liste,
+   // on crée un mois vierge juste avant (tout à 0 : à cette époque, rien n'existait).
    moisPrecedent: () =>
-      set((state) => ({ indexActif: Math.max(0, state.indexActif - 1) })),
+      set((state) => {
+         if (state.indexActif > 0) return { indexActif: state.indexActif - 1 };
+         const premier = state.moisListe[0];
+         const moisIndex = (premier.mois + 11) % 12;
+         const annee = premier.mois === 0 ? premier.annee - 1 : premier.annee;
+         const vide: MoisBudget = {
+            mois: moisIndex, annee,
+            soldeReporte: 0, compte: 0,
+            revenus: [], depenses: [], enveloppes: [], voeux: [], courses: [], previsionnels: [],
+         };
+         return { moisListe: [vide, ...state.moisListe], indexActif: 0 };
+      }),
 
    // On avance, mais jamais au-delà du mois en cours (le dernier de la liste).
    moisSuivant: () =>

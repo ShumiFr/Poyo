@@ -12,12 +12,12 @@ export default function Calendrier() {
    const basculerMoisTest = useBudget((state) => state.basculerMoisTest);
 
    const actif = moisListe[indexActif];
-   const estPremier = indexActif === 0;
    const estDernier = indexActif === moisListe.length - 1;
 
    return (
       <div className="mois-nav">
-         <button className="mois-fleche" onClick={moisPrecedent} disabled={estPremier} aria-label="Mois précédent">
+         {/* ◀ ne se bloque jamais : au tout début, elle crée un mois vierge précédent */}
+         <button className="mois-fleche" onClick={moisPrecedent} aria-label="Mois précédent">
             <ChevronLeft size={18} />
          </button>
 
