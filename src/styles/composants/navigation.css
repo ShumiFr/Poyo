@@ -1,7 +1,8 @@
 /* En-tête d'application (Poyo + mois + actions) */
 .app-header {
    @apply flex items-start justify-between;
-   padding: 20px 16px 8px;
+   /* + safe-area en haut : évite que l'heure/batterie d'Android chevauche le titre */
+   padding: calc(20px + env(safe-area-inset-top)) 16px 8px;
 }
 .app-header .titre { font-size: 26px; letter-spacing: -.5px; }
 .app-header .mois { color: var(--muted); font-size: 14px; margin-top: 2px; }
