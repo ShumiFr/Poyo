@@ -95,7 +95,7 @@ function RootComponent() {
       <>
          <header className="app-header">
             <div>
-               <div className="titre">{session.user.user_metadata?.nom || "Poyo"}</div>
+               <div className="titre">{session.user.user_metadata?.nom || "Mon Budget"}</div>
                <div className="mois">{libelleMois(mois, annee)}</div>
             </div>
             <div className="app-actions">

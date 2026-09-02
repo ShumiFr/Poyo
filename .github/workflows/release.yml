@@ -110,8 +110,8 @@ jobs:
         run: |
           FICHIER=$(find src-tauri/gen/android -path "*release*" -name "*.apk" ! -name "*unsigned*" | head -1)
           echo "APK trouvée : $FICHIER"
-          cp "$FICHIER" "poyo-${GITHUB_REF_NAME}.apk"
-          echo "chemin=poyo-${GITHUB_REF_NAME}.apk" >> "$GITHUB_OUTPUT"
+          cp "$FICHIER" "mon-budget-${GITHUB_REF_NAME}.apk"
+          echo "chemin=mon-budget-${GITHUB_REF_NAME}.apk" >> "$GITHUB_OUTPUT"
 
       - name: Créer la GitHub Release
         uses: softprops/action-gh-release@v2

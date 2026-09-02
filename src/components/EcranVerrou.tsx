@@ -44,7 +44,7 @@ export default function EcranVerrou({ onDeverrouille }: { onDeverrouille: () => 
    return (
       <main className="auth-ecran">
          <div className="card auth-carte">
-            <div className="auth-titre">Poyo</div>
+            <div className="auth-titre">Mon Budget</div>
 
             {!oubli ? (
                <>

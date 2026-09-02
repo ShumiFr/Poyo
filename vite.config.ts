@@ -20,8 +20,8 @@ export default defineConfig({
           VitePWA({
             registerType: "autoUpdate",
             manifest: {
-              name: "Poyo",
-              short_name: "Poyo",
+              name: "Mon Budget",
+              short_name: "Mon Budget",
               theme_color: "#E6E9EC",
               background_color: "#E6E9EC",
               display: "standalone",
