@@ -35,6 +35,10 @@
    min-width: 96px;
    justify-content: center;
    font-size: 14px;
+   background: none;
+   border: none;
+   color: var(--encre);
+   cursor: pointer;
 }
 .mois-passe {
    font-size: 11px; font-weight: 700;
@@ -42,6 +46,26 @@
    background: color-mix(in srgb, var(--accent) 16%, transparent);
    padding: 2px 8px; border-radius: 999px;
 }
+
+/* Sélecteur mois / année (clic sur le mois) */
+.selecteur-annee { @apply flex items-center justify-center gap-4; margin-bottom: 16px; }
+.selecteur-annee-valeur { font-size: 20px; font-weight: 800; min-width: 72px; text-align: center; }
+.selecteur-grille { @apply grid gap-2; grid-template-columns: repeat(3, 1fr); }
+.selecteur-mois {
+   @apply font-semibold;
+   padding: 12px 0;
+   border-radius: 10px;
+   background: var(--carte-2);
+   border: 1px solid var(--ligne);
+   color: var(--encre);
+   cursor: pointer;
+}
+.selecteur-mois.actif {
+   background: color-mix(in srgb, var(--accent) 18%, transparent);
+   border-color: var(--accent);
+   color: var(--accent);
+}
+.selecteur-mois:disabled { opacity: .35; cursor: default; }
 
 /* Bouton jour / nuit */
 .btn-theme {

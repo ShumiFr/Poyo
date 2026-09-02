@@ -252,6 +252,33 @@ describe("navigation entre les mois", () => {
       expect(vide.annee).toBe(2025)
    })
 
+   it("allerAuMois : rejoint un mois déjà présent", () => {
+      useBudget.setState({
+         moisListe: [moisBase({ mois: 4 }), moisBase({ mois: 5 }), moisBase({ mois: 6 })],
+         indexActif: 2,
+      })
+      useBudget.getState().allerAuMois(4, 2026)   // mai
+      expect(useBudget.getState().indexActif).toBe(0)
+   })
+
+   it("allerAuMois : dans le passé, comble le trou avec des mois vierges", () => {
+      // On n'a que septembre 2026 ; on saute directement à juin 2026.
+      useBudget.setState({
+         moisListe: [moisBase({ mois: 8, annee: 2026, compte: 500 })],
+         indexActif: 0,
+      })
+      useBudget.getState().allerAuMois(5, 2026)   // juin
+
+      const s = useBudget.getState()
+      // juin, juillet, août créés vides + septembre existant = 4 mois
+      expect(s.moisListe).toHaveLength(4)
+      expect(s.indexActif).toBe(0)
+      expect(s.moisListe[0]).toMatchObject({ mois: 5, annee: 2026, compte: 0 })
+      expect(s.moisListe[1].mois).toBe(6)   // juillet
+      expect(s.moisListe[2].mois).toBe(7)   // août
+      expect(s.moisListe[3].mois).toBe(8)   // septembre (le mois d'origine)
+   })
+
 })
 
 describe("cascade — modifier un mois passé (étape B)", () => {

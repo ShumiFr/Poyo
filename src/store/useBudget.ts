@@ -102,7 +102,7 @@ export interface BudgetStore {
    //Navigation entre les mois (calendrier)
    moisPrecedent: () => void
    moisSuivant: () => void
-   basculerMoisTest: () => void   // dev seulement : ajoute/retire un mois d'exemple
+   allerAuMois: (mois: number, annee: number) => void   // saut direct depuis le sélecteur
 
    //Mois
    nouveauMois: (soldeReel: number) => void
@@ -190,37 +190,31 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    moisSuivant: () =>
       set((state) => ({ indexActif: Math.min(state.moisListe.length - 1, state.indexActif + 1) })),
 
-   // Dev seulement : ajoute (ou retire) un mois d'exemple en tête de liste
-   // pour pouvoir tester la navigation sans attendre un vrai changement de mois.
-   basculerMoisTest: () =>
+   // Saut direct à un mois/année (depuis le sélecteur). S'il est avant le premier
+   // mois de la liste, on comble le trou avec des mois vierges pour rester continu.
+   // On ne va jamais après le mois en cours (le sélecteur l'interdit déjà).
+   allerAuMois: (mois, annee) =>
       set((state) => {
-         const dejaLa = state.moisListe[0]?.annee === 2000
-         if (dejaLa) {
-            return {
-               moisListe: state.moisListe.slice(1),
-               indexActif: Math.max(0, state.indexActif - 1),
-            };
+         const cle = (m: MoisBudget) => m.annee * 12 + m.mois;
+         const cible = annee * 12 + mois;
+
+         const idx = state.moisListe.findIndex((m) => cle(m) === cible);
+         if (idx !== -1) return { indexActif: idx };   // le mois existe déjà
+
+         const premier = state.moisListe[0];
+         if (cible >= cle(premier)) return {};   // pas trouvé mais pas avant le début : on ne touche à rien
+
+         // On crée tous les mois vierges manquants, de la cible jusqu'au premier existant.
+         const vides: MoisBudget[] = [];
+         for (let k = cible; k < cle(premier); k++) {
+            vides.push({
+               mois: ((k % 12) + 12) % 12,
+               annee: Math.floor(k / 12),
+               soldeReporte: 0, compte: 0,
+               revenus: [], depenses: [], enveloppes: [], voeux: [], courses: [], previsionnels: [],
+            });
          }
-         const test: MoisBudget = {
-            mois: 0, annee: 2000,
-            soldeReporte: 300, compte: 1250,
-            revenus: [
-               { id: crypto.randomUUID(), nom: "Salaire", montant: 1600, type: "regulier", estRecu: true },
-               { id: crypto.randomUUID(), nom: "Remboursement", montant: 40, type: "occasionnel", estRecu: false },
-            ],
-            depenses: [
-               { id: crypto.randomUUID(), nom: "Loyer", montant: 650, type: "regulier", estPayer: true },
-               { id: crypto.randomUUID(), nom: "Électricité", montant: 90, type: "regulier", estPayer: false },
-            ],
-            enveloppes: [{ id: crypto.randomUUID(), nom: "Voiture", montant: 120, couleur: "navy", icone: "car" }],
-            voeux: [{ id: crypto.randomUUID(), nom: "Vacances", montantTotal: 600, montantActuel: 150, estTermine: false }],
-            courses: [{ budget: 80, faite: true }, { budget: 80, faite: false }],
-            previsionnels: [],
-         };
-         return {
-            moisListe: [test, ...state.moisListe],
-            indexActif: state.indexActif + 1,   // on reste sur le même mois qu'avant
-         };
+         return { moisListe: [...vides, ...state.moisListe], indexActif: 0 };
       }),
 
    nouveauMois: (soldeReel) => {
