@@ -1,7 +1,10 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Clock, ArrowDown, FileText, Mail, Flag, AlignLeft, RefreshCw, Sun, Moon } from "lucide-react";
+import { Clock, ArrowDown, FileText, Mail, Flag, AlignLeft, RefreshCw, Sun, Moon, LogOut } from "lucide-react";
 import { useBudget } from "../store/useBudget";
+import { useAuth } from "../store/useAuth";
+import { useSyncBudget } from "../lib/useSyncBudget";
+import { AuthScreen } from "../components/AuthScreen";
 import { Modal } from "../components/Modal";
 import { libelleMois } from "../lib/format";
 
@@ -26,6 +29,18 @@ function RootComponent() {
    const theme = useBudget((state) => state.theme);
    const basculerTheme = useBudget((state) => state.basculerTheme);
 
+   const session = useAuth((state) => state.session);
+   const chargement = useAuth((state) => state.chargement);
+   const deconnexion = useAuth((state) => state.deconnexion);
+
+   // Charge/sauvegarde le budget depuis Supabase selon la session connectée.
+   const budgetPret = useSyncBudget(session);
+
+   // Récupère la session au démarrage et écoute les connexions/déconnexions.
+   useEffect(() => {
+      useAuth.getState().init();
+   }, []);
+
    // Applique le thème (classe .dark sur <html>) à chaque changement.
    useEffect(() => {
       document.documentElement.classList.toggle("dark", theme === "sombre");
@@ -47,16 +62,31 @@ function RootComponent() {
       setConfirme(false);
    }
 
+   // Porte d'entrée : on attend la session, puis on montre l'auth ou l'app.
+   if (chargement) {
+      return <main className="auth-ecran"><p className="sous">Chargement…</p></main>;
+   }
+   if (!session) {
+      return <AuthScreen />;
+   }
+   // Connecté mais budget pas encore chargé depuis la base.
+   if (!budgetPret) {
+      return <main className="auth-ecran"><p className="sous">Chargement de tes données…</p></main>;
+   }
+
    return (
       <>
          <header className="app-header">
             <div>
-               <div className="titre">Poyo</div>
+               <div className="titre">{session.user.user_metadata?.nom || "Poyo"}</div>
                <div className="mois">{libelleMois(mois, annee)}</div>
             </div>
             <div className="app-actions">
                <button className="btn-theme" onClick={basculerTheme} aria-label="Changer de thème">
                   {theme === "sombre" ? <Sun size={18} /> : <Moon size={18} />}
+               </button>
+               <button className="btn-theme" onClick={deconnexion} aria-label="Se déconnecter">
+                  <LogOut size={18} />
                </button>
                <button className="btn-mois" onClick={ouvrir}><RefreshCw size={16} /> Nouveau mois</button>
             </div>

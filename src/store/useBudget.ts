@@ -1,7 +1,27 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type { Depense, Enveloppe, Flux, Frequence, Previsionnel, Revenu, SemaineCourses, TypeAction, Voeu } from "../types";
 import { genererSemaines } from "../lib/courses";
+
+// Valeurs de départ d'un budget vierge (nouvel utilisateur, ou après déconnexion).
+// Plus aucune donnée en dur : tout vient désormais de la base (Supabase).
+function donneesInitiales() {
+   const mois = new Date().getMonth();
+   const annee = new Date().getFullYear();
+   return {
+      compte: 0,
+      soldeReporte: 0,
+      mois,
+      annee,
+      theme: "sombre" as const,
+      revenus: [] as Revenu[],
+      depenses: [] as Depense[],
+      enveloppes: [] as Enveloppe[],
+      voeux: [] as Voeu[],
+      courses: genererSemaines(mois, annee),
+      previsionnels: [] as Previsionnel[],
+      historique: [] as Flux[],
+   };
+}
 
 export interface BudgetStore {
    compte: number,
@@ -16,6 +36,9 @@ export interface BudgetStore {
    courses: SemaineCourses[],
    previsionnels: Previsionnel[],
    historique: Flux[]
+
+   //Réinitialisation (déconnexion)
+   reinitialiser: () => void
 
    //Thème
    basculerTheme: () => void
@@ -68,61 +91,11 @@ export interface BudgetStore {
    acheterVoeu: (id: string, montantReel: number) => void
 }
 
-export const useBudget = create<BudgetStore>()(persist((set, get) => ({
-   compte: 0,
-   soldeReporte: 0,
-   mois: new Date().getMonth(),
-   annee: new Date().getFullYear(),
-   theme: 'sombre',
-   revenus: [
-      {
-         id: "1",
-         nom: "Salaire",
-         montant: 1400,
-         type: "regulier",
-         estRecu: false
-      }
-   ],
-   depenses: [
-      {
-         id: "1",
-         nom: "Loyer",
-         montant: 750,
-         type: "regulier",
-         estPayer: false
-      }
-   ],
-   enveloppes: [
-      {
-         id: "1",
-         nom: "Voiture",
-         montant: 50.50,
-         couleur: "blue",
-         icone: "car"
-      }
-   ],
-   voeux: [
-      {
-         id: "1",
-         nom: "Steam Machine",
-         montantTotal: 1400,
-         montantActuel: 0,
-         estTermine: false
-      }
-   ],
-   courses: genererSemaines(new Date().getMonth(), new Date().getFullYear()),
-   previsionnels: [
-      { id: "1", nom: "Loisirs & sorties", montant: 60, estDepense: false }
-   ],
-   historique: [
-      {
-         id: "1",
-         date: new Date(),
-         nom: "Loyer",
-         montant: 750,
-         type: "depense"
-      }
-   ],
+export const useBudget = create<BudgetStore>()((set, get) => ({
+   ...donneesInitiales(),
+
+   // Remet un budget vierge (on garde le thème, qui est une préférence d'affichage).
+   reinitialiser: () => set((state) => ({ ...donneesInitiales(), theme: state.theme })),
 
    basculerTheme: () =>
       set((state) => ({ theme: state.theme === 'sombre' ? 'clair' : 'sombre' })),
@@ -409,4 +382,4 @@ export const useBudget = create<BudgetStore>()(persist((set, get) => ({
       }))
       get().ajouterMouvement("Achat — " + voeu.nom, montantReel, "depense", id)
    }
-}), { name: "poyo-budget" }))
+}))
