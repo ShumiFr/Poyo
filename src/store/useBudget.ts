@@ -333,9 +333,18 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    },
 
    ajouterRevenu: (revenu) =>
-      set((state) => majActif(state, {
-         revenus: [...moisActif(state).revenus, revenu]
-      })),
+      set((state) => {
+         const idx = state.indexActif;
+         const moisListe = state.moisListe.map((m, i) => {
+            if (i < idx) return m;
+            if (i === idx) return { ...m, revenus: [...m.revenus, revenu] };
+            // Mois suivants : un revenu régulier se reporte, sauf si un même nom existe déjà.
+            if (revenu.type !== "regulier") return m;
+            if (m.revenus.some((r) => r.nom === revenu.nom)) return m;
+            return { ...m, revenus: [...m.revenus, { ...revenu, id: crypto.randomUUID(), estRecu: false, dateRecu: undefined }] };
+         });
+         return { moisListe };
+      }),
 
    retirerRevenu: (id) =>
       set((state) => majActif(state, {
@@ -370,9 +379,18 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
       })),
 
    ajouterDepense: (depense) =>
-      set((state) => majActif(state, {
-         depenses: [...moisActif(state).depenses, depense]
-      })),
+      set((state) => {
+         const idx = state.indexActif;
+         const moisListe = state.moisListe.map((m, i) => {
+            if (i < idx) return m;
+            if (i === idx) return { ...m, depenses: [...m.depenses, depense] };
+            // Mois suivants : une charge régulière se reporte, sauf si un même nom existe déjà.
+            if (depense.type !== "regulier") return m;
+            if (m.depenses.some((d) => d.nom === depense.nom)) return m;
+            return { ...m, depenses: [...m.depenses, { ...depense, id: crypto.randomUUID(), estPayer: false }] };
+         });
+         return { moisListe };
+      }),
 
    retirerDepense: (id) =>
       set((state) => majActif(state, {

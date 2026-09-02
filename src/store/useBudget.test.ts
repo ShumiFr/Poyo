@@ -336,6 +336,55 @@ describe("cascade — modifier un mois passé (étape B)", () => {
       expect(s.moisListe[1].enveloppes[0].montant).toBe(150)   // juin : l'épargne se cumule
    })
 
+   it("ajouter un revenu régulier dans un mois passé le reporte sur les suivants", () => {
+      useBudget.setState({
+         moisListe: [moisBase({ mois: 3 }), moisBase({ mois: 4 }), moisBase({ mois: 5 })],
+         indexActif: 0,   // avril
+         historique: [],
+      })
+
+      useBudget.getState().ajouterRevenu(revenu(2000))   // Salaire régulier
+
+      const s = useBudget.getState()
+      expect(s.moisListe[0].revenus[0].nom).toBe("Salaire")   // avril (créé)
+      expect(s.moisListe[1].revenus[0].nom).toBe("Salaire")   // mai (reporté)
+      expect(s.moisListe[2].revenus[0].nom).toBe("Salaire")   // juin (reporté)
+      // les copies sont neuves : id différent, pas encore reçues
+      expect(s.moisListe[1].revenus[0].id).not.toBe("r1")
+      expect(s.moisListe[1].revenus[0].estRecu).toBe(false)
+   })
+
+   it("ne duplique pas un régulier si un même nom existe déjà plus tard", () => {
+      useBudget.setState({
+         moisListe: [
+            moisBase({ mois: 4 }),                                   // août : pas de loyer
+            moisBase({ mois: 5, depenses: [depense(650)] }),         // septembre : loyer déjà là
+         ],
+         indexActif: 0,
+         historique: [],
+      })
+
+      useBudget.getState().ajouterDepense(depense(650))   // on ajoute "Loyer" en août
+
+      const s = useBudget.getState()
+      expect(s.moisListe[0].depenses).toHaveLength(1)   // août : le nouveau
+      expect(s.moisListe[1].depenses).toHaveLength(1)   // septembre : on garde l'existant, pas de doublon
+   })
+
+   it("une rentrée ponctuelle ne se reporte pas sur les mois suivants", () => {
+      useBudget.setState({
+         moisListe: [moisBase({ mois: 4 }), moisBase({ mois: 5 })],
+         indexActif: 0,
+         historique: [],
+      })
+
+      useBudget.getState().ajouterRevenu({ id: "x", nom: "Prime", montant: 100, type: "occasionnel", estRecu: false })
+
+      const s = useBudget.getState()
+      expect(s.moisListe[0].revenus).toHaveLength(1)
+      expect(s.moisListe[1].revenus).toHaveLength(0)   // ponctuelle : pas de report
+   })
+
    it("modifier le mois en cours ne crée aucune propagation (rien après lui)", () => {
       useBudget.setState({
          moisListe: [moisBase({ mois: 4, compte: 500 }), moisBase({ mois: 5, compte: 800 })],
