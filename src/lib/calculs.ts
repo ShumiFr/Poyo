@@ -16,7 +16,12 @@ export interface DonneesMois {
 // Calcule les lignes du récap d'un mois. Sert à l'accueil et à un mois archivé.
 export function calculerRecap(d: DonneesMois) {
    const revenusPercus = d.revenus.filter((r) => r.estRecu).reduce((s, r) => s + r.montant, 0)
-   const chargesPayees = d.depenses.filter((x) => x.estPayer).reduce((s, x) => s + x.montant, 0)
+   // Charges payées = charges cochées + courses faites + prévisionnels dépensés :
+   // tout ce qui est déjà sorti du compte ce mois-ci.
+   const coursesFaites = d.courses.filter((c) => c.faite).reduce((s, c) => s + c.budget, 0)
+   const previsionnelDepense = d.previsionnels.filter((p) => p.estDepense).reduce((s, p) => s + p.montant, 0)
+   const chargesPayees =
+      d.depenses.filter((x) => x.estPayer).reduce((s, x) => s + x.montant, 0) + coursesFaites + previsionnelDepense
    const previsionnelPrevu = d.previsionnels.filter((p) => !p.estDepense).reduce((s, p) => s + p.montant, 0)
    const chargesAVenir = d.depenses.filter((x) => !x.estPayer).reduce((s, x) => s + x.montant, 0) + reserveCourses(d.courses) + previsionnelPrevu
    const totalEnveloppes = d.enveloppes.reduce((s, e) => s + e.montant, 0)

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import calculerDisponible from "./calculs"
+import calculerDisponible, { calculerRecap } from "./calculs"
 import type { Depense, Enveloppe, Voeu } from "../types"
 
 // Fabriques minimales pour des tests lisibles
@@ -42,5 +42,39 @@ describe("calculerDisponible", () => {
       ]
       // 1000 − (25 + 30) = 945
       expect(calculerDisponible(1000, [], [], [], courses)).toBe(945)
+   })
+})
+
+describe("calculerRecap", () => {
+   it("une semaine de courses faite compte en charges payées, sans raboter les revenus", () => {
+      // Salaire 1000 reçu, une semaine de courses de 80 faite → compte = 1000 − 80 = 920
+      const r = calculerRecap({
+         compte: 920,
+         soldeReporte: 0,
+         revenus: [{ id: "r", nom: "Salaire", montant: 1000, type: "regulier", estRecu: true }],
+         depenses: [],
+         enveloppes: [],
+         voeux: [],
+         courses: [{ budget: 80, faite: true }],
+         previsionnels: [],
+      })
+      expect(r.chargesPayees).toBe(80)       // les courses faites apparaissent en charges payées
+      expect(r.revenusAffiches).toBe(1000)   // et les revenus perçus ne sont plus rabotés
+   })
+
+   it("un prévisionnel dépensé compte aussi en charges payées", () => {
+      // Salaire 1000 reçu, un prévisionnel de 60 dépensé → compte = 940
+      const r = calculerRecap({
+         compte: 940,
+         soldeReporte: 0,
+         revenus: [{ id: "r", nom: "Salaire", montant: 1000, type: "regulier", estRecu: true }],
+         depenses: [],
+         enveloppes: [],
+         voeux: [],
+         courses: [],
+         previsionnels: [{ id: "p", nom: "Loisirs", montant: 60, estDepense: true }],
+      })
+      expect(r.chargesPayees).toBe(60)
+      expect(r.revenusAffiches).toBe(1000)
    })
 })
