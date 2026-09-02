@@ -1,0 +1,120 @@
+name: Release Android APK
+
+# Se déclenche quand on pousse un tag de version, ex. v1.0.0
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write   # nécessaire pour créer la GitHub Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    env:
+      NDK_VERSION: "27.2.12479018"
+
+    steps:
+      - name: Libérer de l'espace disque
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Installer les dépendances npm
+        run: npm ci
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Installer le SDK Android
+        uses: android-actions/setup-android@v3
+
+      - name: Installer le NDK
+        run: |
+          sdkmanager "ndk;${NDK_VERSION}" "platforms;android-34" "build-tools;34.0.0"
+          echo "NDK_HOME=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
+
+      - name: Installer Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Générer le projet Android
+        run: npm run tauri android init -- --ci --skip-targets-install
+
+      # --- Signature : on décode le keystore, on écrit keystore.properties,
+      #     et on ajoute la config de signature au Gradle régénéré ---
+      - name: Préparer la signature
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/keystore.jks"
+          cat > src-tauri/gen/android/keystore.properties <<EOF
+          storeFile=$RUNNER_TEMP/keystore.jks
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          password=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          EOF
+          python3 - <<'PY'
+          import pathlib
+          p = pathlib.Path("src-tauri/gen/android/app/build.gradle.kts")
+          s = p.read_text()
+          signing = '''
+              signingConfigs {
+                  create("release") {
+                      val props = java.util.Properties().apply {
+                          rootProject.file("keystore.properties").inputStream().use { load(it) }
+                      }
+                      keyAlias = props["keyAlias"] as String
+                      keyPassword = props["password"] as String
+                      storeFile = file(props["storeFile"] as String)
+                      storePassword = props["password"] as String
+                  }
+              }
+          '''
+          s = s.replace("android {\n", "android {\n" + signing, 1)
+          s = s.replace('getByName("release") {\n',
+                        'getByName("release") {\n            signingConfig = signingConfigs.getByName("release")\n', 1)
+          p.write_text(s)
+          print("build.gradle.kts patché pour la signature")
+          PY
+
+      - name: Construire l'APK signée (release, arm64)
+        run: npm run tauri android build -- --apk --target aarch64
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Renommer l'APK
+        id: apk
+        run: |
+          FICHIER=$(find src-tauri/gen/android -path "*release*" -name "*.apk" ! -name "*unsigned*" | head -1)
+          echo "APK trouvée : $FICHIER"
+          cp "$FICHIER" "poyo-${GITHUB_REF_NAME}.apk"
+          echo "chemin=poyo-${GITHUB_REF_NAME}.apk" >> "$GITHUB_OUTPUT"
+
+      - name: Créer la GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.apk.outputs.chemin }}
+          generate_release_notes: true
