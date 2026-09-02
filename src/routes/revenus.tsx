@@ -8,7 +8,7 @@ import MontantEditable from '../components/MontantEditable'
 import BoutonBascule from '../components/BoutonBascule'
 import { Modal } from '../components/Modal'
 import { champsRevenu, champsNomMontant } from '../lib/champs'
-import format, { enNombre } from '../lib/format'
+import format, { enNombre, dateCourte } from '../lib/format'
 import type { Frequence, Revenu } from '../types'
 
 export const Route = createFileRoute('/revenus')({
@@ -36,15 +36,22 @@ function RouteComponent() {
             <div className="carte-tete">
                <span className="libelle-col">
                   <h3>{revenu.nom}</h3>
-                  <div className="sous">{revenu.type === "regulier" ? format(revenu.montant) + " / mois" : "Ponctuelle"}</div>
+                  {revenu.estRecu && revenu.dateRecu ? (
+                     <div className="sous"><span className="recu-le">Reçu le {dateCourte(revenu.dateRecu)}</span></div>
+                  ) : revenu.type === "occasionnel" ? (
+                     <div className="sous">Ponctuelle</div>
+                  ) : null}
                </span>
                <MontantEditable montant={revenu.montant} couleur="green" onClick={() => setEnEdition(revenu)} />
-               <BoutonBascule
-                  actif={revenu.estRecu}
-                  couleur="green"
-                  onClick={() => marquerRecu(revenu.id)}
-                  label={revenu.estRecu ? "Annuler la réception" : "Marquer reçu"}
-               />
+               {/* Une rentrée ponctuelle est déjà reçue → pas de bouton, seulement les régulières se pointent */}
+               {revenu.type === "regulier" && (
+                  <BoutonBascule
+                     actif={revenu.estRecu}
+                     couleur="green"
+                     onClick={() => marquerRecu(revenu.id)}
+                     label={revenu.estRecu ? "Annuler la réception" : "Marquer reçu"}
+                  />
+               )}
             </div>
          </div>
       )
@@ -72,7 +79,11 @@ function RouteComponent() {
                estValide={(v) => v.nom.trim() !== "" && enNombre(v.montant) > 0}
                onAnnuler={() => setCreation(false)}
                onValider={(v) => {
-                  ajouterRevenu({ id: crypto.randomUUID(), nom: v.nom.trim(), montant: enNombre(v.montant), type: v.type as Frequence, estRecu: false })
+                  const id = crypto.randomUUID()
+                  const type = v.type as Frequence
+                  ajouterRevenu({ id, nom: v.nom.trim(), montant: enNombre(v.montant), type, estRecu: false })
+                  // Ponctuelle = déjà reçue : on la marque tout de suite (ajoute au compte + journalise)
+                  if (type === "occasionnel") marquerRecu(id)
                   setCreation(false)
                }}
             />

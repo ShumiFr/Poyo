@@ -1,8 +1,23 @@
 /* récap ligne à ligne */
-.recap-ligne { @apply flex items-center justify-between; padding: 8px 0; }
+.recap-ligne { @apply flex items-center justify-between; padding: 8px 0; color: inherit; text-decoration: none; }
 .recap-ligne span:last-child { font-weight: 600; }
-.recap-ligne.vert span { color: var(--vert); }
+
+/* lignes cliquables (mènent vers Revenus / Dépenses / Enveloppes / Vœux) */
+.recap-ligne.cliquable {
+   cursor: pointer;
+   border-radius: 8px;
+   margin-inline: -8px;
+   padding-inline: 8px;
+   transition: background .15s;
+}
+.recap-ligne.cliquable:hover { background: color-mix(in srgb, var(--encre) 6%, transparent); }
+.recap-ligne.cliquable:active { background: color-mix(in srgb, var(--encre) 12%, transparent); }
 .recap-ligne.rouge span { color: var(--rouge); }
+/* Revenus perçus / Charges payées : nom neutre (pas dans le donut), montant coloré */
+.recap-ligne.revenu span:first-child,
+.recap-ligne.charge-payee span:first-child { color: var(--encre); }
+.recap-ligne.revenu span:last-child { color: var(--vert); }
+.recap-ligne.charge-payee span:last-child { color: var(--rouge); }
 /* le nom prend la couleur de sa part dans le donut ; le montant reste rouge */
 .recap-ligne.charges span:first-child { color: var(--orange); }
 .recap-ligne.enveloppes span:first-child { color: var(--teal); }

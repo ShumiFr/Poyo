@@ -14,7 +14,7 @@
    background: var(--carte-2);
    color: var(--encre);
 }
-.champ input:focus, .champ select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.champ input:focus, .champ select:focus { outline: 2px solid var(--focus-couleur, var(--accent)); outline-offset: -1px; }
 
 .type-toggle { @apply flex gap-2; }
 .type-toggle button {
@@ -30,6 +30,22 @@
 
 .form-actions { @apply flex gap-2; margin-top: 8px; }
 .form-actions .btn { @apply flex-1; }
+
+/* liste de choix d'enveloppe (modale « Payer depuis ») */
+.liste-enveloppes { @apply m-0 p-0; list-style: none; margin-top: 8px; }
+.liste-enveloppes li { margin-bottom: 8px; }
+.liste-enveloppes button {
+   @apply w-full flex items-center justify-between;
+   padding: 14px;
+   border: 1px solid var(--ligne);
+   border-radius: 10px;
+   background: var(--carte-2);
+   color: var(--encre);
+   font: inherit;
+   cursor: pointer;
+}
+.liste-enveloppes button .montant { font-weight: 700; }
+.liste-enveloppes button:hover { border-color: var(--rouge); }
 
 /* sélecteur de couleur */
 .palette { @apply flex flex-wrap gap-2.5; }

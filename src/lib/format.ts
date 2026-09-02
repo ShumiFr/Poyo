@@ -13,6 +13,11 @@ export function enNombre(texte: string): number {
    return Number(texte.replace(",", "."))
 }
 
+// Date courte « 24 juil. » à partir d'une date (ou d'une chaîne ISO).
+export function dateCourte(date: Date | string): string {
+   return new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+}
+
 // Libellé « Août 2026 » à partir d'un index de mois (0-11) et d'une année.
 export function libelleMois(mois: number, annee: number): string {
    const texte = new Date(annee, mois).toLocaleDateString('fr-FR', {

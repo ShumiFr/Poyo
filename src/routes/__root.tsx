@@ -1,10 +1,11 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Clock, ArrowDown, FileText, Mail, Flag, AlignLeft, RefreshCw, Sun, Moon, LogOut } from "lucide-react";
+import { Clock, ArrowDown, FileText, Mail, Flag, PiggyBank, RefreshCw, User } from "lucide-react";
 import { useBudget } from "../store/useBudget";
 import { useAuth } from "../store/useAuth";
 import { useSyncBudget } from "../lib/useSyncBudget";
 import { AuthScreen } from "../components/AuthScreen";
+import EcranVerrou from "../components/EcranVerrou";
 import { Modal } from "../components/Modal";
 import { libelleMois } from "../lib/format";
 
@@ -13,12 +14,12 @@ export const Route = createRootRoute({
 });
 
 const onglets = [
-   { to: "/", label: "Accueil", Icone: Clock, exact: true },
-   { to: "/revenus", label: "Rentrées", Icone: ArrowDown },
-   { to: "/depenses", label: "Dépenses", Icone: FileText },
-   { to: "/enveloppes", label: "Enveloppes", Icone: Mail },
-   { to: "/souhaits", label: "Vœux", Icone: Flag },
-   { to: "/historique", label: "Historique", Icone: AlignLeft },
+   { to: "/", label: "Accueil", Icone: Clock, exact: true, cle: "accueil" },
+   { to: "/revenus", label: "Rentrées", Icone: ArrowDown, cle: "revenus" },
+   { to: "/depenses", label: "Dépenses", Icone: FileText, cle: "depenses" },
+   { to: "/enveloppes", label: "Enveloppes", Icone: Mail, cle: "enveloppes" },
+   { to: "/souhaits", label: "Vœux", Icone: Flag, cle: "souhaits" },
+   { to: "/comptes", label: "Comptes", Icone: PiggyBank, cle: "comptes" },
 ] as const;
 
 function RootComponent() {
@@ -27,14 +28,26 @@ function RootComponent() {
    const compte = useBudget((state) => state.compte);
    const nouveauMois = useBudget((state) => state.nouveauMois);
    const theme = useBudget((state) => state.theme);
-   const basculerTheme = useBudget((state) => state.basculerTheme);
 
    const session = useAuth((state) => state.session);
    const chargement = useAuth((state) => state.chargement);
-   const deconnexion = useAuth((state) => state.deconnexion);
+   const codePin = useBudget((state) => state.codePin);
 
    // Charge/sauvegarde le budget depuis Supabase selon la session connectée.
    const budgetPret = useSyncBudget(session);
+
+   // Verrou d'app : re-verrouillé à chaque changement de session et quand l'app
+   // repasse en arrière-plan (retour = code redemandé).
+   const [deverrouille, setDeverrouille] = useState(false);
+
+   // On re-verrouille à un vrai changement de compte (pas à un simple refresh de token).
+   useEffect(() => { setDeverrouille(false); }, [session?.user.id]);
+
+   useEffect(() => {
+      const auCache = () => { if (document.hidden) setDeverrouille(false); };
+      document.addEventListener("visibilitychange", auCache);
+      return () => document.removeEventListener("visibilitychange", auCache);
+   }, []);
 
    // Récupère la session au démarrage et écoute les connexions/déconnexions.
    useEffect(() => {
@@ -73,6 +86,10 @@ function RootComponent() {
    if (!budgetPret) {
       return <main className="auth-ecran"><p className="sous">Chargement de tes données…</p></main>;
    }
+   // Un code est défini et l'app n'est pas encore déverrouillée : on demande le code.
+   if (codePin && !deverrouille) {
+      return <EcranVerrou onDeverrouille={() => setDeverrouille(true)} />;
+   }
 
    return (
       <>
@@ -82,12 +99,9 @@ function RootComponent() {
                <div className="mois">{libelleMois(mois, annee)}</div>
             </div>
             <div className="app-actions">
-               <button className="btn-theme" onClick={basculerTheme} aria-label="Changer de thème">
-                  {theme === "sombre" ? <Sun size={18} /> : <Moon size={18} />}
-               </button>
-               <button className="btn-theme" onClick={deconnexion} aria-label="Se déconnecter">
-                  <LogOut size={18} />
-               </button>
+               <Link to="/profil" className="btn-theme" aria-label="Profil">
+                  <User size={18} />
+               </Link>
                <button className="btn-mois" onClick={ouvrir}><RefreshCw size={16} /> Nouveau mois</button>
             </div>
          </header>
@@ -115,6 +129,7 @@ function RootComponent() {
                <Link
                   key={item.to}
                   to={item.to}
+                  className={"nav-" + item.cle}
                   activeOptions={"exact" in item ? { exact: true } : undefined}
                   activeProps={{ className: "actif" }}
                >

@@ -8,6 +8,7 @@ export interface Revenu {
    montant: number
    type: Frequence
    estRecu: boolean
+   dateRecu?: string   // date de réception (ISO), remplie quand on marque « reçu »
 }
 
 export interface Depense {
@@ -37,6 +38,13 @@ export interface Voeu {
 export interface SemaineCourses {
    budget: number
    faite: boolean
+}
+
+// Compte épargne : purement informatif, sans lien avec les calculs du budget.
+export interface CompteEpargne {
+   id: string
+   nom: string
+   montant: number
 }
 
 export interface Previsionnel {

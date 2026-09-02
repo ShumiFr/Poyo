@@ -21,7 +21,7 @@
 
    --accent: #5ea22a;         /* disponible / reste / bouton principal (vert-citron foncé) */
    --accent-contraste: #fff;  /* texte posé sur l'accent */
-   --vert: #1f9e66;           /* positif : reçu, +revenus */
+   --vert: #5a9e2b;           /* positif : reçu, +revenus (vert pomme) */
    --teal: #0f9c8b;           /* enveloppes */
    --orange: #c2831c;         /* charges (donut) — ocre */
    --rouge: #d64a48;          /* négatif : dépenses, manque */
@@ -32,7 +32,7 @@
    --overlay: rgba(16, 35, 43, .45);
 
    /* palette des catégories d'enveloppe */
-   --cat-navy: #21445a;  --cat-steel: #4f7f96; --cat-teal: #12b39a; --cat-green: #2f9e6f; --cat-sage: #6f8253;
+   --cat-navy: #21445a;  --cat-steel: #4f7f96; --cat-teal: #12b39a; --cat-green: var(--vert); --cat-sage: #6f8253;
    --cat-gold: #c19a2e;  --cat-red: #c0492f;   --cat-rose: #b56576; --cat-purple: #3f3563; --cat-lilac: #8b7fb0; --cat-blue: #4f7f96;
 }
 
@@ -54,7 +54,7 @@
 
    --accent: #a3e635;          /* lime */
    --accent-contraste: #0b0e14;
-   --vert: #34d399;
+   --vert: #8bc34a;            /* vert pomme, plus chaleureux */
    --teal: #2dd4bf;
    --orange: #fb923c;
    --rouge: #f87171;
@@ -64,7 +64,7 @@
    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
    --overlay: rgba(0, 0, 0, .55);
 
-   --cat-navy: #60a5fa;  --cat-steel: #60a5fa; --cat-teal: #2dd4bf; --cat-green: #34d399; --cat-sage: #a3b565;
+   --cat-navy: #60a5fa;  --cat-steel: #60a5fa; --cat-teal: #2dd4bf; --cat-green: var(--vert); --cat-sage: #a3b565;
    --cat-gold: #fbbf24;  --cat-red: #f87171;   --cat-rose: #f472b6; --cat-purple: #c084fc; --cat-lilac: #c4b5fd; --cat-blue: #60a5fa;
 }
 
@@ -117,5 +117,6 @@ button { font: inherit; cursor: pointer; color: inherit; }
 @import "./pages/accueil.css";
 @import "./pages/voeux.css";
 @import "./pages/auth.css";
+@import "./pages/profil.css";
 /* les couleurs de catégorie en dernier : elles priment sur .btn, .montant… */
 @import "./composants/categories.css";

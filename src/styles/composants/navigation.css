@@ -62,10 +62,19 @@
    font-size: 13px;
    padding: 8px 12px;
    border-radius: 999px;
+   /* couleur de l'onglet actif : celle de la page (neutre par défaut) */
+   --nav-actif: var(--encre);
 }
+.bottom-nav a.nav-revenus { --nav-actif: var(--vert); }
+.bottom-nav a.nav-depenses { --nav-actif: var(--rouge); }
+.bottom-nav a.nav-enveloppes { --nav-actif: var(--teal); }
+.bottom-nav a.nav-souhaits { --nav-actif: var(--violet); }
+.bottom-nav a.nav-comptes { --nav-actif: var(--cat-navy); }
+/* accueil reste neutre (--encre par défaut) */
+
 .bottom-nav a .lib { display: none; }
 .bottom-nav a.actif {
-   background: color-mix(in srgb, var(--accent) 18%, transparent);
-   color: var(--accent);
+   background: color-mix(in srgb, var(--nav-actif) 18%, transparent);
+   color: var(--nav-actif);
 }
 .bottom-nav a.actif .lib { display: inline; }

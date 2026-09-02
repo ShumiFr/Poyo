@@ -10,15 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComptesRouteImport } from './routes/comptes'
 import { Route as DepensesRouteImport } from './routes/depenses'
 import { Route as EnveloppesRouteImport } from './routes/enveloppes'
-import { Route as HistoriqueRouteImport } from './routes/historique'
+import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as RevenusRouteImport } from './routes/revenus'
 import { Route as SouhaitsRouteImport } from './routes/souhaits'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComptesRoute = ComptesRouteImport.update({
+  id: '/comptes',
+  path: '/comptes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DepensesRoute = DepensesRouteImport.update({
@@ -31,9 +37,9 @@ const EnveloppesRoute = EnveloppesRouteImport.update({
   path: '/enveloppes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HistoriqueRoute = HistoriqueRouteImport.update({
-  id: '/historique',
-  path: '/historique',
+const ProfilRoute = ProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RevenusRoute = RevenusRouteImport.update({
@@ -49,51 +55,68 @@ const SouhaitsRoute = SouhaitsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/comptes': typeof ComptesRoute
   '/depenses': typeof DepensesRoute
   '/enveloppes': typeof EnveloppesRoute
-  '/historique': typeof HistoriqueRoute
+  '/profil': typeof ProfilRoute
   '/revenus': typeof RevenusRoute
   '/souhaits': typeof SouhaitsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/comptes': typeof ComptesRoute
   '/depenses': typeof DepensesRoute
   '/enveloppes': typeof EnveloppesRoute
-  '/historique': typeof HistoriqueRoute
+  '/profil': typeof ProfilRoute
   '/revenus': typeof RevenusRoute
   '/souhaits': typeof SouhaitsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/comptes': typeof ComptesRoute
   '/depenses': typeof DepensesRoute
   '/enveloppes': typeof EnveloppesRoute
-  '/historique': typeof HistoriqueRoute
+  '/profil': typeof ProfilRoute
   '/revenus': typeof RevenusRoute
   '/souhaits': typeof SouhaitsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/depenses' | '/enveloppes' | '/historique' | '/revenus' | '/souhaits'
+    | '/'
+    | '/comptes'
+    | '/depenses'
+    | '/enveloppes'
+    | '/profil'
+    | '/revenus'
+    | '/souhaits'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/depenses' | '/enveloppes' | '/historique' | '/revenus' | '/souhaits'
+    | '/'
+    | '/comptes'
+    | '/depenses'
+    | '/enveloppes'
+    | '/profil'
+    | '/revenus'
+    | '/souhaits'
   id:
     | '__root__'
     | '/'
+    | '/comptes'
     | '/depenses'
     | '/enveloppes'
-    | '/historique'
+    | '/profil'
     | '/revenus'
     | '/souhaits'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ComptesRoute: typeof ComptesRoute
   DepensesRoute: typeof DepensesRoute
   EnveloppesRoute: typeof EnveloppesRoute
-  HistoriqueRoute: typeof HistoriqueRoute
+  ProfilRoute: typeof ProfilRoute
   RevenusRoute: typeof RevenusRoute
   SouhaitsRoute: typeof SouhaitsRoute
 }
@@ -105,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comptes': {
+      id: '/comptes'
+      path: '/comptes'
+      fullPath: '/comptes'
+      preLoaderRoute: typeof ComptesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/depenses': {
@@ -121,11 +151,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnveloppesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/historique': {
-      id: '/historique'
-      path: '/historique'
-      fullPath: '/historique'
-      preLoaderRoute: typeof HistoriqueRouteImport
+    '/profil': {
+      id: '/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof ProfilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/revenus': {
@@ -147,9 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ComptesRoute: ComptesRoute,
   DepensesRoute: DepensesRoute,
   EnveloppesRoute: EnveloppesRoute,
-  HistoriqueRoute: HistoriqueRoute,
+  ProfilRoute: ProfilRoute,
   RevenusRoute: RevenusRoute,
   SouhaitsRoute: SouhaitsRoute,
 }
