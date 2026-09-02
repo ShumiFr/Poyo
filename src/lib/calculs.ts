@@ -1,5 +1,35 @@
-import type { Depense, Enveloppe, Previsionnel, SemaineCourses, Voeu } from "../types";
+import type { Depense, Enveloppe, Previsionnel, Revenu, SemaineCourses, Voeu } from "../types";
 import { reserveCourses } from "./courses";
+
+// Toutes les données d'un mois dont on a besoin pour son récap (accueil + calendrier).
+export interface DonneesMois {
+   compte: number
+   soldeReporte: number
+   revenus: Revenu[]
+   depenses: Depense[]
+   enveloppes: Enveloppe[]
+   voeux: Voeu[]
+   courses: SemaineCourses[]
+   previsionnels: Previsionnel[]
+}
+
+// Calcule les lignes du récap d'un mois. Sert à l'accueil et à un mois archivé.
+export function calculerRecap(d: DonneesMois) {
+   const revenusPercus = d.revenus.filter((r) => r.estRecu).reduce((s, r) => s + r.montant, 0)
+   const chargesPayees = d.depenses.filter((x) => x.estPayer).reduce((s, x) => s + x.montant, 0)
+   const previsionnelPrevu = d.previsionnels.filter((p) => !p.estDepense).reduce((s, p) => s + p.montant, 0)
+   const chargesAVenir = d.depenses.filter((x) => !x.estPayer).reduce((s, x) => s + x.montant, 0) + reserveCourses(d.courses) + previsionnelPrevu
+   const totalEnveloppes = d.enveloppes.reduce((s, e) => s + e.montant, 0)
+   const totalVoeux = d.voeux.reduce((s, v) => s + v.montantActuel, 0)
+
+   // Écart entre le compte réel et sa reconstitution → le récap boucle toujours.
+   const autresEntrees = d.compte - (d.soldeReporte + revenusPercus - chargesPayees)
+   const revenusAffiches = revenusPercus + autresEntrees
+
+   const reste = calculerDisponible(d.compte, d.depenses, d.enveloppes, d.voeux, d.courses, d.previsionnels)
+
+   return { revenusAffiches, chargesPayees, chargesAVenir, totalEnveloppes, totalVoeux, reste }
+}
 
 export default function calculerDisponible(
    compte: number,

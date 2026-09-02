@@ -7,7 +7,7 @@ import PrevisionnelCard from '../cartes/PrevisionnelCard'
 import Section from '../components/Section'
 import Form from '../components/Form'
 import { Modal } from '../components/Modal'
-import { useBudget } from '../store/useBudget'
+import { useBudget, moisActif } from '../store/useBudget'
 import { champsDepense } from '../lib/champs'
 import { reserveCourses } from '../lib/courses'
 import format, { enNombre } from '../lib/format'
@@ -18,7 +18,7 @@ export const Route = createFileRoute('/depenses')({
 })
 
 function SectionPrevisionnel() {
-   const previsionnels = useBudget((state) => state.previsionnels)
+   const previsionnels = useBudget((state) => moisActif(state).previsionnels)
    const total = previsionnels.reduce((somme, p) => somme + p.montant, 0)
 
    // Les prévisionnels se créent désormais depuis « Nouvelle dépense » (source = Prévisionnel).
@@ -32,10 +32,10 @@ function SectionPrevisionnel() {
 }
 
 function RouteComponent() {
-   const depenses = useBudget((state) => state.depenses)
-   const courses = useBudget((state) => state.courses)
-   const previsionnels = useBudget((state) => state.previsionnels)
-   const enveloppes = useBudget((state) => state.enveloppes)
+   const depenses = useBudget((state) => moisActif(state).depenses)
+   const courses = useBudget((state) => moisActif(state).courses)
+   const previsionnels = useBudget((state) => moisActif(state).previsionnels)
+   const enveloppes = useBudget((state) => moisActif(state).enveloppes)
    const ajouterDepense = useBudget((state) => state.ajouterDepense)
    const depenserImmediat = useBudget((state) => state.depenserImmediat)
    const [creation, setCreation] = useState(false)

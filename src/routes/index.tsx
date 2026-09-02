@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import calculerDisponible from "../lib/calculs";
-import { reserveCourses } from "../lib/courses";
-import { useBudget } from "../store/useBudget";
+import { calculerRecap } from "../lib/calculs";
+import { useBudget, moisActif } from "../store/useBudget";
 import format from "../lib/format";
 import Donut from "../components/Donut";
 
@@ -10,30 +9,13 @@ export const Route = createFileRoute('/')({
 })
 
 function DashboardComponent() {
-   const compte = useBudget((state) => state.compte)
-   const soldeReporte = useBudget((state) => state.soldeReporte)
-   const revenus = useBudget((state) => state.revenus)
-   const depenses = useBudget((state) => state.depenses)
-   const enveloppes = useBudget((state) => state.enveloppes)
-   const voeux = useBudget((state) => state.voeux)
-   const courses = useBudget((state) => state.courses)
-   const previsionnels = useBudget((state) => state.previsionnels)
+   // Toutes les données affichées viennent du mois sélectionné.
+   const { compte, soldeReporte, revenus, depenses, enveloppes, voeux, courses, previsionnels } =
+      useBudget(moisActif)
 
-   // Montants dérivés
-   const revenusPercus = revenus.filter((r) => r.estRecu).reduce((s, r) => s + r.montant, 0)
-   const chargesPayees = depenses.filter((d) => d.estPayer).reduce((s, d) => s + d.montant, 0)
-   const previsionnelPrevu = previsionnels.filter((p) => !p.estDepense).reduce((s, p) => s + p.montant, 0)
-   const chargesAVenir = depenses.filter((d) => !d.estPayer).reduce((s, d) => s + d.montant, 0) + reserveCourses(courses) + previsionnelPrevu
-   const totalEnveloppes = enveloppes.reduce((s, e) => s + e.montant, 0)
-   const totalVoeux = voeux.reduce((s, v) => s + v.montantActuel, 0)
-
-   // Écart entre le compte réel et sa reconstitution (entrées rapides / ajustements) → le récap boucle toujours
-   const autresEntrees = compte - (soldeReporte + revenusPercus - chargesPayees)
-   // On regroupe tout ce qui rentre sur une seule ligne « Revenus perçus »
-   const revenusAffiches = revenusPercus + autresEntrees
-
-   // Ce qu'il reste = compte − charges à venir − réserve courses − prévisionnel − enveloppes − vœux
-   const reste = calculerDisponible(compte, depenses, enveloppes, voeux, courses, previsionnels)
+   // Montants dérivés (mêmes calculs que la vue d'un mois archivé)
+   const { revenusAffiches, chargesPayees, chargesAVenir, totalEnveloppes, totalVoeux, reste } =
+      calculerRecap({ compte, soldeReporte, revenus, depenses, enveloppes, voeux, courses, previsionnels })
    const restePositif = Math.max(0, reste)
 
    // Donut : le compte réparti en reste / charges à venir / enveloppes / vœux

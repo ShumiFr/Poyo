@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { useBudget } from "./useBudget"
-import type { Depense, Revenu, Enveloppe } from "../types"
+import type { Depense, MoisBudget, Revenu, Enveloppe } from "../types"
 
 const revenu = (montant: number): Revenu =>
    ({ id: "r1", nom: "Salaire", montant, type: "regulier", estRecu: false })
@@ -9,189 +9,178 @@ const depense = (montant: number): Depense =>
 const enveloppe = (montant: number): Enveloppe =>
    ({ id: "e1", nom: "Voiture", montant, couleur: "navy", icone: "car" })
 
-// On repart d'un état propre avant chaque test
-beforeEach(() => {
-   useBudget.setState({
-      compte: 0,
-      soldeReporte: 0,
-      mois: 5,
-      annee: 2026,
-      revenus: [],
-      depenses: [],
-      enveloppes: [],
-      voeux: [],
-      courses: [],
-      previsionnels: [],
-      historique: [],
-   })
+// Un mois complet, avec la possibilité de changer quelques champs.
+const moisBase = (patch: Partial<MoisBudget> = {}): MoisBudget => ({
+   mois: 5, annee: 2026, soldeReporte: 0, compte: 0,
+   revenus: [], depenses: [], enveloppes: [], voeux: [], courses: [], previsionnels: [],
+   ...patch,
 })
+
+// Pose un seul mois affiché (le plus courant des cas de test).
+function poser(patch: Partial<MoisBudget> = {}) {
+   useBudget.setState({ moisListe: [moisBase(patch)], indexActif: 0, historique: [] })
+}
+
+// Le mois actuellement affiché.
+const actif = () => {
+   const s = useBudget.getState()
+   return s.moisListe[s.indexActif]
+}
+
+beforeEach(() => poser())
 
 describe("marquerRecu (R4/R5)", () => {
    it("ajoute le revenu au compte et journalise une Rentrée", () => {
-      useBudget.setState({ revenus: [revenu(1400)] })
+      poser({ revenus: [revenu(1400)] })
       useBudget.getState().marquerRecu("r1")
 
-      const s = useBudget.getState()
-      expect(s.compte).toBe(1400)
-      expect(s.revenus[0].estRecu).toBe(true)
-      expect(s.historique[0]).toMatchObject({ montant: 1400, type: "revenu" })
+      expect(actif().compte).toBe(1400)
+      expect(actif().revenus[0].estRecu).toBe(true)
+      expect(useBudget.getState().historique[0]).toMatchObject({ montant: 1400, type: "revenu" })
    })
 
    it("re-cliquer annule : retire du compte et journalise l'inverse", () => {
-      useBudget.setState({ revenus: [{ ...revenu(1400), estRecu: true }], compte: 1400 })
+      poser({ revenus: [{ ...revenu(1400), estRecu: true }], compte: 1400 })
       useBudget.getState().marquerRecu("r1")
 
-      const s = useBudget.getState()
-      expect(s.compte).toBe(0)
-      expect(s.revenus[0].estRecu).toBe(false)
-      expect(s.historique[0].type).toBe("depense")
+      expect(actif().compte).toBe(0)
+      expect(actif().revenus[0].estRecu).toBe(false)
+      expect(useBudget.getState().historique[0].type).toBe("depense")
    })
 })
 
 describe("marquerPayer (D4)", () => {
    it("retire la charge du compte et journalise une Sortie", () => {
-      useBudget.setState({ depenses: [depense(750)], compte: 1000 })
+      poser({ depenses: [depense(750)], compte: 1000 })
       useBudget.getState().marquerPayer("d1")
 
-      const s = useBudget.getState()
-      expect(s.compte).toBe(250)
-      expect(s.depenses[0].estPayer).toBe(true)
-      expect(s.historique[0]).toMatchObject({ montant: 750, type: "depense" })
+      expect(actif().compte).toBe(250)
+      expect(actif().depenses[0].estPayer).toBe(true)
+      expect(useBudget.getState().historique[0]).toMatchObject({ montant: 750, type: "depense" })
    })
 })
 
 describe("enveloppes (E2/E3)", () => {
    it("retirer est plafonné au contenu (jamais négatif)", () => {
-      useBudget.setState({ enveloppes: [enveloppe(50)] })
+      poser({ enveloppes: [enveloppe(50)] })
       useBudget.getState().retirerArgentEnveloppe("e1", 80)
-      expect(useBudget.getState().enveloppes[0].montant).toBe(0)
+      expect(actif().enveloppes[0].montant).toBe(0)
    })
 })
 
 describe("dépenser depuis une enveloppe (E6)", () => {
    it("baisse l'enveloppe ET le compte, sans toucher au disponible", () => {
-      useBudget.setState({ compte: 500, enveloppes: [enveloppe(100)] })
+      poser({ compte: 500, enveloppes: [enveloppe(100)] })
       // disponible avant = 500 − 100 (enveloppe) = 400
       useBudget.getState().depenserDepuisEnveloppe("e1", 30)
 
-      const s = useBudget.getState()
-      expect(s.compte).toBe(470)
-      expect(s.enveloppes[0].montant).toBe(70)
+      expect(actif().compte).toBe(470)
+      expect(actif().enveloppes[0].montant).toBe(70)
       // disponible après = 470 − 70 = 400 : inchangé
-      expect(s.compte - s.enveloppes[0].montant).toBe(400)
-      expect(s.historique[0]).toMatchObject({ montant: 30, type: "depense", refId: "e1" })
+      expect(actif().compte - actif().enveloppes[0].montant).toBe(400)
+      expect(useBudget.getState().historique[0]).toMatchObject({ montant: 30, type: "depense", refId: "e1" })
    })
 
    it("est plafonné au contenu de l'enveloppe", () => {
-      useBudget.setState({ compte: 500, enveloppes: [enveloppe(100)] })
+      poser({ compte: 500, enveloppes: [enveloppe(100)] })
       useBudget.getState().depenserDepuisEnveloppe("e1", 250) // plus que le contenu
 
-      const s = useBudget.getState()
-      expect(s.enveloppes[0].montant).toBe(0)
-      expect(s.compte).toBe(400) // seulement 100 dépensés
+      expect(actif().enveloppes[0].montant).toBe(0)
+      expect(actif().compte).toBe(400) // seulement 100 dépensés
    })
 })
 
 describe("dépense immédiate (page Dépenses)", () => {
    it("depuis le compte : déduit le compte et laisse une charge payée", () => {
-      useBudget.setState({ compte: 500 })
+      poser({ compte: 500 })
       useBudget.getState().depenserImmediat("Dentiste", 60, "occasionnel", "compte")
 
-      const s = useBudget.getState()
-      expect(s.compte).toBe(440)
-      expect(s.depenses[0]).toMatchObject({ nom: "Dentiste", montant: 60, estPayer: true })
-      expect(s.historique[0]).toMatchObject({ montant: 60, type: "depense" })
+      expect(actif().compte).toBe(440)
+      expect(actif().depenses[0]).toMatchObject({ nom: "Dentiste", montant: 60, estPayer: true })
+      expect(useBudget.getState().historique[0]).toMatchObject({ montant: 60, type: "depense" })
    })
 
    it("depuis une enveloppe : sort de l'enveloppe ET du compte", () => {
-      useBudget.setState({ compte: 500, enveloppes: [enveloppe(100)] })
+      poser({ compte: 500, enveloppes: [enveloppe(100)] })
       useBudget.getState().depenserImmediat("Plein essence", 40, "occasionnel", "e1")
 
-      const s = useBudget.getState()
-      expect(s.compte).toBe(460)
-      expect(s.enveloppes[0].montant).toBe(60)
-      expect(s.depenses[0]).toMatchObject({ montant: 40, estPayer: true })
+      expect(actif().compte).toBe(460)
+      expect(actif().enveloppes[0].montant).toBe(60)
+      expect(actif().depenses[0]).toMatchObject({ montant: 40, estPayer: true })
    })
 })
 
 describe("courses (D7)", () => {
    it("cocher « courses faites » déduit le budget du compte et journalise", () => {
-      useBudget.setState({ compte: 500, courses: [{ budget: 25, faite: false }] })
+      poser({ compte: 500, courses: [{ budget: 25, faite: false }] })
       useBudget.getState().basculerSemaineFaite(0)
 
-      const s = useBudget.getState()
-      expect(s.compte).toBe(475)
-      expect(s.courses[0].faite).toBe(true)
-      expect(s.historique[0]).toMatchObject({ montant: 25, type: "depense" })
+      expect(actif().compte).toBe(475)
+      expect(actif().courses[0].faite).toBe(true)
+      expect(useBudget.getState().historique[0]).toMatchObject({ montant: 25, type: "depense" })
    })
 
    it("décocher rend l'argent au compte (réversible)", () => {
-      useBudget.setState({ compte: 475, courses: [{ budget: 25, faite: true }] })
+      poser({ compte: 475, courses: [{ budget: 25, faite: true }] })
       useBudget.getState().basculerSemaineFaite(0)
-      expect(useBudget.getState().compte).toBe(500)
-      expect(useBudget.getState().courses[0].faite).toBe(false)
+      expect(actif().compte).toBe(500)
+      expect(actif().courses[0].faite).toBe(false)
    })
 
    it("ajuster le budget ne descend jamais sous 0", () => {
-      useBudget.setState({ courses: [{ budget: 5, faite: false }] })
+      poser({ courses: [{ budget: 5, faite: false }] })
       useBudget.getState().ajusterSemaine(0, -5)
-      expect(useBudget.getState().courses[0].budget).toBe(0)
+      expect(actif().courses[0].budget).toBe(0)
       useBudget.getState().ajusterSemaine(0, -5)
-      expect(useBudget.getState().courses[0].budget).toBe(0)
+      expect(actif().courses[0].budget).toBe(0)
    })
 
    it("définir un montant exact remplace le budget de la semaine", () => {
-      useBudget.setState({ courses: [{ budget: 25, faite: false }] })
+      poser({ courses: [{ budget: 25, faite: false }] })
       useBudget.getState().definirBudgetSemaine(0, 37.5)
-      expect(useBudget.getState().courses[0].budget).toBe(37.5)
+      expect(actif().courses[0].budget).toBe(37.5)
    })
 })
 
 describe("acheter un vœu (V5)", () => {
    it("déduit le montant réel, termine le vœu, et rectifie l'écart via le disponible", () => {
       // épargné 200 pour une cible 180, compte 500 → disponible = 500 − 200 = 300
-      useBudget.setState({
+      poser({
          compte: 500,
          voeux: [{ id: "v1", nom: "Casque", montantTotal: 180, montantActuel: 200, estTermine: false }],
       })
 
       useBudget.getState().acheterVoeu("v1", 170) // acheté moins cher que prévu
 
-      const s = useBudget.getState()
-      expect(s.compte).toBe(330)               // 500 − 170
-      expect(s.voeux[0].montantActuel).toBe(0)
-      expect(s.voeux[0].estTermine).toBe(true)
-      // disponible après = 330 − 0 = 330 : +30 rendus (200 épargnés − 170 payés)
-      expect(s.historique[0]).toMatchObject({ montant: 170, type: "depense", refId: "v1" })
+      expect(actif().compte).toBe(330)               // 500 − 170
+      expect(actif().voeux[0].montantActuel).toBe(0)
+      expect(actif().voeux[0].estTermine).toBe(true)
+      expect(useBudget.getState().historique[0]).toMatchObject({ montant: 170, type: "depense", refId: "v1" })
    })
 })
 
 describe("prévisionnel (D6)", () => {
    it("« dépensé ce mois » déduit le budget du compte et journalise", () => {
-      useBudget.setState({ compte: 500, previsionnels: [{ id: "p1", nom: "Loisirs", montant: 60, estDepense: false }] })
+      poser({ compte: 500, previsionnels: [{ id: "p1", nom: "Loisirs", montant: 60, estDepense: false }] })
       useBudget.getState().basculerPrevisionnelDepense("p1")
 
-      const s = useBudget.getState()
-      expect(s.compte).toBe(440)
-      expect(s.previsionnels[0].estDepense).toBe(true)
-      expect(s.historique[0]).toMatchObject({ montant: 60, type: "depense" })
+      expect(actif().compte).toBe(440)
+      expect(actif().previsionnels[0].estDepense).toBe(true)
+      expect(useBudget.getState().historique[0]).toMatchObject({ montant: 60, type: "depense" })
    })
 
    it("ajuster le budget ne descend jamais sous 0", () => {
-      useBudget.setState({ previsionnels: [{ id: "p1", nom: "Loisirs", montant: 10, estDepense: false }] })
+      poser({ previsionnels: [{ id: "p1", nom: "Loisirs", montant: 10, estDepense: false }] })
       useBudget.getState().ajusterPrevisionnel("p1", -10)
       useBudget.getState().ajusterPrevisionnel("p1", -10)
-      expect(useBudget.getState().previsionnels[0].montant).toBe(0)
+      expect(actif().previsionnels[0].montant).toBe(0)
    })
 })
 
 describe("nouveauMois (M1)", () => {
-   it("avance le mois, reporte le solde réel et journalise l'écart", () => {
-      useBudget.setState({
-         compte: 500,
-         soldeReporte: 0,
-         mois: 5,
-         annee: 2026,
+   it("ajoute un mois, reporte le solde réel et journalise l'écart", () => {
+      poser({
+         compte: 500, soldeReporte: 0, mois: 5, annee: 2026,
          revenus: [{ ...revenu(1400), estRecu: true }],
          depenses: [{ ...depense(750), estPayer: true }],
       })
@@ -199,20 +188,63 @@ describe("nouveauMois (M1)", () => {
       useBudget.getState().nouveauMois(600) // solde réel corrigé à 600 (+100 d'écart)
 
       const s = useBudget.getState()
-      expect(s.mois).toBe(6)
-      expect(s.compte).toBe(600)
-      expect(s.soldeReporte).toBe(600)
-      expect(s.revenus[0].estRecu).toBe(false)   // remis à recevoir
-      expect(s.depenses[0].estPayer).toBe(false) // remis à payer
+      expect(s.moisListe).toHaveLength(2)       // l'ancien mois est conservé
+      expect(s.indexActif).toBe(1)              // on affiche le nouveau mois
+      expect(actif().mois).toBe(6)
+      expect(actif().compte).toBe(600)
+      expect(actif().soldeReporte).toBe(600)
+      expect(actif().revenus[0].estRecu).toBe(false)   // remis à recevoir
+      expect(actif().depenses[0].estPayer).toBe(false) // remis à payer
+      // l'ancien mois garde son état (consultable dans le calendrier)
+      expect(s.moisListe[0].revenus[0].estRecu).toBe(true)
       expect(s.historique[0]).toMatchObject({ montant: 100, type: "revenu" })
    })
 
    it("bascule d'année après décembre", () => {
-      useBudget.setState({ mois: 11, annee: 2026, compte: 0 })
+      poser({ mois: 11, annee: 2026, compte: 0 })
       useBudget.getState().nouveauMois(0)
 
+      expect(actif().mois).toBe(0)
+      expect(actif().annee).toBe(2027)
+   })
+})
+
+describe("navigation entre les mois", () => {
+   it("précédent / suivant se déplacent sans sortir des bornes", () => {
+      // Trois mois : mai, juin, juillet (juillet = en cours)
+      useBudget.setState({
+         moisListe: [
+            moisBase({ mois: 4 }), moisBase({ mois: 5 }), moisBase({ mois: 6 }),
+         ],
+         indexActif: 2,
+      })
+
+      useBudget.getState().moisPrecedent()
+      expect(useBudget.getState().indexActif).toBe(1)
+      useBudget.getState().moisPrecedent()
+      useBudget.getState().moisPrecedent()
+      expect(useBudget.getState().indexActif).toBe(0)   // bloqué au premier
+
+      useBudget.getState().moisSuivant()
+      useBudget.getState().moisSuivant()
+      useBudget.getState().moisSuivant()
+      expect(useBudget.getState().indexActif).toBe(2)   // bloqué au mois en cours
+   })
+
+   it("modifier un mois passé ne touche pas le mois en cours (pas encore de cascade)", () => {
+      useBudget.setState({
+         moisListe: [
+            moisBase({ mois: 4, compte: 500, depenses: [depense(200)] }),
+            moisBase({ mois: 5, compte: 800 }),
+         ],
+         indexActif: 0,   // on affiche mai (le mois passé)
+         historique: [],
+      })
+
+      useBudget.getState().marquerPayer("d1")   // on paie une charge de mai
+
       const s = useBudget.getState()
-      expect(s.mois).toBe(0)
-      expect(s.annee).toBe(2027)
+      expect(s.moisListe[0].compte).toBe(300)   // mai baisse
+      expect(s.moisListe[1].compte).toBe(800)   // juin (en cours) inchangé pour l'instant
    })
 })

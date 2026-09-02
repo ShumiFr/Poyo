@@ -62,3 +62,18 @@ export interface Flux {
    type: TypeAction
    refId?: string   // enveloppe/vœu concerné, pour un historique par carte
 }
+
+// Un mois complet du budget. L'app garde une liste de ces mois (le calendrier)
+// et affiche celui qu'on a sélectionné. Tout ce qui « change chaque mois » est ici.
+export interface MoisBudget {
+   mois: number
+   annee: number
+   soldeReporte: number
+   compte: number
+   revenus: Revenu[]
+   depenses: Depense[]
+   enveloppes: Enveloppe[]
+   voeux: Voeu[]
+   courses: SemaineCourses[]
+   previsionnels: Previsionnel[]
+}

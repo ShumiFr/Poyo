@@ -1,11 +1,12 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Clock, ArrowDown, FileText, Mail, Flag, PiggyBank, RefreshCw, User } from "lucide-react";
+import { Clock, ArrowDown, FileText, Mail, Flag, PiggyBank, User } from "lucide-react";
 import { useBudget } from "../store/useBudget";
 import { useAuth } from "../store/useAuth";
 import { useSyncBudget } from "../lib/useSyncBudget";
 import { AuthScreen } from "../components/AuthScreen";
 import EcranVerrou from "../components/EcranVerrou";
+import Calendrier from "../components/Calendrier";
 import { Modal } from "../components/Modal";
 import { libelleMois } from "../lib/format";
 
@@ -23,9 +24,8 @@ const onglets = [
 ] as const;
 
 function RootComponent() {
-   const mois = useBudget((state) => state.mois);
-   const annee = useBudget((state) => state.annee);
-   const compte = useBudget((state) => state.compte);
+   // Le mois en cours = le dernier de la liste (celui qu'on peut clôturer).
+   const moisCourant = useBudget((state) => state.moisListe[state.moisListe.length - 1]);
    const nouveauMois = useBudget((state) => state.nouveauMois);
    const theme = useBudget((state) => state.theme);
 
@@ -61,19 +61,50 @@ function RootComponent() {
 
    const [confirme, setConfirme] = useState(false);
    const [solde, setSolde] = useState("");
+   const [bascProposee, setBascProposee] = useState(false);
 
-   const moisSuivant = libelleMois((mois + 1) % 12, mois === 11 ? annee + 1 : annee);
+   // Le mois réel d'aujourd'hui = la cible quand on démarre un nouveau mois.
+   const maintenant = new Date();
+   const moisCible = libelleMois(maintenant.getMonth(), maintenant.getFullYear());
    const soldeValide = Number(solde.replace(",", "."));
 
    function ouvrir() {
-      setSolde(String(compte));   // pré-rempli avec le solde suivi par l'app
+      setSolde(String(moisCourant.compte));   // pré-rempli avec le solde suivi par l'app
       setConfirme(true);
    }
 
    function demarrer() {
+      // 1er mois : on démarre avec le solde confirmé.
       nouveauMois(soldeValide);
+      // Si plusieurs mois ont été sautés, on rattrape en gardant le solde.
+      while (enRetardSurAujourdhui()) {
+         const liste = useBudget.getState().moisListe;
+         nouveauMois(liste[liste.length - 1].compte);
+      }
       setConfirme(false);
    }
+
+   // Vrai si le mois en cours (le dernier) est antérieur au mois réel d'aujourd'hui.
+   function enRetardSurAujourdhui() {
+      const n = new Date();
+      const liste = useBudget.getState().moisListe;
+      const dernier = liste[liste.length - 1];
+      return dernier.annee < n.getFullYear() || (dernier.annee === n.getFullYear() && dernier.mois < n.getMonth());
+   }
+
+   // Bascule automatique : si le mois en cours est en retard sur la date du jour,
+   // on propose une fois de confirmer le solde pour démarrer le mois en cours.
+   useEffect(() => {
+      if (!budgetPret || bascProposee) return;
+      const enRetard =
+         moisCourant.annee < maintenant.getFullYear() ||
+         (moisCourant.annee === maintenant.getFullYear() && moisCourant.mois < maintenant.getMonth());
+      if (enRetard) {
+         setBascProposee(true);
+         ouvrir();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [budgetPret, moisCourant.mois, moisCourant.annee, bascProposee]);
 
    // Porte d'entrée : on attend la session, puis on montre l'auth ou l'app.
    if (chargement) {
@@ -96,19 +127,18 @@ function RootComponent() {
          <header className="app-header">
             <div>
                <div className="titre">{session.user.user_metadata?.nom || "Mon Budget"}</div>
-               <div className="mois">{libelleMois(mois, annee)}</div>
             </div>
             <div className="app-actions">
                <Link to="/profil" className="btn-theme" aria-label="Profil">
                   <User size={18} />
                </Link>
-               <button className="btn-mois" onClick={ouvrir}><RefreshCw size={16} /> Nouveau mois</button>
+               <Calendrier />
             </div>
          </header>
 
          <Modal isOpen={confirme} onClose={() => setConfirme(false)}>
-            <h2>Démarrer {moisSuivant} ?</h2>
-            <p className="sous">Confirme ton solde réel en fin de mois. Un écart sera journalisé en ajustement.</p>
+            <h2>Démarrer {moisCible} ?</h2>
+            <p className="sous">Confirme ton solde réel de fin de mois. Un écart sera journalisé en ajustement.</p>
             <div className="champ">
                <label>Solde de fin de mois</label>
                <input value={solde} onChange={(e) => setSolde(e.target.value)} />

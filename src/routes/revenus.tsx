@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { useBudget } from '../store/useBudget'
+import { useBudget, moisActif } from '../store/useBudget'
 import Section from '../components/Section'
 import Form from '../components/Form'
 import MontantEditable from '../components/MontantEditable'
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/revenus')({
 })
 
 function RouteComponent() {
-   const revenus = useBudget((state) => state.revenus)
+   const revenus = useBudget((state) => moisActif(state).revenus)
    const ajouterRevenu = useBudget((state) => state.ajouterRevenu)
    const marquerRecu = useBudget((state) => state.marquerRecu)
    const modifierRevenu = useBudget((state) => state.modifierRevenu)

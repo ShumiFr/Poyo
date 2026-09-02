@@ -1,42 +1,56 @@
 import { create } from "zustand";
-import type { CompteEpargne, Depense, Enveloppe, Flux, Frequence, Previsionnel, Revenu, SemaineCourses, TypeAction, Voeu } from "../types";
+import type { CompteEpargne, Depense, Enveloppe, Flux, Frequence, MoisBudget, Revenu, TypeAction, Voeu } from "../types";
 import { genererSemaines } from "../lib/courses";
 
-// Valeurs de départ d'un budget vierge (nouvel utilisateur, ou après déconnexion).
-// Plus aucune donnée en dur : tout vient désormais de la base (Supabase).
-function donneesInitiales() {
-   const mois = new Date().getMonth();
-   const annee = new Date().getFullYear();
+// Un mois vierge (pour un nouvel utilisateur ou un tout nouveau mois).
+function moisVierge(date = new Date()): MoisBudget {
+   const mois = date.getMonth();
+   const annee = date.getFullYear();
    return {
-      compte: 0,
-      soldeReporte: 0,
       mois,
       annee,
-      theme: "sombre" as const,
-      revenus: [] as Revenu[],
-      depenses: [] as Depense[],
-      enveloppes: [] as Enveloppe[],
-      voeux: [] as Voeu[],
+      soldeReporte: 0,
+      compte: 0,
+      revenus: [],
+      depenses: [],
+      enveloppes: [],
+      voeux: [],
       courses: genererSemaines(mois, annee),
-      previsionnels: [] as Previsionnel[],
+      previsionnels: [],
+   };
+}
+
+// Valeurs de départ d'un budget vierge (nouvel utilisateur, ou après déconnexion).
+// Le budget est une LISTE de mois + l'index du mois affiché. Le reste est global.
+function donneesInitiales() {
+   return {
+      moisListe: [moisVierge()] as MoisBudget[],
+      indexActif: 0,
+      theme: "sombre" as const,
       historique: [] as Flux[],
       comptesEpargne: [] as CompteEpargne[],
       codePin: undefined as string | undefined,
    };
 }
 
+// Le mois actuellement affiché (celui que toutes les pages lisent).
+export function moisActif(state: BudgetStore): MoisBudget {
+   return state.moisListe[state.indexActif];
+}
+
+// Applique un changement au mois affiché uniquement, sans toucher aux autres.
+function majActif(state: BudgetStore, patch: Partial<MoisBudget>) {
+   return {
+      moisListe: state.moisListe.map((m, i) =>
+         i === state.indexActif ? { ...m, ...patch } : m
+      ),
+   };
+}
+
 export interface BudgetStore {
-   compte: number,
-   soldeReporte: number,
-   mois: number,
-   annee: number,
-   theme: 'sombre' | 'clair',
-   revenus: Revenu[],
-   depenses: Depense[],
-   enveloppes: Enveloppe[],
-   voeux: Voeu[],
-   courses: SemaineCourses[],
-   previsionnels: Previsionnel[],
+   moisListe: MoisBudget[]      // tous les mois, du plus ancien au plus récent
+   indexActif: number           // le mois affiché (le dernier = le mois en cours)
+   theme: 'sombre' | 'clair'
    historique: Flux[]
    comptesEpargne: CompteEpargne[]
    codePin?: string   // empreinte (hachée) du code de verrouillage, ou absent si désactivé
@@ -46,6 +60,11 @@ export interface BudgetStore {
 
    //Thème
    basculerTheme: () => void
+
+   //Navigation entre les mois (calendrier)
+   moisPrecedent: () => void
+   moisSuivant: () => void
+   basculerMoisTest: () => void   // dev seulement : ajoute/retire un mois d'exemple
 
    //Mois
    nouveauMois: (soldeReel: number) => void
@@ -113,96 +132,147 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    basculerTheme: () =>
       set((state) => ({ theme: state.theme === 'sombre' ? 'clair' : 'sombre' })),
 
+   // On recule dans le temps, sans jamais dépasser le premier mois.
+   moisPrecedent: () =>
+      set((state) => ({ indexActif: Math.max(0, state.indexActif - 1) })),
+
+   // On avance, mais jamais au-delà du mois en cours (le dernier de la liste).
+   moisSuivant: () =>
+      set((state) => ({ indexActif: Math.min(state.moisListe.length - 1, state.indexActif + 1) })),
+
+   // Dev seulement : ajoute (ou retire) un mois d'exemple en tête de liste
+   // pour pouvoir tester la navigation sans attendre un vrai changement de mois.
+   basculerMoisTest: () =>
+      set((state) => {
+         const dejaLa = state.moisListe[0]?.annee === 2000
+         if (dejaLa) {
+            return {
+               moisListe: state.moisListe.slice(1),
+               indexActif: Math.max(0, state.indexActif - 1),
+            };
+         }
+         const test: MoisBudget = {
+            mois: 0, annee: 2000,
+            soldeReporte: 300, compte: 1250,
+            revenus: [
+               { id: crypto.randomUUID(), nom: "Salaire", montant: 1600, type: "regulier", estRecu: true },
+               { id: crypto.randomUUID(), nom: "Remboursement", montant: 40, type: "occasionnel", estRecu: false },
+            ],
+            depenses: [
+               { id: crypto.randomUUID(), nom: "Loyer", montant: 650, type: "regulier", estPayer: true },
+               { id: crypto.randomUUID(), nom: "Électricité", montant: 90, type: "regulier", estPayer: false },
+            ],
+            enveloppes: [{ id: crypto.randomUUID(), nom: "Voiture", montant: 120, couleur: "navy", icone: "car" }],
+            voeux: [{ id: crypto.randomUUID(), nom: "Vacances", montantTotal: 600, montantActuel: 150, estTermine: false }],
+            courses: [{ budget: 80, faite: true }, { budget: 80, faite: false }],
+            previsionnels: [],
+         };
+         return {
+            moisListe: [test, ...state.moisListe],
+            indexActif: state.indexActif + 1,   // on reste sur le même mois qu'avant
+         };
+      }),
+
    nouveauMois: (soldeReel) => {
-      // Écart entre le solde réel confirmé et celui suivi par l'app.
-      const ecart = soldeReel - get().compte
+      // On clôture toujours le mois en cours (le dernier de la liste).
+      const dernier = get().moisListe[get().moisListe.length - 1];
+      const ecart = soldeReel - dernier.compte;
       if (ecart !== 0) {
-         get().ajouterMouvement("Ajustement de solde", Math.abs(ecart), ecart > 0 ? "revenu" : "depense")
+         get().ajouterMouvement("Ajustement de solde", Math.abs(ecart), ecart > 0 ? "revenu" : "depense");
       }
       set((state) => {
-         const nouveauMoisIndex = (state.mois + 1) % 12
-         const nouvelleAnnee = state.mois === 11 ? state.annee + 1 : state.annee
-         return {
-            mois: nouveauMoisIndex,
-            annee: nouvelleAnnee,
+         const ancien = state.moisListe[state.moisListe.length - 1];
+         const moisIndex = (ancien.mois + 1) % 12;
+         const annee = ancien.mois === 11 ? ancien.annee + 1 : ancien.annee;
+
+         const nouveau: MoisBudget = {
+            mois: moisIndex,
+            annee,
             // le solde réel confirmé devient le compte et le solde reporté du nouveau mois
-            compte: soldeReel,
             soldeReporte: soldeReel,
+            compte: soldeReel,
             // les charges et revenus repassent à payer / recevoir
-            depenses: state.depenses.map((d) => ({ ...d, estPayer: false })),
-            revenus: state.revenus.map((r) => ({ ...r, estRecu: false })),
+            revenus: ancien.revenus.map((r) => ({ ...r, estRecu: false })),
+            depenses: ancien.depenses.map((d) => ({ ...d, estPayer: false })),
+            // enveloppes et vœux sont conservés (leur épargne se cumule)
+            enveloppes: ancien.enveloppes,
+            voeux: ancien.voeux,
             // les semaines de courses sont régénérées pour le nouveau mois
-            courses: genererSemaines(nouveauMoisIndex, nouvelleAnnee),
+            courses: genererSemaines(moisIndex, annee),
             // les budgets prévisionnels repassent « non dépensés » (montant conservé)
-            previsionnels: state.previsionnels.map((p) => ({ ...p, estDepense: false })),
-            // enveloppes, vœux et historique sont conservés
-         }
-      })
+            previsionnels: ancien.previsionnels.map((p) => ({ ...p, estDepense: false })),
+         };
+
+         const moisListe = [...state.moisListe, nouveau];
+         return { moisListe, indexActif: moisListe.length - 1 };
+      });
    },
 
    ajusterSemaine: (index, delta) =>
-      set((state) => ({
-         courses: state.courses.map((s, i) =>
+      set((state) => majActif(state, {
+         courses: moisActif(state).courses.map((s, i) =>
             i === index ? { ...s, budget: Math.max(0, s.budget + delta) } : s
          )
       })),
 
    definirBudgetSemaine: (index, montant) =>
-      set((state) => ({
-         courses: state.courses.map((s, i) =>
+      set((state) => majActif(state, {
+         courses: moisActif(state).courses.map((s, i) =>
             i === index ? { ...s, budget: Math.max(0, montant) } : s
          )
       })),
 
    basculerSemaineFaite: (index) => {
-      const semaine = get().courses[index]
-      if (!semaine) return
-      const devientFaite = !semaine.faite
-      set((state) => ({
-         courses: state.courses.map((s, i) =>
-            i === index ? { ...s, faite: devientFaite } : s
-         ),
-         compte: devientFaite ? state.compte - semaine.budget : state.compte + semaine.budget,
-      }))
+      const semaine = moisActif(get()).courses[index];
+      if (!semaine) return;
+      const devientFaite = !semaine.faite;
+      set((state) => {
+         const a = moisActif(state);
+         return majActif(state, {
+            courses: a.courses.map((s, i) => i === index ? { ...s, faite: devientFaite } : s),
+            compte: devientFaite ? a.compte - semaine.budget : a.compte + semaine.budget,
+         });
+      });
       get().ajouterMouvement(
          devientFaite ? "Courses semaine " + (index + 1) : "Annulation — Courses semaine " + (index + 1),
          semaine.budget,
          devientFaite ? "depense" : "revenu"
-      )
+      );
    },
 
    ajouterPrevisionnel: (nom, montant) =>
-      set((state) => ({
-         previsionnels: [...state.previsionnels, { id: crypto.randomUUID(), nom, montant, estDepense: false }]
+      set((state) => majActif(state, {
+         previsionnels: [...moisActif(state).previsionnels, { id: crypto.randomUUID(), nom, montant, estDepense: false }]
       })),
 
    retirerPrevisionnel: (id) =>
-      set((state) => ({
-         previsionnels: state.previsionnels.filter((p) => p.id !== id)
+      set((state) => majActif(state, {
+         previsionnels: moisActif(state).previsionnels.filter((p) => p.id !== id)
       })),
 
    ajusterPrevisionnel: (id, delta) =>
-      set((state) => ({
-         previsionnels: state.previsionnels.map((p) =>
+      set((state) => majActif(state, {
+         previsionnels: moisActif(state).previsionnels.map((p) =>
             p.id === id ? { ...p, montant: Math.max(0, p.montant + delta) } : p
          )
       })),
 
    basculerPrevisionnelDepense: (id) => {
-      const prev = get().previsionnels.find((p) => p.id === id)
-      if (!prev) return
-      const devientDepense = !prev.estDepense
-      set((state) => ({
-         previsionnels: state.previsionnels.map((p) =>
-            p.id === id ? { ...p, estDepense: devientDepense } : p
-         ),
-         compte: devientDepense ? state.compte - prev.montant : state.compte + prev.montant,
-      }))
+      const prev = moisActif(get()).previsionnels.find((p) => p.id === id);
+      if (!prev) return;
+      const devientDepense = !prev.estDepense;
+      set((state) => {
+         const a = moisActif(state);
+         return majActif(state, {
+            previsionnels: a.previsionnels.map((p) => p.id === id ? { ...p, estDepense: devientDepense } : p),
+            compte: devientDepense ? a.compte - prev.montant : a.compte + prev.montant,
+         });
+      });
       get().ajouterMouvement(
          devientDepense ? prev.nom : "Annulation — " + prev.nom,
          prev.montant,
          devientDepense ? "depense" : "revenu"
-      )
+      );
    },
 
    ajouterMouvement: (nom, montant, type, refId) =>
@@ -214,146 +284,137 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
       })),
 
    ajouterAuCompte: (montant) => {
-      set((state) => ({ compte: state.compte + montant }))
-      get().ajouterMouvement("Entrée d'argent", montant, "revenu")
+      set((state) => majActif(state, { compte: moisActif(state).compte + montant }));
+      get().ajouterMouvement("Entrée d'argent", montant, "revenu");
    },
 
    ajouterRevenu: (revenu) =>
-      set((state) => ({
-         revenus: [...state.revenus, revenu]
+      set((state) => majActif(state, {
+         revenus: [...moisActif(state).revenus, revenu]
       })),
 
    retirerRevenu: (id) =>
-      set((state) => ({
-         revenus: state.revenus.filter((revenu) => revenu.id !== id)
+      set((state) => majActif(state, {
+         revenus: moisActif(state).revenus.filter((revenu) => revenu.id !== id)
       })),
 
    marquerRecu: (id) => {
-      const revenu = get().revenus.find((r) => r.id === id)
-      if (!revenu) return
-      const devientRecu = !revenu.estRecu
-      set((state) => ({
-         revenus: state.revenus.map((r) =>
-            r.id === id
-               ? { ...r, estRecu: devientRecu, dateRecu: devientRecu ? new Date().toISOString() : undefined }
-               : r
-         ),
-         compte: devientRecu
-            ? state.compte + revenu.montant
-            : state.compte - revenu.montant,
-      }))
+      const revenu = moisActif(get()).revenus.find((r) => r.id === id);
+      if (!revenu) return;
+      const devientRecu = !revenu.estRecu;
+      set((state) => {
+         const a = moisActif(state);
+         return majActif(state, {
+            revenus: a.revenus.map((r) =>
+               r.id === id
+                  ? { ...r, estRecu: devientRecu, dateRecu: devientRecu ? new Date().toISOString() : undefined }
+                  : r
+            ),
+            compte: devientRecu ? a.compte + revenu.montant : a.compte - revenu.montant,
+         });
+      });
       get().ajouterMouvement(
          devientRecu ? revenu.nom : "Annulation — " + revenu.nom,
          revenu.montant,
          devientRecu ? "revenu" : "depense"
-      )
+      );
    },
 
    modifierRevenu: (id, nom, montant) =>
-      set((state) => ({
-         revenus: state.revenus.map((r) =>
-            r.id === id ? { ...r, nom, montant } : r
-         )
+      set((state) => majActif(state, {
+         revenus: moisActif(state).revenus.map((r) => r.id === id ? { ...r, nom, montant } : r)
       })),
 
    ajouterDepense: (depense) =>
-      set((state) => ({
-         depenses: [...state.depenses, depense]
+      set((state) => majActif(state, {
+         depenses: [...moisActif(state).depenses, depense]
       })),
 
    retirerDepense: (id) =>
-      set((state) => ({
-         depenses: state.depenses.filter((depense) => depense.id !== id)
+      set((state) => majActif(state, {
+         depenses: moisActif(state).depenses.filter((depense) => depense.id !== id)
       })),
 
    modifierDepense: (id, nom, montant) =>
-      set((state) => ({
-         depenses: state.depenses.map((d) =>
-            d.id === id ? { ...d, nom, montant } : d
-         )
+      set((state) => majActif(state, {
+         depenses: moisActif(state).depenses.map((d) => d.id === id ? { ...d, nom, montant } : d)
       })),
 
    depenserImmediat: (nom, montant, type, source) => {
       // On garde une trace sous forme de dépense déjà payée (grisée)
-      const depense: Depense = { id: crypto.randomUUID(), nom, montant, type, estPayer: true }
-      set((state) => ({ depenses: [...state.depenses, depense] }))
+      const depense: Depense = { id: crypto.randomUUID(), nom, montant, type, estPayer: true };
+      set((state) => majActif(state, { depenses: [...moisActif(state).depenses, depense] }));
       if (source === "compte") {
-         set((state) => ({ compte: state.compte - montant }))
-         get().ajouterMouvement(nom, montant, "depense")
+         set((state) => majActif(state, { compte: moisActif(state).compte - montant }));
+         get().ajouterMouvement(nom, montant, "depense");
       } else {
          // source = id d'une enveloppe : l'argent sort de l'enveloppe ET du compte
-         get().depenserDepuisEnveloppe(source, montant)
+         get().depenserDepuisEnveloppe(source, montant);
       }
    },
 
    marquerPayer: (id) => {
-      const depense = get().depenses.find((d) => d.id === id)
-      if (!depense) return
-      const devientPayee = !depense.estPayer
-      set((state) => ({
-         depenses: state.depenses.map((d) =>
-            d.id === id ? { ...d, estPayer: devientPayee } : d
-         ),
-         compte: devientPayee
-            ? state.compte - depense.montant
-            : state.compte + depense.montant,
-      }))
+      const depense = moisActif(get()).depenses.find((d) => d.id === id);
+      if (!depense) return;
+      const devientPayee = !depense.estPayer;
+      set((state) => {
+         const a = moisActif(state);
+         return majActif(state, {
+            depenses: a.depenses.map((d) => d.id === id ? { ...d, estPayer: devientPayee } : d),
+            compte: devientPayee ? a.compte - depense.montant : a.compte + depense.montant,
+         });
+      });
       get().ajouterMouvement(
          devientPayee ? depense.nom : "Annulation — " + depense.nom,
          depense.montant,
          devientPayee ? "depense" : "revenu"
-      )
+      );
    },
 
    ajouterEnveloppe: (enveloppe) =>
-      set((state) => ({
-         enveloppes: [...state.enveloppes, enveloppe]
+      set((state) => majActif(state, {
+         enveloppes: [...moisActif(state).enveloppes, enveloppe]
       })),
 
    modifierEnveloppe: (id, nom, couleur, icone) =>
-      set((state) => ({
-         enveloppes: state.enveloppes.map((e) =>
-            e.id === id ? { ...e, nom, couleur, icone } : e
-         )
+      set((state) => majActif(state, {
+         enveloppes: moisActif(state).enveloppes.map((e) => e.id === id ? { ...e, nom, couleur, icone } : e)
       })),
 
    ajouterArgentEnveloppe: (id, montant) => {
-      set((state) => ({
-         enveloppes: state.enveloppes.map((enveloppe) =>
-            enveloppe.id === id
-               ? { ...enveloppe, montant: enveloppe.montant + montant }
-               : enveloppe
+      set((state) => majActif(state, {
+         enveloppes: moisActif(state).enveloppes.map((enveloppe) =>
+            enveloppe.id === id ? { ...enveloppe, montant: enveloppe.montant + montant } : enveloppe
          )
-      }))
-      const enveloppe = get().enveloppes.find((e) => e.id === id)
-      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeEntrant", id)
+      }));
+      const enveloppe = moisActif(get()).enveloppes.find((e) => e.id === id);
+      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeEntrant", id);
    },
 
    retirerArgentEnveloppe: (id, montant) => {
-      set((state) => ({
-         enveloppes: state.enveloppes.map((enveloppe) =>
-            enveloppe.id === id
-               ? { ...enveloppe, montant: Math.max(0, enveloppe.montant - montant) }
-               : enveloppe
+      set((state) => majActif(state, {
+         enveloppes: moisActif(state).enveloppes.map((enveloppe) =>
+            enveloppe.id === id ? { ...enveloppe, montant: Math.max(0, enveloppe.montant - montant) } : enveloppe
          )
-      }))
-      const enveloppe = get().enveloppes.find((e) => e.id === id)
-      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeSortant", id)
+      }));
+      const enveloppe = moisActif(get()).enveloppes.find((e) => e.id === id);
+      get().ajouterMouvement(enveloppe?.nom ?? "Enveloppe", montant, "enveloppeSortant", id);
    },
 
    depenserDepuisEnveloppe: (id, montant) => {
-      const enveloppe = get().enveloppes.find((e) => e.id === id)
-      if (!enveloppe) return
+      const enveloppe = moisActif(get()).enveloppes.find((e) => e.id === id);
+      if (!enveloppe) return;
       // On ne dépense jamais plus que le contenu de l'enveloppe.
-      const sortie = Math.min(montant, enveloppe.montant)
-      set((state) => ({
-         // l'argent quitte l'enveloppe ET le compte (le disponible ne bouge pas)
-         compte: state.compte - sortie,
-         enveloppes: state.enveloppes.map((e) =>
-            e.id === id ? { ...e, montant: e.montant - sortie } : e
-         ),
-      }))
-      get().ajouterMouvement(enveloppe.nom, sortie, "depense", id)
+      const sortie = Math.min(montant, enveloppe.montant);
+      set((state) => {
+         const a = moisActif(state);
+         return majActif(state, {
+            // l'argent quitte l'enveloppe ET le compte (le disponible ne bouge pas)
+            compte: a.compte - sortie,
+            enveloppes: a.enveloppes.map((e) => e.id === id ? { ...e, montant: e.montant - sortie } : e),
+         });
+      });
+      get().ajouterMouvement(enveloppe.nom, sortie, "depense", id);
    },
 
    ajouterCompteEpargne: (nom, montant) =>
@@ -363,9 +424,7 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
 
    modifierCompteEpargne: (id, nom, montant) =>
       set((state) => ({
-         comptesEpargne: state.comptesEpargne.map((c) =>
-            c.id === id ? { ...c, nom, montant } : c
-         )
+         comptesEpargne: state.comptesEpargne.map((c) => c.id === id ? { ...c, nom, montant } : c)
       })),
 
    retirerCompteEpargne: (id) =>
@@ -377,44 +436,41 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    retirerCodePin: () => set({ codePin: undefined }),
 
    ajouterVoeu: (voeu) =>
-      set((state) => ({
-         voeux: [...state.voeux, voeu]
+      set((state) => majActif(state, {
+         voeux: [...moisActif(state).voeux, voeu]
       })),
 
    ajouterArgentVoeu: (id, montant) => {
-      set((state) => ({
-         voeux: state.voeux.map((voeu) =>
-            voeu.id === id
-               ? { ...voeu, montantActuel: voeu.montantActuel + montant }
-               : voeu
+      set((state) => majActif(state, {
+         voeux: moisActif(state).voeux.map((voeu) =>
+            voeu.id === id ? { ...voeu, montantActuel: voeu.montantActuel + montant } : voeu
          )
-      }))
-      const voeu = get().voeux.find((v) => v.id === id)
-      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuEntrant", id)
+      }));
+      const voeu = moisActif(get()).voeux.find((v) => v.id === id);
+      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuEntrant", id);
    },
 
    retirerArgentVoeu: (id, montant) => {
-      set((state) => ({
-         voeux: state.voeux.map((voeu) =>
-            voeu.id === id
-               ? { ...voeu, montantActuel: Math.max(0, voeu.montantActuel - montant) }
-               : voeu
+      set((state) => majActif(state, {
+         voeux: moisActif(state).voeux.map((voeu) =>
+            voeu.id === id ? { ...voeu, montantActuel: Math.max(0, voeu.montantActuel - montant) } : voeu
          )
-      }))
-      const voeu = get().voeux.find((v) => v.id === id)
-      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuSortant", id)
+      }));
+      const voeu = moisActif(get()).voeux.find((v) => v.id === id);
+      get().ajouterMouvement(voeu?.nom ?? "Vœu", montant, "voeuSortant", id);
    },
 
    acheterVoeu: (id, montantReel) => {
-      const voeu = get().voeux.find((v) => v.id === id)
-      if (!voeu) return
-      set((state) => ({
-         // le montant réel sort du compte ; l'écart avec l'épargne se rectifie tout seul via le disponible
-         compte: state.compte - montantReel,
-         voeux: state.voeux.map((v) =>
-            v.id === id ? { ...v, montantActuel: 0, estTermine: true } : v
-         ),
-      }))
-      get().ajouterMouvement("Achat — " + voeu.nom, montantReel, "depense", id)
+      const voeu = moisActif(get()).voeux.find((v) => v.id === id);
+      if (!voeu) return;
+      set((state) => {
+         const a = moisActif(state);
+         return majActif(state, {
+            // le montant réel sort du compte ; l'écart avec l'épargne se rectifie via le disponible
+            compte: a.compte - montantReel,
+            voeux: a.voeux.map((v) => v.id === id ? { ...v, montantActuel: 0, estTermine: true } : v),
+         });
+      });
+      get().ajouterMouvement("Achat — " + voeu.nom, montantReel, "depense", id);
    }
-}))
+}));

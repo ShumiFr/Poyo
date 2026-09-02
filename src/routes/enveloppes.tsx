@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { useBudget } from '../store/useBudget'
+import { useBudget, moisActif } from '../store/useBudget'
 import EnveloppeCard from '../cartes/EnveloppeCard'
 import Form from '../components/Form'
 import { Modal } from '../components/Modal'
@@ -15,12 +15,12 @@ export const Route = createFileRoute('/enveloppes')({
 })
 
 function RouteComponent() {
-   const compte = useBudget((state) => state.compte)
-   const depenses = useBudget((state) => state.depenses)
-   const voeux = useBudget((state) => state.voeux)
-   const enveloppes = useBudget((state) => state.enveloppes)
-   const courses = useBudget((state) => state.courses)
-   const previsionnels = useBudget((state) => state.previsionnels)
+   const compte = useBudget((state) => moisActif(state).compte)
+   const depenses = useBudget((state) => moisActif(state).depenses)
+   const voeux = useBudget((state) => moisActif(state).voeux)
+   const enveloppes = useBudget((state) => moisActif(state).enveloppes)
+   const courses = useBudget((state) => moisActif(state).courses)
+   const previsionnels = useBudget((state) => moisActif(state).previsionnels)
    const ajouterEnveloppe = useBudget((state) => state.ajouterEnveloppe)
 
    const [creation, setCreation] = useState(false)

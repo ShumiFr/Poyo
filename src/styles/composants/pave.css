@@ -6,7 +6,7 @@
 }
 .pave-grid { @apply grid gap-2.5; grid-template-columns: repeat(3, 1fr); }
 .pave-grid button {
-   @apply font-semibold;
+   @apply flex items-center justify-center font-semibold;
    background: var(--carte-2);
    border: 1px solid var(--ligne);
    border-radius: 10px;
