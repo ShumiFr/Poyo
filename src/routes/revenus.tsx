@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { useBudget, moisActif } from '../store/useBudget'
 import Section from '../components/Section'
 import Form from '../components/Form'
@@ -20,6 +20,7 @@ function RouteComponent() {
    const ajouterRevenu = useBudget((state) => state.ajouterRevenu)
    const marquerRecu = useBudget((state) => state.marquerRecu)
    const modifierRevenu = useBudget((state) => state.modifierRevenu)
+   const retirerRevenu = useBudget((state) => state.retirerRevenu)
 
    const [creation, setCreation] = useState(false)
    const [enEdition, setEnEdition] = useState<Revenu | null>(null)
@@ -52,6 +53,9 @@ function RouteComponent() {
                      label={revenu.estRecu ? "Annuler la réception" : "Marquer reçu"}
                   />
                )}
+               <button className="carre" onClick={() => retirerRevenu(revenu.id)} aria-label="Supprimer">
+                  <Trash2 size={16} />
+               </button>
             </div>
          </div>
       )
