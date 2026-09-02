@@ -1,10 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import calculerDisponible from "../lib/calculs";
 import { reserveCourses } from "../lib/courses";
 import { useBudget } from "../store/useBudget";
 import format from "../lib/format";
-import ModalePave from "../components/ModalePave";
 import Donut from "../components/Donut";
 
 export const Route = createFileRoute('/')({
@@ -20,9 +18,6 @@ function DashboardComponent() {
    const voeux = useBudget((state) => state.voeux)
    const courses = useBudget((state) => state.courses)
    const previsionnels = useBudget((state) => state.previsionnels)
-   const ajouterAuCompte = useBudget((state) => state.ajouterAuCompte)
-
-   const [open, setOpen] = useState(false)
 
    // Montants dérivés
    const revenusPercus = revenus.filter((r) => r.estRecu).reduce((s, r) => s + r.montant, 0)
@@ -45,7 +40,7 @@ function DashboardComponent() {
    const totalRing = restePositif + chargesAVenir + totalEnveloppes + totalVoeux
    const segments = [
       { valeur: restePositif, couleur: "var(--accent)" },
-      { valeur: chargesAVenir, couleur: "var(--orange)" },
+      { valeur: chargesAVenir, couleur: "var(--rouge)" },
       { valeur: totalEnveloppes, couleur: "var(--teal)" },
       { valeur: totalVoeux, couleur: "var(--violet)" },
    ]
@@ -61,7 +56,7 @@ function DashboardComponent() {
             />
             <div className="donut-legende">
                <span><span className="pastille" style={{ background: "var(--accent)" }} />Reste</span>
-               <span><span className="pastille" style={{ background: "var(--orange)" }} />Charges</span>
+               <span><span className="pastille" style={{ background: "var(--rouge)" }} />Charges</span>
                <span><span className="pastille" style={{ background: "var(--teal)" }} />Enveloppes</span>
                <span><span className="pastille" style={{ background: "var(--violet)" }} />Vœux</span>
             </div>
@@ -72,30 +67,30 @@ function DashboardComponent() {
                <span>Solde du mois dernier</span>
                <span>{format(soldeReporte)}</span>
             </div>
-            <div className="recap-ligne vert">
+            <Link to="/revenus" className="recap-ligne revenu cliquable">
                <span>Revenus perçus</span>
                <span>+ {format(revenusAffiches)}</span>
-            </div>
-            <div className="recap-ligne rouge">
+            </Link>
+            <Link to="/depenses" className="recap-ligne charge-payee cliquable">
                <span>Charges payées</span>
                <span>− {format(chargesPayees)}</span>
-            </div>
+            </Link>
             <div className="recap-ligne sous-total">
                <span>Sur le compte</span>
                <span>{format(compte)}</span>
             </div>
-            <div className="recap-ligne rouge charges">
+            <Link to="/depenses" className="recap-ligne rouge cliquable">
                <span>Charges à venir</span>
                <span>− {format(chargesAVenir)}</span>
-            </div>
-            <div className="recap-ligne rouge enveloppes">
+            </Link>
+            <Link to="/enveloppes" className="recap-ligne rouge enveloppes cliquable">
                <span>Enveloppes</span>
                <span>− {format(totalEnveloppes)}</span>
-            </div>
-            <div className="recap-ligne rouge voeux">
+            </Link>
+            <Link to="/souhaits" className="recap-ligne rouge voeux cliquable">
                <span>Vœux</span>
                <span>− {format(totalVoeux)}</span>
-            </div>
+            </Link>
             <div className="recap-ligne total">
                <span>Ce qu'il me reste</span>
                <span>{format(restePositif)}</span>
@@ -104,18 +99,6 @@ function DashboardComponent() {
                <div className="recap-manque">Il manque {format(-reste)}</div>
             )}
          </div>
-
-         <button className="btn btn-primary btn-full" onClick={() => setOpen(true)}>+ Entrée d'argent</button>
-
-         <ModalePave
-            ouvert={open}
-            onFermer={() => setOpen(false)}
-            titre="Entrée d'argent"
-            sousTitre="Ajouté à ce qu'il reste"
-            couleur="green"
-            libelleValider="Ajouter"
-            onValider={(montant) => { ajouterAuCompte(montant); setOpen(false) }}
-         />
       </>
    )
 }

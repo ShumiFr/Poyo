@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Depense, Enveloppe, Flux, Frequence, Previsionnel, Revenu, SemaineCourses, TypeAction, Voeu } from "../types";
+import type { CompteEpargne, Depense, Enveloppe, Flux, Frequence, Previsionnel, Revenu, SemaineCourses, TypeAction, Voeu } from "../types";
 import { genererSemaines } from "../lib/courses";
 
 // Valeurs de départ d'un budget vierge (nouvel utilisateur, ou après déconnexion).
@@ -20,6 +20,8 @@ function donneesInitiales() {
       courses: genererSemaines(mois, annee),
       previsionnels: [] as Previsionnel[],
       historique: [] as Flux[],
+      comptesEpargne: [] as CompteEpargne[],
+      codePin: undefined as string | undefined,
    };
 }
 
@@ -36,6 +38,8 @@ export interface BudgetStore {
    courses: SemaineCourses[],
    previsionnels: Previsionnel[],
    historique: Flux[]
+   comptesEpargne: CompteEpargne[]
+   codePin?: string   // empreinte (hachée) du code de verrouillage, ou absent si désactivé
 
    //Réinitialisation (déconnexion)
    reinitialiser: () => void
@@ -83,6 +87,15 @@ export interface BudgetStore {
    ajouterArgentEnveloppe: (id: string, montant: number) => void
    retirerArgentEnveloppe: (id: string, montant: number) => void
    depenserDepuisEnveloppe: (id: string, montant: number) => void
+
+   //Comptes épargne (informatif, sans lien avec le budget)
+   ajouterCompteEpargne: (nom: string, montant: number) => void
+   modifierCompteEpargne: (id: string, nom: string, montant: number) => void
+   retirerCompteEpargne: (id: string) => void
+
+   //Verrou (code PIN)
+   definirCodePin: (hash: string) => void
+   retirerCodePin: () => void
 
    //Voeux
    ajouterVoeu: (voeu: Voeu) => void
@@ -221,7 +234,9 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
       const devientRecu = !revenu.estRecu
       set((state) => ({
          revenus: state.revenus.map((r) =>
-            r.id === id ? { ...r, estRecu: devientRecu } : r
+            r.id === id
+               ? { ...r, estRecu: devientRecu, dateRecu: devientRecu ? new Date().toISOString() : undefined }
+               : r
          ),
          compte: devientRecu
             ? state.compte + revenu.montant
@@ -340,6 +355,26 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
       }))
       get().ajouterMouvement(enveloppe.nom, sortie, "depense", id)
    },
+
+   ajouterCompteEpargne: (nom, montant) =>
+      set((state) => ({
+         comptesEpargne: [...state.comptesEpargne, { id: crypto.randomUUID(), nom, montant }]
+      })),
+
+   modifierCompteEpargne: (id, nom, montant) =>
+      set((state) => ({
+         comptesEpargne: state.comptesEpargne.map((c) =>
+            c.id === id ? { ...c, nom, montant } : c
+         )
+      })),
+
+   retirerCompteEpargne: (id) =>
+      set((state) => ({
+         comptesEpargne: state.comptesEpargne.filter((c) => c.id !== id)
+      })),
+
+   definirCodePin: (hash) => set({ codePin: hash }),
+   retirerCodePin: () => set({ codePin: undefined }),
 
    ajouterVoeu: (voeu) =>
       set((state) => ({

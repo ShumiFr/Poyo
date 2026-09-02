@@ -1,6 +1,6 @@
 import type { SemaineCourses } from "../types"
 
-export const BUDGET_SEMAINE_DEFAUT = 25
+export const BUDGET_SEMAINE_DEFAUT = 80
 
 // Nombre de semaines du mois = nombre de blocs de 7 jours (4 ou 5).
 export function nombreDeSemaines(mois: number, annee: number): number {

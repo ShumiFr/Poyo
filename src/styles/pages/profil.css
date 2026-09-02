@@ -1,0 +1,5 @@
+/* Page Profil : lignes réglage (libellé + bouton) */
+.profil-ligne { @apply flex items-center justify-between; gap: 12px; }
+.profil-ligne > span { color: var(--encre); font-weight: 600; }
+.profil-btn { @apply inline-flex items-center gap-2; }
+.profil-deco { @apply inline-flex items-center justify-center gap-2; margin-top: 8px; }

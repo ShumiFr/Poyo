@@ -1,15 +1,17 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import Champ from './Champ'
 import ChoixType from './ChoixType'
 import ActionsForm from './ActionsForm'
+import SourceDepense from './SourceDepense'
 import { COULEURS, CLES_ICONES, ICONES } from '../lib/styleEnveloppe'
-import type { Frequence } from '../types'
+import type { Enveloppe, Frequence } from '../types'
 
 // Description d'un champ. C'est la config qui change d'un formulaire à l'autre.
 export type ChampConfig =
    | { type: 'texte' | 'montant'; cle: string; label: string; placeholder?: string }
    | { type: 'type'; cle: string; rouge?: boolean }
    | { type: 'select'; cle: string; label: string; options: { valeur: string; libelle: string }[] }
+   | { type: 'source'; cle: string; enveloppes: Enveloppe[] }
    | { type: 'couleur'; cle: string }
    | { type: 'icone'; cle: string }
 
@@ -39,7 +41,7 @@ export default function Form({
    const couleurActive = valeurs['couleur'] ?? couleur
 
    return (
-      <div>
+      <div style={{ ['--focus-couleur']: `var(--cat-${couleurActive})` } as CSSProperties}>
          {champs.map((champ) => {
             if (champ.type === 'texte' || champ.type === 'montant') {
                return (
@@ -72,6 +74,19 @@ export default function Form({
                         {champ.options.map((o) => <option key={o.valeur} value={o.valeur}>{o.libelle}</option>)}
                      </select>
                   </div>
+               )
+            }
+
+            if (champ.type === 'source') {
+               // Seules les dépenses ponctuelles (déjà payées) ont une source.
+               if (valeurs['type'] !== 'occasionnel') return null
+               return (
+                  <SourceDepense
+                     key={champ.cle}
+                     valeur={valeurs[champ.cle] ?? ''}
+                     enveloppes={champ.enveloppes}
+                     onChange={(v) => set(champ.cle, v)}
+                  />
                )
             }
 

@@ -6,7 +6,7 @@ import Form from '../components/Form'
 import MontantEditable from '../components/MontantEditable'
 import BoutonBascule from '../components/BoutonBascule'
 import { champsNomMontant } from '../lib/champs'
-import format, { enNombre } from '../lib/format'
+import { enNombre } from '../lib/format'
 import type { Depense } from '../types'
 
 export default function DepenseCard({ depense }: { depense: Depense }) {
@@ -21,15 +21,18 @@ export default function DepenseCard({ depense }: { depense: Depense }) {
          <div className="carte-tete">
             <span className="libelle-col">
                <h3>{depense.nom}</h3>
-               <div className="sous">{depense.type === "regulier" ? format(depense.montant) + " / mois" : "Ponctuelle"}</div>
+               {depense.type === "occasionnel" && <div className="sous">Ponctuelle</div>}
             </span>
             <MontantEditable montant={depense.montant} couleur="red" onClick={() => setEnEdition(true)} />
-            <BoutonBascule
-               actif={depense.estPayer}
-               couleur="red"
-               onClick={() => marquerPayer(depense.id)}
-               label={depense.estPayer ? "Annuler le paiement" : "Payer"}
-            />
+            {/* Une dépense ponctuelle est déjà payée → pas de bouton, seulement les régulières se pointent */}
+            {depense.type === "regulier" && (
+               <BoutonBascule
+                  actif={depense.estPayer}
+                  couleur="red"
+                  onClick={() => marquerPayer(depense.id)}
+                  label={depense.estPayer ? "Annuler le paiement" : "Payer"}
+               />
+            )}
             <button className="carre" onClick={() => retirerDepense(depense.id)} aria-label="Supprimer">
                <Trash2 size={16} />
             </button>

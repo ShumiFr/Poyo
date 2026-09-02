@@ -16,3 +16,12 @@
 }
 .pave-actions { @apply flex gap-2; margin-top: 16px; }
 .pave-actions .btn { @apply flex-1; }
+
+/* points de saisie du code PIN */
+.pin-points { @apply flex justify-center; gap: 14px; margin: 20px 0 24px; }
+.pin-point {
+   width: 14px; height: 14px;
+   border-radius: 999px;
+   border: 2px solid var(--muted);
+}
+.pin-point.rempli { background: var(--accent); border-color: var(--accent); }
