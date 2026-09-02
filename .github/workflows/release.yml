@@ -70,25 +70,19 @@ jobs:
       - name: Préparer la signature
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/keystore.jks"
-          cat > src-tauri/gen/android/keystore.properties <<EOF
-          storeFile=$RUNNER_TEMP/keystore.jks
-          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
-          password=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          EOF
           python3 - <<'PY'
           import pathlib
           p = pathlib.Path("src-tauri/gen/android/app/build.gradle.kts")
           s = p.read_text()
+          # Config de signature lue depuis les variables d'environnement (System.getenv),
+          # pour éviter la collision du plugin `java` avec le package `java.util`.
           signing = '''
               signingConfigs {
                   create("release") {
-                      val props = java.util.Properties().apply {
-                          rootProject.file("keystore.properties").inputStream().use { load(it) }
-                      }
-                      keyAlias = props["keyAlias"] as String
-                      keyPassword = props["password"] as String
-                      storeFile = file(props["storeFile"] as String)
-                      storePassword = props["password"] as String
+                      keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                      keyPassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                      storeFile = file(System.getenv("ANDROID_KEYSTORE_PATH")!!)
+                      storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
                   }
               }
           '''
@@ -96,7 +90,7 @@ jobs:
           s = s.replace('getByName("release") {\n',
                         'getByName("release") {\n            signingConfig = signingConfigs.getByName("release")\n', 1)
           p.write_text(s)
-          print("build.gradle.kts patché pour la signature")
+          print("build.gradle.kts patché pour la signature (via env)")
           PY
 
       - name: Construire l'APK signée (release, arm64)
@@ -104,6 +98,9 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/keystore.jks
 
       - name: Renommer l'APK
         id: apk
