@@ -1,0 +1,32 @@
+/* Écran de connexion / inscription (avant d'entrer dans l'app) */
+.auth-ecran {
+   @apply flex-1 flex items-center justify-center;
+   padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+}
+.auth-carte {
+   width: 100%;
+   max-width: 360px;
+}
+.auth-titre { font-size: 30px; font-weight: 800; color: var(--encre); }
+.auth-carte .sous { margin-bottom: 16px; }
+
+.auth-erreur {
+   color: var(--rouge);
+   font-size: 14px;
+   margin: 4px 0 12px;
+}
+.auth-message {
+   color: var(--vert);
+   font-size: 14px;
+   margin: 4px 0 12px;
+}
+
+.auth-bascule {
+   @apply w-full text-center;
+   margin-top: 14px;
+   background: none;
+   border: none;
+   color: var(--accent);
+   font-weight: 600;
+   font-size: 14px;
+}

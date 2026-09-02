@@ -116,5 +116,6 @@ button { font: inherit; cursor: pointer; color: inherit; }
 @import "./composants/historique.css";
 @import "./pages/accueil.css";
 @import "./pages/voeux.css";
+@import "./pages/auth.css";
 /* les couleurs de catégorie en dernier : elles priment sur .btn, .montant… */
 @import "./composants/categories.css";
