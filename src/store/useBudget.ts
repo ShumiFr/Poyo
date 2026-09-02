@@ -261,18 +261,31 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    },
 
    ajusterSemaine: (index, delta) =>
-      set((state) => majActif(state, {
-         courses: moisActif(state).courses.map((s, i) =>
-            i === index ? { ...s, budget: Math.max(0, s.budget + delta) } : s
-         )
-      })),
+      set((state) => {
+         const a = moisActif(state);
+         const semaine = a.courses[index];
+         if (!semaine) return {};
+         const nouveauBudget = Math.max(0, semaine.budget + delta);
+         const diff = nouveauBudget - semaine.budget;
+         // Si la semaine est déjà faite, l'argent est déjà sorti : on ajuste le compte de l'écart.
+         return majActif(state, {
+            courses: a.courses.map((s, i) => i === index ? { ...s, budget: nouveauBudget } : s),
+            compte: semaine.faite ? a.compte - diff : a.compte,
+         });
+      }),
 
    definirBudgetSemaine: (index, montant) =>
-      set((state) => majActif(state, {
-         courses: moisActif(state).courses.map((s, i) =>
-            i === index ? { ...s, budget: Math.max(0, montant) } : s
-         )
-      })),
+      set((state) => {
+         const a = moisActif(state);
+         const semaine = a.courses[index];
+         if (!semaine) return {};
+         const nouveauBudget = Math.max(0, montant);
+         const diff = nouveauBudget - semaine.budget;
+         return majActif(state, {
+            courses: a.courses.map((s, i) => i === index ? { ...s, budget: nouveauBudget } : s),
+            compte: semaine.faite ? a.compte - diff : a.compte,
+         });
+      }),
 
    basculerSemaineFaite: (index) => {
       const semaine = moisActif(get()).courses[index];

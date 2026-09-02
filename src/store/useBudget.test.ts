@@ -156,6 +156,26 @@ describe("courses (D7)", () => {
       useBudget.getState().definirBudgetSemaine(0, 37.5)
       expect(actif().courses[0].budget).toBe(37.5)
    })
+
+   it("changer le budget d'une semaine FAITE réajuste le compte", () => {
+      poser({ compte: 400, courses: [{ budget: 100, faite: true }] })   // 100 déjà dépensés
+      useBudget.getState().definirBudgetSemaine(0, 30)                   // finalement 30
+      expect(actif().compte).toBe(470)          // 70 rendus au compte
+      expect(actif().courses[0].budget).toBe(30)
+   })
+
+   it("changer le budget d'une semaine NON faite ne touche pas le compte", () => {
+      poser({ compte: 500, courses: [{ budget: 100, faite: false }] })
+      useBudget.getState().definirBudgetSemaine(0, 30)
+      expect(actif().compte).toBe(500)
+   })
+
+   it("ajuster le budget d'une semaine faite réajuste le compte", () => {
+      poser({ compte: 400, courses: [{ budget: 100, faite: true }] })
+      useBudget.getState().ajusterSemaine(0, -40)   // budget → 60
+      expect(actif().compte).toBe(440)              // 40 rendus
+      expect(actif().courses[0].budget).toBe(60)
+   })
 })
 
 describe("acheter un vœu (V5)", () => {

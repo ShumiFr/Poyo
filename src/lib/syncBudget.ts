@@ -11,11 +11,27 @@ function garantirCourses(moisListe: MoisBudget[]): MoisBudget[] {
    );
 }
 
+// Répare un solde orphelin : si aucun argent n'a bougé dans le mois (rien reçu,
+// rien payé, aucune course faite, aucun prévisionnel dépensé, ni enveloppe ni
+// vœu), alors le compte doit valoir le solde reporté. Corrige d'anciens bugs.
+function corrigerSoldesVides(moisListe: MoisBudget[]): MoisBudget[] {
+   return moisListe.map((m) => {
+      const aucunMouvement =
+         m.revenus.every((r) => !r.estRecu) &&
+         m.depenses.every((d) => !d.estPayer) &&
+         m.courses.every((c) => !c.faite) &&
+         m.previsionnels.every((p) => !p.estDepense) &&
+         m.enveloppes.length === 0 &&
+         m.voeux.length === 0;
+      return aucunMouvement && m.compte !== m.soldeReporte ? { ...m, compte: m.soldeReporte } : m;
+   });
+}
+
 // Convertit un budget de l'ancien format (un seul mois « à plat ») vers le
 // nouveau (une liste de mois). Les données déjà au nouveau format passent tel quel.
 function normaliserBudget(data: Record<string, unknown>): Record<string, unknown> {
    if (Array.isArray(data.moisListe)) {
-      return { ...data, moisListe: garantirCourses(data.moisListe as MoisBudget[]) };
+      return { ...data, moisListe: corrigerSoldesVides(garantirCourses(data.moisListe as MoisBudget[])) };
    }
 
    const moisCourant: MoisBudget = {
@@ -37,7 +53,7 @@ function normaliserBudget(data: Record<string, unknown>): Record<string, unknown
    const moisListe = [...anciennesArchives, moisCourant];
 
    return {
-      moisListe: garantirCourses(moisListe),
+      moisListe: corrigerSoldesVides(garantirCourses(moisListe)),
       indexActif: moisListe.length - 1,
       theme: data.theme ?? "sombre",
       historique: data.historique ?? [],
