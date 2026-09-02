@@ -1,4 +1,4 @@
-# Poyo — Backlog produit
+# Mon Budget — Backlog produit
 
 > App de budget personnel (méthode enveloppes). Stack : React 19 + TypeScript, TanStack Router (file-based), Zustand, Zod, Vite, PWA, Vitest.
 > Ce backlog traduit la maquette finale (Claude Design) en user stories. Le prototype de référence décrit : un compte central, un « disponible » **calculé**, un pavé numérique, un système de courses hebdomadaire, le « nouveau mois » et un historique automatique.

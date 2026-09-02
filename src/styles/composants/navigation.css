@@ -1,4 +1,4 @@
-/* En-tête d'application (Poyo + mois + actions) */
+/* En-tête d'application (nom + mois + actions) */
 .app-header {
    @apply flex items-start justify-between;
    /* + safe-area en haut : évite que l'heure/batterie d'Android chevauche le titre */

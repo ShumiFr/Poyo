@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Poyo",
+  "productName": "Mon Budget",
   "version": "1.0.0",
-  "identifier": "com.poyo.app",
+  "identifier": "com.monbudget.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Poyo",
+        "title": "Mon Budget",
         "width": 800,
         "height": 600,
         "resizable": true,

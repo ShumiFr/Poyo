@@ -34,7 +34,7 @@ export function AuthScreen() {
    return (
       <main className="auth-ecran">
          <div className="card auth-carte">
-            <div className="auth-titre">Poyo</div>
+            <div className="auth-titre">Mon Budget</div>
             <p className="sous">{modeInscription ? "Crée ton compte" : "Connecte-toi"}</p>
 
             <form onSubmit={valider}>
