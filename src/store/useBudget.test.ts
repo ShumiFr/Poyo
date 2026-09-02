@@ -66,6 +66,22 @@ describe("enveloppes (E2/E3)", () => {
       useBudget.getState().retirerArgentEnveloppe("e1", 80)
       expect(actif().enveloppes[0].montant).toBe(0)
    })
+
+   it("supprimer une enveloppe la retire sans toucher au compte", () => {
+      poser({ compte: 500, enveloppes: [enveloppe(120)] })
+      useBudget.getState().retirerEnveloppe("e1")
+      expect(actif().enveloppes).toHaveLength(0)
+      expect(actif().compte).toBe(500)   // l'argent réservé revient au disponible, compte inchangé
+   })
+})
+
+describe("vœux — suppression", () => {
+   it("supprimer un vœu le retire sans toucher au compte", () => {
+      poser({ compte: 500, voeux: [{ id: "v1", nom: "Casque", montantTotal: 180, montantActuel: 150, estTermine: false }] })
+      useBudget.getState().retirerVoeu("v1")
+      expect(actif().voeux).toHaveLength(0)
+      expect(actif().compte).toBe(500)
+   })
 })
 
 describe("dépenser depuis une enveloppe (E6)", () => {

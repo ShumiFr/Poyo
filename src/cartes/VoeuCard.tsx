@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Trash2 } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
 import { Modal } from '../components/Modal'
 import ModalePave from '../components/ModalePave'
@@ -10,6 +11,7 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
    const ajouterArgent = useBudget((state) => state.ajouterArgentVoeu)
    const retirerArgent = useBudget((state) => state.retirerArgentVoeu)
    const acheterVoeu = useBudget((state) => state.acheterVoeu)
+   const retirerVoeu = useBudget((state) => state.retirerVoeu)
 
    const [ouvert, setOuvert] = useState(false)
    const [ouvertRetrait, setOuvertRetrait] = useState(false)
@@ -53,6 +55,9 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
             <div className="voeu-tete">
                <h3>{voeu.nom}</h3>
                <span className="sur">Acheté ✓</span>
+               <button className="carre-mini" onClick={() => retirerVoeu(voeu.id)} aria-label="Supprimer">
+                  <Trash2 size={14} />
+               </button>
             </div>
          </div>
       )
@@ -75,6 +80,9 @@ export default function VoeuCard({ voeu, disponible }: { voeu: Voeu, disponible:
          <div className="carte-actions">
             <button className="btn" onClick={() => setOuvertRetrait(true)}>Retirer</button>
             <button className="btn bg-purple" onClick={() => setOuvert(true)}>Mettre de côté</button>
+            <button className="carre" onClick={() => retirerVoeu(voeu.id)} aria-label="Supprimer">
+               <Trash2 size={16} />
+            </button>
          </div>
 
          {atteint && (

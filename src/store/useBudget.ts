@@ -140,6 +140,7 @@ export interface BudgetStore {
 
    //Enveloppes
    ajouterEnveloppe: (enveloppe: Enveloppe) => void
+   retirerEnveloppe: (id: string) => void
    modifierEnveloppe: (id: string, nom: string, couleur: string, icone: string) => void
    ajouterArgentEnveloppe: (id: string, montant: number) => void
    retirerArgentEnveloppe: (id: string, montant: number) => void
@@ -156,6 +157,7 @@ export interface BudgetStore {
 
    //Voeux
    ajouterVoeu: (voeu: Voeu) => void
+   retirerVoeu: (id: string) => void
    ajouterArgentVoeu: (id: string, montant: number) => void
    retirerArgentVoeu: (id: string, montant: number) => void
    acheterVoeu: (id: string, montantReel: number) => void
@@ -466,6 +468,13 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
          enveloppes: [...moisActif(state).enveloppes, enveloppe]
       })),
 
+   retirerEnveloppe: (id) =>
+      // On la retire simplement : son argent était réservé (pas sorti du compte),
+      // il revient donc au disponible tout seul.
+      set((state) => majActif(state, {
+         enveloppes: moisActif(state).enveloppes.filter((e) => e.id !== id)
+      })),
+
    modifierEnveloppe: (id, nom, couleur, icone) =>
       set((state) => majActif(state, {
          enveloppes: moisActif(state).enveloppes.map((e) => e.id === id ? { ...e, nom, couleur, icone } : e)
@@ -528,6 +537,12 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    ajouterVoeu: (voeu) =>
       set((state) => majActif(state, {
          voeux: [...moisActif(state).voeux, voeu]
+      })),
+
+   retirerVoeu: (id) =>
+      // Comme les enveloppes : l'épargne du vœu était réservée, elle revient au disponible.
+      set((state) => majActif(state, {
+         voeux: moisActif(state).voeux.filter((v) => v.id !== id)
       })),
 
    ajouterArgentVoeu: (id, montant) => {

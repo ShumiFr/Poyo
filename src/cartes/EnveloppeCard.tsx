@@ -20,6 +20,7 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
    const retirerArgent = useBudget((state) => state.retirerArgentEnveloppe)
    const depenser = useBudget((state) => state.depenserDepuisEnveloppe)
    const modifierEnveloppe = useBudget((state) => state.modifierEnveloppe)
+   const retirerEnveloppe = useBudget((state) => state.retirerEnveloppe)
    const historique = useBudget((state) => state.historique)
 
    const [ouvert, setOuvert] = useState(false)
@@ -130,6 +131,13 @@ export default function EnveloppeCard({ enveloppe, disponible }: { enveloppe: En
                onAnnuler={() => setOuvertEdit(false)}
                onValider={(v) => { modifierEnveloppe(enveloppe.id, v.nom.trim(), v.couleur, v.icone); setOuvertEdit(false) }}
             />
+            <button
+               className="btn btn-full text-red"
+               style={{ marginTop: 12 }}
+               onClick={() => { retirerEnveloppe(enveloppe.id); setOuvertEdit(false) }}
+            >
+               Supprimer l'enveloppe
+            </button>
          </Modal>
 
          <ConfirmationDepassement
