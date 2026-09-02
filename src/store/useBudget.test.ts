@@ -231,20 +231,74 @@ describe("navigation entre les mois", () => {
       expect(useBudget.getState().indexActif).toBe(2)   // bloqué au mois en cours
    })
 
-   it("modifier un mois passé ne touche pas le mois en cours (pas encore de cascade)", () => {
+})
+
+describe("cascade — modifier un mois passé (étape B)", () => {
+   it("payer une charge d'un mois passé baisse aussi le mois en cours", () => {
       useBudget.setState({
          moisListe: [
             moisBase({ mois: 4, compte: 500, depenses: [depense(200)] }),
-            moisBase({ mois: 5, compte: 800 }),
+            moisBase({ mois: 5, compte: 800, soldeReporte: 500 }),
          ],
          indexActif: 0,   // on affiche mai (le mois passé)
          historique: [],
       })
 
-      useBudget.getState().marquerPayer("d1")   // on paie une charge de mai
+      useBudget.getState().marquerPayer("d1")   // on paie une charge de 200 en mai
 
       const s = useBudget.getState()
-      expect(s.moisListe[0].compte).toBe(300)   // mai baisse
-      expect(s.moisListe[1].compte).toBe(800)   // juin (en cours) inchangé pour l'instant
+      expect(s.moisListe[0].compte).toBe(300)        // mai : 500 − 200
+      expect(s.moisListe[1].soldeReporte).toBe(300)  // juin démarre 200 plus bas
+      expect(s.moisListe[1].compte).toBe(600)        // juin : 800 − 200
+   })
+
+   it("l'écart se propage sur TOUS les mois suivants", () => {
+      useBudget.setState({
+         moisListe: [
+            moisBase({ mois: 3, compte: 1000, revenus: [revenu(300)] }),
+            moisBase({ mois: 4, compte: 1200, soldeReporte: 1000 }),
+            moisBase({ mois: 5, compte: 900, soldeReporte: 1200 }),
+         ],
+         indexActif: 0,   // avril
+         historique: [],
+      })
+
+      useBudget.getState().marquerRecu("r1")   // on encaisse 300 en avril
+
+      const s = useBudget.getState()
+      expect(s.moisListe[0].compte).toBe(1300)   // avril : +300
+      expect(s.moisListe[1].compte).toBe(1500)   // mai : +300
+      expect(s.moisListe[2].compte).toBe(1200)   // juin : +300
+   })
+
+   it("ajouter de l'argent dans une enveloppe d'un mois passé se reporte", () => {
+      useBudget.setState({
+         moisListe: [
+            moisBase({ mois: 4, enveloppes: [enveloppe(100)] }),
+            moisBase({ mois: 5, enveloppes: [enveloppe(100)] }),
+         ],
+         indexActif: 0,
+         historique: [],
+      })
+
+      useBudget.getState().ajouterArgentEnveloppe("e1", 50)   // +50 dans l'enveloppe de mai
+
+      const s = useBudget.getState()
+      expect(s.moisListe[0].enveloppes[0].montant).toBe(150)   // mai
+      expect(s.moisListe[1].enveloppes[0].montant).toBe(150)   // juin : l'épargne se cumule
+   })
+
+   it("modifier le mois en cours ne crée aucune propagation (rien après lui)", () => {
+      useBudget.setState({
+         moisListe: [moisBase({ mois: 4, compte: 500 }), moisBase({ mois: 5, compte: 800 })],
+         indexActif: 1,   // le mois en cours
+         historique: [],
+      })
+
+      useBudget.getState().ajouterAuCompte(100)
+
+      const s = useBudget.getState()
+      expect(s.moisListe[1].compte).toBe(900)   // juin monte
+      expect(s.moisListe[0].compte).toBe(500)   // mai (passé) intact
    })
 })

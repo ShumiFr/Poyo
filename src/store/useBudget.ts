@@ -38,13 +38,51 @@ export function moisActif(state: BudgetStore): MoisBudget {
    return state.moisListe[state.indexActif];
 }
 
-// Applique un changement au mois affiché uniquement, sans toucher aux autres.
+// Calcule, pour chaque élément (enveloppe ou vœu) présent avant ET après,
+// de combien son solde a bougé. Sert à reporter l'écart sur les mois suivants.
+function deltasParId<T extends { id: string }>(
+   avant: T[],
+   apres: T[],
+   valeur: (x: T) => number,
+): Record<string, number> {
+   const deltas: Record<string, number> = {};
+   for (const a of apres) {
+      const av = avant.find((x) => x.id === a.id);
+      if (av) {
+         const delta = valeur(a) - valeur(av);
+         if (delta !== 0) deltas[a.id] = delta;
+      }
+   }
+   return deltas;
+}
+
+// Applique un changement au mois affiché, PUIS répercute l'écart de solde sur
+// tous les mois suivants (effet domino). Si on modifie le mois en cours (le
+// dernier), il n'y a aucun mois après : rien ne se propage.
 function majActif(state: BudgetStore, patch: Partial<MoisBudget>) {
-   return {
-      moisListe: state.moisListe.map((m, i) =>
-         i === state.indexActif ? { ...m, ...patch } : m
-      ),
-   };
+   const idx = state.indexActif;
+   const ancien = state.moisListe[idx];
+   const nouveau = { ...ancien, ...patch };
+
+   // Écarts de solde qui se reportent d'un mois sur l'autre.
+   const dCompte = nouveau.compte - ancien.compte;
+   const dEnv = deltasParId(ancien.enveloppes, nouveau.enveloppes, (e) => e.montant);
+   const dVoeu = deltasParId(ancien.voeux, nouveau.voeux, (v) => v.montantActuel);
+
+   const moisListe = state.moisListe.map((m, i) => {
+      if (i < idx) return m;         // mois plus anciens : inchangés
+      if (i === idx) return nouveau; // le mois modifié
+      // mois suivants : on décale leurs soldes du même écart
+      return {
+         ...m,
+         soldeReporte: m.soldeReporte + dCompte,
+         compte: m.compte + dCompte,
+         enveloppes: m.enveloppes.map((e) => e.id in dEnv ? { ...e, montant: e.montant + dEnv[e.id] } : e),
+         voeux: m.voeux.map((v) => v.id in dVoeu ? { ...v, montantActuel: v.montantActuel + dVoeu[v.id] } : v),
+      };
+   });
+
+   return { moisListe };
 }
 
 export interface BudgetStore {
