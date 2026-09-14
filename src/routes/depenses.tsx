@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, CalendarClock } from 'lucide-react'
 import DepenseCard from '../cartes/DepenseCard'
 import SemaineCard from '../cartes/SemaineCard'
 import PrevisionnelCard from '../cartes/PrevisionnelCard'
@@ -10,6 +10,7 @@ import { Modal } from '../components/Modal'
 import { useBudget, moisActif } from '../store/useBudget'
 import { champsDepense } from '../lib/champs'
 import { reserveCourses } from '../lib/courses'
+import { facturesASurveiller } from '../lib/echeances'
 import format, { enNombre } from '../lib/format'
 import type { Depense, Frequence } from '../types'
 
@@ -38,7 +39,15 @@ function RouteComponent() {
    const enveloppes = useBudget((state) => moisActif(state).enveloppes)
    const ajouterDepense = useBudget((state) => state.ajouterDepense)
    const depenserImmediat = useBudget((state) => state.depenserImmediat)
+   const moisAffiche = useBudget(moisActif)
+   const estDernier = useBudget((state) => state.indexActif === state.moisListe.length - 1)
    const [creation, setCreation] = useState(false)
+
+   // Le mois affiché est-il le vrai mois d'aujourd'hui ? (les échéances « en retard »
+   // n'ont de sens que pour le mois en cours)
+   const maintenant = new Date()
+   const estMoisReel = estDernier && moisAffiche.mois === maintenant.getMonth() && moisAffiche.annee === maintenant.getFullYear()
+   const surveil = facturesASurveiller(depenses, maintenant)
 
    const regulieres = depenses.filter((d) => d.type === "regulier")
    const ponctuelles = depenses.filter((d) => d.type === "occasionnel")
@@ -58,8 +67,20 @@ function RouteComponent() {
             <span className="screen-resume neg">{format(aVenir)} à venir</span>
          </div>
 
+         {estMoisReel && (surveil.enRetard.length > 0 || surveil.bientot.length > 0) && (
+            <div className={"facture-alerte " + (surveil.enRetard.length > 0 ? "retard" : "bientot")}>
+               <CalendarClock size={18} />
+               <span>
+                  {surveil.enRetard.length > 0
+                     ? `${surveil.enRetard.length} facture${surveil.enRetard.length > 1 ? "s" : ""} en retard`
+                     : `${surveil.bientot.length} facture${surveil.bientot.length > 1 ? "s" : ""} à payer bientôt`}
+                  {surveil.enRetard.length > 0 && surveil.bientot.length > 0 && ` · ${surveil.bientot.length} bientôt`}
+               </span>
+            </div>
+         )}
+
          <Section titre="Régulières" total={total(regulieres)} couleur="var(--rouge)">
-            {regulieres.map((depense) => <DepenseCard key={depense.id} depense={depense} />)}
+            {regulieres.map((depense) => <DepenseCard key={depense.id} depense={depense} estMoisReel={estMoisReel} />)}
          </Section>
 
          <Section titre={"Courses · " + courses.length + " semaines"} total={totalCourses} couleur="var(--teal)">
@@ -70,7 +91,7 @@ function RouteComponent() {
 
          {ponctuelles.length > 0 && (
             <Section titre="Ponctuelles" total={total(ponctuelles)} couleur="var(--rouge)">
-               {ponctuelles.map((depense) => <DepenseCard key={depense.id} depense={depense} />)}
+               {ponctuelles.map((depense) => <DepenseCard key={depense.id} depense={depense} estMoisReel={estMoisReel} />)}
             </Section>
          )}
 
@@ -81,7 +102,7 @@ function RouteComponent() {
             <p className="sous">Une sortie d'argent</p>
             <Form
                champs={champsDepense(enveloppes)}
-               valeursInitiales={{ nom: "", type: "regulier", montant: "", source: "compte" }}
+               valeursInitiales={{ nom: "", type: "regulier", montant: "", source: "compte", jourEcheance: "" }}
                couleur="red"
                estValide={(v) =>
                   v.nom.trim() !== "" && enNombre(v.montant) > 0 &&
@@ -95,8 +116,9 @@ function RouteComponent() {
                      // Ponctuelle = déjà payée : depuis le compte ou une enveloppe.
                      depenserImmediat(v.nom.trim(), montant, type, v.source)
                   } else {
-                     // Permanente = charge à venir à pointer plus tard.
-                     ajouterDepense({ id: crypto.randomUUID(), nom: v.nom.trim(), montant, type, estPayer: false })
+                     // Permanente = charge à venir à pointer plus tard, avec échéance éventuelle.
+                     const jourEcheance = v.jourEcheance ? Number(v.jourEcheance) : undefined
+                     ajouterDepense({ id: crypto.randomUUID(), nom: v.nom.trim(), montant, type, estPayer: false, jourEcheance })
                   }
                   setCreation(false)
                }}

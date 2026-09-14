@@ -134,7 +134,7 @@ export interface BudgetStore {
    ajouterDepense: (depense: Depense) => void
    retirerDepense: (id: string) => void
    marquerPayer: (id: string) => void
-   modifierDepense: (id: string, nom: string, montant: number) => void
+   modifierDepense: (id: string, nom: string, montant: number, jourEcheance?: number) => void
    // dépense immédiate : source = "compte" ou l'id d'une enveloppe
    depenserImmediat: (nom: string, montant: number, type: Frequence, source: string) => void
 
@@ -439,14 +439,14 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
          });
       }),
 
-   modifierDepense: (id, nom, montant) =>
+   modifierDepense: (id, nom, montant, jourEcheance) =>
       set((state) => {
          const a = moisActif(state);
          const depense = a.depenses.find((d) => d.id === id);
          // Si elle est déjà payée, on ajuste le compte de la différence de montant.
          const diff = depense?.estPayer ? montant - depense.montant : 0;
          return majActif(state, {
-            depenses: a.depenses.map((d) => d.id === id ? { ...d, nom, montant } : d),
+            depenses: a.depenses.map((d) => d.id === id ? { ...d, nom, montant, jourEcheance } : d),
             compte: a.compte - diff,
          });
       }),

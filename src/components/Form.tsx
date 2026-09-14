@@ -12,6 +12,7 @@ export type ChampConfig =
    | { type: 'type'; cle: string; rouge?: boolean }
    | { type: 'select'; cle: string; label: string; options: { valeur: string; libelle: string }[] }
    | { type: 'source'; cle: string; enveloppes: Enveloppe[] }
+   | { type: 'echeance'; cle: string }
    | { type: 'couleur'; cle: string }
    | { type: 'icone'; cle: string }
 
@@ -87,6 +88,22 @@ export default function Form({
                      enveloppes={champ.enveloppes}
                      onChange={(v) => set(champ.cle, v)}
                   />
+               )
+            }
+
+            if (champ.type === 'echeance') {
+               // Jour d'échéance : seulement pour les charges régulières (factures).
+               if (valeurs['type'] !== 'regulier') return null
+               return (
+                  <div key={champ.cle} className="champ">
+                     <label>Jour d'échéance (optionnel)</label>
+                     <select value={valeurs[champ.cle] ?? ''} onChange={(e) => set(champ.cle, e.target.value)}>
+                        <option value="">Aucune</option>
+                        {Array.from({ length: 31 }, (_, k) => k + 1).map((j) => (
+                           <option key={j} value={String(j)}>Le {j}</option>
+                        ))}
+                     </select>
+                  </div>
                )
             }
 

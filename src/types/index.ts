@@ -17,6 +17,7 @@ export interface Depense {
    montant: number
    type: Frequence
    estPayer: boolean
+   jourEcheance?: number   // jour du mois (1-31) où la charge est due, pour les factures régulières
 }
 
 export interface Enveloppe {

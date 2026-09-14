@@ -18,10 +18,19 @@ export function champsDepense(enveloppes: Enveloppe[]): ChampConfig[] {
       { type: "texte", cle: "nom", label: "Nom", placeholder: "Ex. Salle de sport" },
       { type: "type", cle: "type", rouge: true },
       { type: "montant", cle: "montant", label: "Montant", placeholder: "0" },
+      // Échéance : uniquement pour les charges régulières (factures).
+      { type: "echeance", cle: "jourEcheance" },
       // Ne s'affiche que pour les ponctuelles (déjà payées) : compte ou enveloppe.
       { type: "source", cle: "source", enveloppes },
    ]
 }
+
+// Édition d'une charge régulière : nom, montant + jour d'échéance.
+export const champsDepenseEdition: ChampConfig[] = [
+   { type: "texte", cle: "nom", label: "Nom" },
+   { type: "montant", cle: "montant", label: "Montant" },
+   { type: "echeance", cle: "jourEcheance" },
+]
 
 export const champsVoeu: ChampConfig[] = [
    { type: "texte", cle: "nom", label: "Nom", placeholder: "Ex. Nouveau vélo" },

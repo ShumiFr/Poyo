@@ -1,0 +1,26 @@
+/* Échéances des factures (charges régulières) */
+
+/* Ligne « Le 5 » sous le nom d'une charge, avec badge de statut */
+.echeance { @apply inline-flex items-center gap-2; color: var(--muted); font-size: 13px; margin-top: 2px; }
+.echeance-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.echeance-badge.retard { color: var(--rouge); background: color-mix(in srgb, var(--rouge) 16%, transparent); }
+.echeance-badge.bientot { color: var(--orange); background: color-mix(in srgb, var(--orange) 16%, transparent); }
+
+/* Bannière de rappel en haut de la page Dépenses */
+.facture-alerte {
+   @apply flex items-center gap-2 font-semibold;
+   padding: 12px 14px;
+   border-radius: 12px;
+   margin-bottom: 12px;
+   font-size: 14px;
+}
+.facture-alerte.retard {
+   color: var(--rouge);
+   background: color-mix(in srgb, var(--rouge) 12%, transparent);
+   border: 1px solid color-mix(in srgb, var(--rouge) 30%, transparent);
+}
+.facture-alerte.bientot {
+   color: var(--orange);
+   background: color-mix(in srgb, var(--orange) 12%, transparent);
+   border: 1px solid color-mix(in srgb, var(--orange) 30%, transparent);
+}
