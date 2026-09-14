@@ -75,6 +75,16 @@ describe("enveloppes (E2/E3)", () => {
    })
 })
 
+describe("dettes", () => {
+   it("rembourser augmente le remboursé, plafonné au montant total", () => {
+      useBudget.setState({ dettes: [{ id: "x", nom: "Prêt", montantTotal: 1000, montantRembourse: 0 }] })
+      useBudget.getState().rembourserDette("x", 300)
+      expect(useBudget.getState().dettes[0].montantRembourse).toBe(300)
+      useBudget.getState().rembourserDette("x", 900)   // dépasserait 1000
+      expect(useBudget.getState().dettes[0].montantRembourse).toBe(1000)   // plafonné
+   })
+})
+
 describe("vœux — suppression", () => {
    it("supprimer un vœu le retire sans toucher au compte", () => {
       poser({ compte: 500, voeux: [{ id: "v1", nom: "Casque", montantTotal: 180, montantActuel: 150, estTermine: false }] })

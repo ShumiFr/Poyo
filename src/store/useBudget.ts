@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { CompteEpargne, Depense, Enveloppe, Flux, Frequence, MoisBudget, Revenu, TypeAction, Voeu } from "../types";
+import type { CompteEpargne, Depense, Dette, Enveloppe, Flux, Frequence, MoisBudget, Revenu, TypeAction, Voeu } from "../types";
 import { genererSemaines } from "../lib/courses";
 
 // Un mois vierge (pour un nouvel utilisateur ou un tout nouveau mois).
@@ -29,6 +29,7 @@ function donneesInitiales() {
       theme: "sombre" as const,
       historique: [] as Flux[],
       comptesEpargne: [] as CompteEpargne[],
+      dettes: [] as Dette[],
       codePin: undefined as string | undefined,
    };
 }
@@ -91,6 +92,7 @@ export interface BudgetStore {
    theme: 'sombre' | 'clair'
    historique: Flux[]
    comptesEpargne: CompteEpargne[]
+   dettes: Dette[]
    codePin?: string   // empreinte (hachée) du code de verrouillage, ou absent si désactivé
 
    //Réinitialisation (déconnexion)
@@ -150,6 +152,12 @@ export interface BudgetStore {
    ajouterCompteEpargne: (nom: string, montant: number) => void
    modifierCompteEpargne: (id: string, nom: string, montant: number) => void
    retirerCompteEpargne: (id: string) => void
+
+   //Dettes (informatif : suivi de remboursement, sans impact sur le compte)
+   ajouterDette: (nom: string, montantTotal: number) => void
+   rembourserDette: (id: string, montant: number) => void
+   modifierDette: (id: string, nom: string, montantTotal: number) => void
+   retirerDette: (id: string) => void
 
    //Verrou (code PIN)
    definirCodePin: (hash: string) => void
@@ -548,6 +556,29 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    retirerCompteEpargne: (id) =>
       set((state) => ({
          comptesEpargne: state.comptesEpargne.filter((c) => c.id !== id)
+      })),
+
+   ajouterDette: (nom, montantTotal) =>
+      set((state) => ({
+         dettes: [...state.dettes, { id: crypto.randomUUID(), nom, montantTotal, montantRembourse: 0 }]
+      })),
+
+   rembourserDette: (id, montant) =>
+      set((state) => ({
+         dettes: state.dettes.map((d) =>
+            // On ne rembourse jamais plus que le montant total.
+            d.id === id ? { ...d, montantRembourse: Math.min(d.montantTotal, d.montantRembourse + montant) } : d
+         )
+      })),
+
+   modifierDette: (id, nom, montantTotal) =>
+      set((state) => ({
+         dettes: state.dettes.map((d) => d.id === id ? { ...d, nom, montantTotal } : d)
+      })),
+
+   retirerDette: (id) =>
+      set((state) => ({
+         dettes: state.dettes.filter((d) => d.id !== id)
       })),
 
    definirCodePin: (hash) => set({ codePin: hash }),

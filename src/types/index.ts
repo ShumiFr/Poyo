@@ -48,6 +48,14 @@ export interface CompteEpargne {
    montant: number
 }
 
+// Dette à rembourser : informatif aussi (suivi de progression, sans impact sur le compte).
+export interface Dette {
+   id: string
+   nom: string
+   montantTotal: number       // montant dû au départ
+   montantRembourse: number   // déjà remboursé
+}
+
 export interface Previsionnel {
    id: string
    nom: string

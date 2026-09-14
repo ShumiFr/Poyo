@@ -1,0 +1,9 @@
+/* Barre de progression du remboursement d'une dette (teal = déjà remboursé) */
+.dette-barre {
+   @apply overflow-hidden;
+   background: color-mix(in srgb, var(--teal) 16%, transparent);
+   border-radius: 999px;
+   height: 8px;
+   margin: 10px 0 14px;
+}
+.dette-barre-remplie { background: var(--teal); height: 100%; border-radius: 999px; }

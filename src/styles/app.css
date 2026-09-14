@@ -116,6 +116,7 @@ button { font: inherit; cursor: pointer; color: inherit; }
 @import "./composants/historique.css";
 @import "./composants/tutoriel.css";
 @import "./composants/echeances.css";
+@import "./composants/dette.css";
 @import "./pages/accueil.css";
 @import "./pages/voeux.css";
 @import "./pages/auth.css";
