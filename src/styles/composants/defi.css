@@ -1,0 +1,46 @@
+/* Défis d'épargne : barre de progression + grille de cases à cocher */
+.defi-barre {
+   @apply overflow-hidden;
+   background: color-mix(in srgb, var(--accent) 16%, transparent);
+   border-radius: 999px;
+   height: 8px;
+   margin: 10px 0 8px;
+}
+.defi-barre-remplie { background: var(--accent); height: 100%; border-radius: 999px; }
+
+.defi-meta { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+
+.defi-grille {
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+   gap: 6px;
+}
+.defi-case {
+   @apply inline-flex items-center justify-center font-bold;
+   aspect-ratio: 1;
+   border-radius: 8px;
+   border: 1px solid var(--ligne);
+   background: var(--carte-2);
+   color: var(--muted);
+   font-size: 12px;
+   cursor: pointer;
+}
+.defi-case.faite {
+   background: var(--accent);
+   color: var(--accent-contraste);
+   border-color: transparent;
+}
+
+/* Catalogue de défis (modale de choix) */
+.catalogue { @apply flex flex-col gap-2 m-0 p-0; list-style: none; }
+.catalogue-item {
+   @apply flex flex-col w-full text-left;
+   gap: 4px;
+   padding: 14px;
+   border-radius: 12px;
+   border: 1px solid var(--ligne);
+   background: var(--carte-2);
+   cursor: pointer;
+}
+.catalogue-nom { font-weight: 700; color: var(--encre); }
+.catalogue-desc { color: var(--muted); font-size: 13px; }

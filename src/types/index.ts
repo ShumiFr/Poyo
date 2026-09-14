@@ -56,6 +56,14 @@ export interface Dette {
    montantRembourse: number   // déjà remboursé
 }
 
+// Défi d'épargne : une grille de montants à cocher au fil de l'épargne (ludique, informatif).
+export interface Defi {
+   id: string
+   nom: string
+   cases: number[]      // les montants à épargner, une case chacun
+   faites: boolean[]    // cases déjà cochées (même longueur que `cases`)
+}
+
 export interface Previsionnel {
    id: string
    nom: string

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { CompteEpargne, Depense, Dette, Enveloppe, Flux, Frequence, MoisBudget, Revenu, TypeAction, Voeu } from "../types";
+import type { CompteEpargne, Defi, Depense, Dette, Enveloppe, Flux, Frequence, MoisBudget, Revenu, TypeAction, Voeu } from "../types";
 import { genererSemaines } from "../lib/courses";
 
 // Un mois vierge (pour un nouvel utilisateur ou un tout nouveau mois).
@@ -30,6 +30,7 @@ function donneesInitiales() {
       historique: [] as Flux[],
       comptesEpargne: [] as CompteEpargne[],
       dettes: [] as Dette[],
+      defis: [] as Defi[],
       codePin: undefined as string | undefined,
    };
 }
@@ -93,6 +94,7 @@ export interface BudgetStore {
    historique: Flux[]
    comptesEpargne: CompteEpargne[]
    dettes: Dette[]
+   defis: Defi[]
    codePin?: string   // empreinte (hachée) du code de verrouillage, ou absent si désactivé
 
    //Réinitialisation (déconnexion)
@@ -158,6 +160,11 @@ export interface BudgetStore {
    rembourserDette: (id: string, montant: number) => void
    modifierDette: (id: string, nom: string, montantTotal: number) => void
    retirerDette: (id: string) => void
+
+   //Défis d'épargne (informatif : grille de cases à cocher)
+   ajouterDefi: (nom: string, cases: number[]) => void
+   basculerCaseDefi: (id: string, index: number) => void
+   retirerDefi: (id: string) => void
 
    //Verrou (code PIN)
    definirCodePin: (hash: string) => void
@@ -579,6 +586,23 @@ export const useBudget = create<BudgetStore>()((set, get) => ({
    retirerDette: (id) =>
       set((state) => ({
          dettes: state.dettes.filter((d) => d.id !== id)
+      })),
+
+   ajouterDefi: (nom, cases) =>
+      set((state) => ({
+         defis: [...state.defis, { id: crypto.randomUUID(), nom, cases, faites: cases.map(() => false) }]
+      })),
+
+   basculerCaseDefi: (id, index) =>
+      set((state) => ({
+         defis: state.defis.map((d) =>
+            d.id === id ? { ...d, faites: d.faites.map((f, i) => i === index ? !f : f) } : d
+         )
+      })),
+
+   retirerDefi: (id) =>
+      set((state) => ({
+         defis: state.defis.filter((d) => d.id !== id)
       })),
 
    definirCodePin: (hash) => set({ codePin: hash }),
