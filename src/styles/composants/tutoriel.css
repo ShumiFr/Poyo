@@ -1,0 +1,48 @@
+/* Tutoriel de bienvenue (carrousel plein écran) */
+.tuto-overlay {
+   @apply fixed inset-0 flex items-center justify-center;
+   background: var(--overlay);
+   z-index: 50;
+   padding: 20px;
+}
+.tuto-sheet {
+   @apply relative;
+   width: 430px;
+   max-width: 100%;
+   background: var(--carte);
+   border-radius: 20px;
+   padding: 30px 24px 22px;
+   text-align: center;
+   box-shadow: var(--shadow);
+   animation: sheet-up .22s ease-out;
+}
+.tuto-passer {
+   @apply absolute;
+   top: 14px; right: 16px;
+   background: none; border: none;
+   color: var(--muted); font-size: 14px; font-weight: 600;
+   cursor: pointer;
+}
+.tuto-illus {
+   @apply flex items-center justify-center;
+   width: 96px; height: 96px;
+   border-radius: 999px;
+   margin: 6px auto 20px;
+}
+.tuto-sheet h2 { font-size: 22px; margin-bottom: 10px; }
+.tuto-texte {
+   color: var(--muted);
+   font-size: 15px;
+   line-height: 1.5;
+   min-height: 66px;   /* limite les sauts de hauteur entre étapes */
+}
+.tuto-points { @apply flex items-center justify-center gap-2; margin: 22px 0 20px; }
+.tuto-point {
+   width: 8px; height: 8px;
+   border-radius: 999px;
+   background: var(--ligne);
+   transition: width .2s, background .2s;
+}
+.tuto-point.actif { width: 22px; background: var(--accent); }
+.tuto-actions { @apply flex gap-2; }
+.tuto-actions .btn { @apply flex-1; }

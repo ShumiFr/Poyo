@@ -7,7 +7,9 @@ import { useSyncBudget } from "../lib/useSyncBudget";
 import { AuthScreen } from "../components/AuthScreen";
 import EcranVerrou from "../components/EcranVerrou";
 import Calendrier from "../components/Calendrier";
+import Tutoriel from "../components/Tutoriel";
 import { Modal } from "../components/Modal";
+import { useUI, tutorielDejaVu } from "../store/useUI";
 import { libelleMois } from "../lib/format";
 
 export const Route = createRootRoute({
@@ -34,6 +36,10 @@ function RootComponent() {
    const chargement = useAuth((state) => state.chargement);
    const codePin = useBudget((state) => state.codePin);
 
+   const tutorielOuvert = useUI((state) => state.tutorielOuvert);
+   const ouvrirTutoriel = useUI((state) => state.ouvrirTutoriel);
+   const [tutoPropose, setTutoPropose] = useState(false);
+
    // Charge/sauvegarde le budget depuis Supabase selon la session connectée.
    const budgetPret = useSyncBudget(session);
 
@@ -59,6 +65,15 @@ function RootComponent() {
    useEffect(() => {
       document.documentElement.classList.toggle("dark", theme === "sombre");
    }, [theme]);
+
+   // Première ouverture de l'app (connectée + déverrouillée) : on propose le tutoriel.
+   useEffect(() => {
+      const appPrete = !!session && budgetPret && (!codePin || deverrouille);
+      if (appPrete && !tutoPropose && !tutorielDejaVu()) {
+         setTutoPropose(true);
+         ouvrirTutoriel();
+      }
+   }, [session, budgetPret, codePin, deverrouille, tutoPropose, ouvrirTutoriel]);
 
    const [confirme, setConfirme] = useState(false);
    const [solde, setSolde] = useState("");
@@ -125,6 +140,8 @@ function RootComponent() {
 
    return (
       <>
+         {tutorielOuvert && <Tutoriel />}
+
          <header className="app-header">
             <div>
                <div className="titre">{session.user.user_metadata?.nom || "Mon Budget"}</div>

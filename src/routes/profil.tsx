@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Sun, Moon, ShieldCheck, LogOut } from 'lucide-react'
+import { Sun, Moon, ShieldCheck, LogOut, GraduationCap } from 'lucide-react'
 import { useBudget } from '../store/useBudget'
 import { useAuth } from '../store/useAuth'
+import { useUI } from '../store/useUI'
 import SecuriteModal from '../components/SecuriteModal'
 
 export const Route = createFileRoute('/profil')({
@@ -15,6 +16,7 @@ function RouteComponent() {
    const codePin = useBudget((s) => s.codePin)
    const session = useAuth((s) => s.session)
    const deconnexion = useAuth((s) => s.deconnexion)
+   const ouvrirTutoriel = useUI((s) => s.ouvrirTutoriel)
 
    const [securiteOuvert, setSecuriteOuvert] = useState(false)
 
@@ -41,6 +43,13 @@ function RouteComponent() {
             <span>Code de verrouillage · {codePin ? "activé" : "désactivé"}</span>
             <button className="btn profil-btn" onClick={() => setSecuriteOuvert(true)}>
                <ShieldCheck size={16} /> {codePin ? "Gérer" : "Activer"}
+            </button>
+         </div>
+
+         <div className="card profil-ligne">
+            <span>Tutoriel de bienvenue</span>
+            <button className="btn profil-btn" onClick={ouvrirTutoriel}>
+               <GraduationCap size={16} /> Revoir
             </button>
          </div>
 
