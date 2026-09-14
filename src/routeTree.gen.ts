@@ -16,6 +16,7 @@ import { Route as EnveloppesRouteImport } from './routes/enveloppes'
 import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as RevenusRouteImport } from './routes/revenus'
 import { Route as SouhaitsRouteImport } from './routes/souhaits'
+import { Route as StatsRouteImport } from './routes/stats'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const SouhaitsRoute = SouhaitsRouteImport.update({
   path: '/souhaits',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StatsRoute = StatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/profil': typeof ProfilRoute
   '/revenus': typeof RevenusRoute
   '/souhaits': typeof SouhaitsRoute
+  '/stats': typeof StatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/profil': typeof ProfilRoute
   '/revenus': typeof RevenusRoute
   '/souhaits': typeof SouhaitsRoute
+  '/stats': typeof StatsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/profil': typeof ProfilRoute
   '/revenus': typeof RevenusRoute
   '/souhaits': typeof SouhaitsRoute
+  '/stats': typeof StatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/profil'
     | '/revenus'
     | '/souhaits'
+    | '/stats'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/profil'
     | '/revenus'
     | '/souhaits'
+    | '/stats'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/profil'
     | '/revenus'
     | '/souhaits'
+    | '/stats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   ProfilRoute: typeof ProfilRoute
   RevenusRoute: typeof RevenusRoute
   SouhaitsRoute: typeof SouhaitsRoute
+  StatsRoute: typeof StatsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SouhaitsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stats': {
+      id: '/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof StatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfilRoute: ProfilRoute,
   RevenusRoute: RevenusRoute,
   SouhaitsRoute: SouhaitsRoute,
+  StatsRoute: StatsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

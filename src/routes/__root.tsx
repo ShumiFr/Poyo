@@ -1,6 +1,6 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { Clock, ArrowDown, FileText, Mail, Flag, PiggyBank, User } from "lucide-react";
+import { Clock, ArrowDown, FileText, Mail, Flag, PiggyBank, User, BarChart3 } from "lucide-react";
 import { useBudget } from "../store/useBudget";
 import { useAuth } from "../store/useAuth";
 import { useSyncBudget } from "../lib/useSyncBudget";
@@ -16,6 +16,7 @@ export const Route = createRootRoute({
 
 const onglets = [
    { to: "/", label: "Accueil", Icone: Clock, exact: true, cle: "accueil" },
+   { to: "/stats", label: "Stats", Icone: BarChart3, cle: "stats" },
    { to: "/revenus", label: "Rentrées", Icone: ArrowDown, cle: "revenus" },
    { to: "/depenses", label: "Dépenses", Icone: FileText, cle: "depenses" },
    { to: "/enveloppes", label: "Enveloppes", Icone: Mail, cle: "enveloppes" },

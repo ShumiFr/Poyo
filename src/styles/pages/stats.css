@@ -1,0 +1,34 @@
+/* Page Statistiques */
+
+/* Tuiles de chiffres clés */
+.stats-kpis { @apply grid gap-2; grid-template-columns: repeat(3, 1fr); margin-bottom: 4px; }
+.kpi {
+   background: var(--carte);
+   border: 1px solid var(--ligne);
+   border-radius: 14px;
+   padding: 14px 10px;
+   text-align: center;
+   box-shadow: var(--shadow);
+}
+.kpi-valeur { font-size: 18px; font-weight: 800; line-height: 1.1; }
+.kpi-label { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+/* Légende au-dessus d'un graphique */
+.graph-legende { @apply flex items-center gap-4; margin: 4px 0 12px; }
+.graph-legende span { @apply inline-flex items-center gap-1.5; color: var(--muted); font-size: 12px; }
+.graph-legende .pastille { width: 10px; height: 10px; border-radius: 3px; }
+
+/* Conteneur d'un graphique : défile horizontalement si trop large */
+.graph-scroll { @apply overflow-x-auto; margin-top: 8px; }
+
+/* Répartition des dépenses (barres horizontales) */
+.repartition { @apply flex flex-col gap-3; margin-top: 8px; }
+.repartition-tete { @apply flex items-center justify-between; font-size: 14px; margin-bottom: 4px; }
+.repartition-montant { font-weight: 700; }
+.repartition-piste {
+   height: 10px;
+   border-radius: 999px;
+   background: color-mix(in srgb, var(--encre) 8%, transparent);
+   overflow: hidden;
+}
+.repartition-barre { height: 100%; border-radius: 999px; }

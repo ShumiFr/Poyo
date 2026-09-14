@@ -113,6 +113,7 @@
    /* couleur de l'onglet actif : celle de la page (neutre par défaut) */
    --nav-actif: var(--encre);
 }
+.bottom-nav a.nav-stats { --nav-actif: var(--cat-gold); }
 .bottom-nav a.nav-revenus { --nav-actif: var(--vert); }
 .bottom-nav a.nav-depenses { --nav-actif: var(--rouge); }
 .bottom-nav a.nav-enveloppes { --nav-actif: var(--teal); }

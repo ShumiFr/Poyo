@@ -118,5 +118,6 @@ button { font: inherit; cursor: pointer; color: inherit; }
 @import "./pages/voeux.css";
 @import "./pages/auth.css";
 @import "./pages/profil.css";
+@import "./pages/stats.css";
 /* les couleurs de catégorie en dernier : elles priment sur .btn, .montant… */
 @import "./composants/categories.css";
